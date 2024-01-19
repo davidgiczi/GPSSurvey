@@ -1,11 +1,8 @@
 <resources>
     <string name="app_name">GPSurvey</string>
     <string name="start_measure_option">Mérés indítása</string>
-    <string name="calc_distance_option">Távolság számítása</string>
-    <string name="calc_area_option">Terület számítása</string>
-    <string name="save_point_data_option">Pontok fájlba mentése</string>
-    <string name="save_line_data_option">Vonal fájlba mentése</string>
-    <string name="save_area_data_option">Terület fájlba mentése</string>
+    <string name="calc_option">Távolság/terület számítása</string>
+    <string name="save_data_option">Adatok fájlba mentése</string>
     <string name="exit_option">Kilépés</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

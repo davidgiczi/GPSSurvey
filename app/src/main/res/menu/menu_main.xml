@@ -14,27 +14,12 @@
         <item
             android:id="@+id/line_calc_option"
             android:orderInCategory="100"
-            android:title="@string/calc_distance_option"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/area_calc_option"
-            android:orderInCategory="100"
-            android:title="@string/calc_area_option"
+            android:title="@string/calc_option"
             app:showAsAction="never" />
         <item
             android:id="@+id/save_point_option"
             android:orderInCategory="100"
-            android:title="@string/save_point_data_option"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/save_line_option"
-            android:orderInCategory="100"
-            android:title="@string/save_line_data_option"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/save_area_option"
-            android:orderInCategory="100"
-            android:title="@string/save_area_data_option"
+            android:title="@string/save_data_option"
             app:showAsAction="never" />
 
     </group>
