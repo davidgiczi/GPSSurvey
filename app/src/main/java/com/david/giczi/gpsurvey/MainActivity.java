@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             startMeasureDialog();
         }
         else if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null  ){
-            Toast.makeText(this, "A mérés elindítva, folyamatban van.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "A mérés elindítva.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -96,8 +96,9 @@ public class MainActivity extends AppCompatActivity {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                Toast.makeText(MainActivity.this, "Longitude: " + location.getLongitude() + "\n" +
-                        "Latitude: " + location.getLatitude(), Toast.LENGTH_SHORT).show();
+                    binding.latitudeData.setText(String.valueOf(location.getLatitude()));
+                    binding.longitudeData.setText(String.valueOf(location.getLongitude()));
+                    binding.altitudeData.setText(String.valueOf(location.getAltitude()));
             }
 
             @Override

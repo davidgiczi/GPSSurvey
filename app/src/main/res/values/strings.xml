@@ -1,12 +1,17 @@
 <resources>
     <string name="app_name">GPSurvey</string>
     <string name="start_measure_option">Mérés indítása</string>
+    <string name="point_format_option">Pont kijelzés formátuma</string>
+    <string name="decimal_format_option">Decimális formátum</string>
+    <string name="angle_min_sec_format_option">Fok - perc - mperc</string>
+    <string name="xyz_format_option">X, Y, Z</string>
     <string name="calc_option">Távolság/terület számítása</string>
     <string name="save_data_option">Adatok fájlba mentése</string>
+    <string name="point_catching_option">Pont kitűzése</string>
     <string name="exit_option">Kilépés</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
+    <string name="latitude">Φ:</string>
+    <string name="longitude">Λ:</string>
+    <string name="altitude">h:</string>
     <string name="save_point">Pont mérése</string>
 </resources>
