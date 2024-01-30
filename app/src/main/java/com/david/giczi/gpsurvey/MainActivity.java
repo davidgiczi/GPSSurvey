@@ -73,12 +73,13 @@ public class MainActivity extends AppCompatActivity {
         }
         else if( id == R.id.start_measure_option ){
 
-            if( locationListener == null ){
-                startMeasure();
-            }
-            else{
+         if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null){
                 Toast.makeText(this, "A mérés elindítva.", Toast.LENGTH_SHORT).show();
             }
+         else {
+             startMeasure();
+         }
+
             if(  GO_MEAS_FRAGMENT ) {
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_StartFragment_to_MeasFragment);
