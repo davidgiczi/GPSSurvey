@@ -41,6 +41,12 @@
             app:showAsAction="never" />
 
         <item
+            android:id="@+id/set_point_option"
+            android:orderInCategory="100"
+            android:title="@string/set_point_option"
+            app:showAsAction="never" />
+
+        <item
             android:id="@+id/catching_option"
             android:orderInCategory="100"
             android:title="@string/point_catching_option"

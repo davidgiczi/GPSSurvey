@@ -6,6 +6,7 @@
     <string name="angle_min_sec_format_option">Fok - perc - mperc</string>
     <string name="xyz_format_option">X, Y, Z</string>
     <string name="calc_option">Távolság/terület számítása</string>
+    <string name="set_point_option">Pont bevitele</string>
     <string name="save_data_option">Adatok fájlba mentése</string>
     <string name="point_catching_option">Pont kitűzése</string>
     <string name="exit_option">Kilépés</string>
