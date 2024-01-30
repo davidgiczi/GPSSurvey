@@ -23,6 +23,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
+import com.david.giczi.gpsurvey.utils.WGS84;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -35,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private static final int REQUEST_LOCATION = 1;
     public static boolean GO_MEAS_FRAGMENT;
+    private boolean decimalFormat = true;
+    private boolean angleMinSecFormat;
+    private boolean xyzFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +90,21 @@ public class MainActivity extends AppCompatActivity {
                         .navigate(R.id.action_StartFragment_to_MeasFragment);
             }
         }
+        else if( id == R.id.decimal_format ){
+            decimalFormat = true;
+            angleMinSecFormat = false;
+            xyzFormat = false;
+        }
+        else if( id == R.id.xyz_format ){
+            xyzFormat = true;
+            decimalFormat = false;
+            angleMinSecFormat = false;
+        }
+        else if( id == R.id.angle_min_sec_format ){
+            angleMinSecFormat = true;
+            decimalFormat = false;
+            xyzFormat = false;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -95,14 +115,53 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+    private String setAngleMinSecFormat(double data){
+
+        int angle = (int) data;
+        int min = (int) ((data - angle) * 60);
+        double sec = ((data - angle) * 3600 - min * 60);
+        return angle + "° " + min + "' " + sec + "\"";
+    }
+
     private void startMeasure(){
 
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                    binding.latitudeData.setText(String.valueOf(location.getLatitude()));
-                    binding.longitudeData.setText(String.valueOf(location.getLongitude()));
-                    binding.altitudeData.setText(String.valueOf(location.getAltitude()));
+                if( angleMinSecFormat ){
+                    binding.latitudeText.setText(R.string.latitude);
+                    binding.longitudeText.setText(R.string.longitude);
+                    binding.altitudeText.setText(R.string.altitude);
+                    binding.latitudeData.setText(setAngleMinSecFormat(location.getLatitude()));
+                    binding.longitudeData.setText(setAngleMinSecFormat(location.getLongitude()));
+                    String altitude = String.valueOf(location.getAltitude()) + "m";
+                    binding.altitudeData.setText(altitude);
+                }
+                else if( decimalFormat ){
+                    binding.latitudeText.setText(R.string.latitude);
+                    binding.longitudeText.setText(R.string.longitude);
+                    binding.altitudeText.setText(R.string.altitude);
+                    String latitude = String.valueOf(location.getLatitude()) + "°";
+                    String longitude = String.valueOf(location.getLongitude()) + "°";
+                    binding.latitudeData.setText(latitude);
+                    binding.longitudeData.setText(longitude);
+                    String altitude = String.valueOf(location.getAltitude()) + "m";
+                    binding.altitudeData.setText(altitude);
+                }
+                else if( xyzFormat ){
+                    binding.latitudeText.setText(R.string.X);
+                    binding.longitudeText.setText(R.string.Y);
+                    binding.altitudeText.setText(R.string.Z);
+                    binding.latitudeData.setText(WGS84.getX(location.getLatitude(),
+                                                            location.getLongitude(),
+                                                            location.getAltitude()));
+                    binding.longitudeData.setText(WGS84.getY(location.getLatitude(),
+                            location.getLongitude(),
+                            location.getAltitude()));
+                    binding.altitudeData.setText(WGS84.getZ(location.getLatitude(),
+                            location.getLongitude(),
+                            location.getAltitude()));
+                }
             }
 
             @Override

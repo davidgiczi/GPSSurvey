@@ -14,5 +14,8 @@
     <string name="latitude">Φ:</string>
     <string name="longitude">Λ:</string>
     <string name="altitude">h:</string>
+    <string name="X">X:</string>
+    <string name="Y">Y:</string>
+    <string name="Z">Z:</string>
     <string name="save_point">Pont mérése</string>
 </resources>
