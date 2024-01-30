@@ -7,23 +7,21 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
-import com.david.giczi.gpsurvey.databinding.FragmentSecondBinding;
+import com.david.giczi.gpsurvey.databinding.FragmentMeasBinding;
 
-public class SecondFragment extends Fragment {
+public class MeasFragment extends Fragment {
 
-    private FragmentSecondBinding binding;
+    private FragmentMeasBinding binding;
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
-        binding = FragmentSecondBinding.inflate(inflater, container, false);
+        binding = FragmentMeasBinding.inflate(inflater, container, false);
+        MainActivity.GO_MEAS_FRAGMENT = false;
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {

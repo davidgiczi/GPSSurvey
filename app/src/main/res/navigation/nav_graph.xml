@@ -8,19 +8,16 @@
     <fragment
         android:id="@+id/StartFragment"
         android:name="com.david.giczi.gpsurvey.StartFragment"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/fragment_start">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_StartFragment_to_MeasFragment"
+            app:destination="@id/MeasFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.david.giczi.gpsurvey.SecondFragment"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/MeasFragment"
+        android:name="com.david.giczi.gpsurvey.MeasFragment"
+        tools:layout="@layout/fragment_meas">
 
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/StartFragment" />
     </fragment>
 </navigation>

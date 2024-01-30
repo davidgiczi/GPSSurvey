@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private static final int REQUEST_LOCATION = 1;
+    public static boolean GO_MEAS_FRAGMENT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.toolbar);
-
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -72,13 +72,16 @@ public class MainActivity extends AppCompatActivity {
             exitDialog();
         }
         else if( id == R.id.start_measure_option ){
+
             if( locationListener == null ){
                 startMeasure();
-                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
             else{
-                Toast.makeText(this, "A mérés elindítva, folyamatban van.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "A mérés elindítva.", Toast.LENGTH_SHORT).show();
+            }
+            if(  GO_MEAS_FRAGMENT ) {
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_StartFragment_to_MeasFragment);
             }
         }
 
@@ -136,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 startMeasure();
                 Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
+                        .navigate(R.id.action_StartFragment_to_MeasFragment);
             }
         });
 

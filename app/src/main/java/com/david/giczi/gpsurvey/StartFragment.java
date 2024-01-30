@@ -8,21 +8,22 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.david.giczi.gpsurvey.databinding.FragmentFirstBinding;
+import com.david.giczi.gpsurvey.databinding.FragmentStartBinding;
+
 
 public class StartFragment extends Fragment {
 
-    private FragmentFirstBinding binding;
+    private FragmentStartBinding binding;
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-      binding = FragmentFirstBinding.inflate(inflater, container, false);
+      binding = FragmentStartBinding.inflate(inflater, container, false);
       binding.startPage.setBackground(((MainActivity) getActivity()).getDrawable(R.drawable.background_satellite));
+      MainActivity.GO_MEAS_FRAGMENT = true;
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
