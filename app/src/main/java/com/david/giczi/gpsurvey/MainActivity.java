@@ -2,7 +2,6 @@ package com.david.giczi.gpsurvey;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -17,9 +16,7 @@ import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuCompat;
 import androidx.navigation.NavController;
-import androidx.navigation.NavHostController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
@@ -28,6 +25,8 @@ import com.david.giczi.gpsurvey.utils.WGS84;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         int angle = (int) data;
         int min = (int) ((data - angle) * 60);
         double sec = ((data - angle) * 3600 - min * 60);
-        return angle + "° " + min + "' " + sec + "\"";
+        return angle + "° " + (9 < min ? min : "0" + min) + "' " + (9 < sec ? sec : "0" + sec) + "\"";
     }
 
     private void startMeasure(){
@@ -134,18 +133,18 @@ public class MainActivity extends AppCompatActivity {
                     binding.altitudeText.setText(R.string.altitude);
                     binding.latitudeData.setText(setAngleMinSecFormat(location.getLatitude()));
                     binding.longitudeData.setText(setAngleMinSecFormat(location.getLongitude()));
-                    String altitude = String.valueOf(location.getAltitude()) + "m";
+                    String altitude = location.getAltitude() + "m";
                     binding.altitudeData.setText(altitude);
                 }
                 else if( decimalFormat ){
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
                     binding.altitudeText.setText(R.string.altitude);
-                    String latitude = String.valueOf(location.getLatitude()) + "°";
-                    String longitude = String.valueOf(location.getLongitude()) + "°";
+                    String latitude = location.getLatitude() + "°";
+                    String longitude = location.getLongitude() + "°";
                     binding.latitudeData.setText(latitude);
                     binding.longitudeData.setText(longitude);
-                    String altitude = String.valueOf(location.getAltitude()) + "m";
+                    String altitude = location.getAltitude() + "m";
                     binding.altitudeData.setText(altitude);
                 }
                 else if( xyzFormat ){
@@ -194,22 +193,13 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Mérés indítása");
         builder.setMessage("Indítja a mérést?");
 
-        builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-                startMeasure();
-                Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main)
-                        .navigate(R.id.action_StartFragment_to_MeasFragment);
-            }
+        builder.setPositiveButton("Igen", (dialog, which) -> {
+            startMeasure();
+            Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main)
+                    .navigate(R.id.action_StartFragment_to_MeasFragment);
         });
 
-        builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Nem", (dialog, which) -> dialog.dismiss());
 
         AlertDialog alert = builder.create();
         alert.show();
@@ -221,21 +211,12 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Alkalmazás bezárása");
         builder.setMessage("Biztos, hogy ki akarsz lépni az alkalmazásból?\n\nA nem mentett adatok elvesznek.");
 
-        builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                System.exit(0);
-            }
+        builder.setPositiveButton("Igen", (dialog, which) -> {
+            dialog.dismiss();
+            System.exit(0);
         });
 
-        builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Nem", (dialog, which) -> dialog.dismiss());
 
         AlertDialog alert = builder.create();
         alert.show();
