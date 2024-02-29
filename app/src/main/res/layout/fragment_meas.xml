@@ -7,6 +7,7 @@
     tools:context=".MeasFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/measlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp">
@@ -16,13 +17,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save_point"
-            app:layout_constraintBottom_toTopOf="@id/textview_second"
+            app:layout_constraintBottom_toTopOf="@id/eov_data"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textview_second"
+            android:id="@+id/eov_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

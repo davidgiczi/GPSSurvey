@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
+import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
 import android.view.Menu;
@@ -39,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
+    public static String X_WGS;
+    public static String Y_WGS;
+    public static String Z_WGS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +165,24 @@ public class MainActivity extends AppCompatActivity {
                             location.getLongitude(),
                             location.getAltitude()));
                 }
+                double X_WGS = Double.parseDouble(WGS84.getX(location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude()).substring(0, WGS84.getX(location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude()).indexOf("m")));
+                double Y_WGS = Double.parseDouble(WGS84.getY(location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude()).substring(0, WGS84.getY(location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude()).indexOf("m")));
+                double Z_WGS = Double.parseDouble(WGS84.getZ(location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude()).substring(0, WGS84.getZ(location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude()).indexOf("m")));
+                EOV eov = new EOV(X_WGS, Y_WGS, Z_WGS);
+                binding.eovText.setText(R.string.eov);
+                binding.eovData.setText(eov.toString());
             }
 
             @Override

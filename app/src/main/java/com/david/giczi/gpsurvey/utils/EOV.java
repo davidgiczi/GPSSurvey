@@ -22,15 +22,15 @@ public class EOV {
     private static final double eX = Math.toRadians(- 0.302264 / 3600.0);
     private static final double eY =  Math.toRadians(- 0.161038 / 3600.0);
     private static final double eZ =  Math.toRadians(- 0.292622 / 3600.0);
-    private final double[][] Rx =
+    private static final double[][] Rx =
             {{1.0, 0.0, 0.0},
             {0.0, Math.cos(eX), Math.sin(eX)},
             {0.0, - Math.sin(eX), Math.cos(eX)}};
-    private final double[][] Ry =
+    private static final double[][] Ry =
             {{Math.cos(eY), 0.0, - Math.sin(eY)},
             {0.0, 1.0, 0.0},
             {Math.sin(eY), 0.0, Math.cos(eY)}};
-    private final double[][] Rz =
+    private static final double[][] Rz =
             {{Math.cos(eZ), Math.sin(eZ), 0.0},
             {- Math.sin(eZ), Math.cos(eZ), 0.0},
             {0.0, 0.0, 1.0}};
@@ -44,7 +44,7 @@ public class EOV {
         this.wgsY = wgsY;
         this.wgsZ = wgsZ;
     }
-    public List<Double> getCoordinatesForEOV(){
+    private List<Double> getCoordinatesForEOV(){
 
         List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();
         double sphereFi = 2 * Math.toDegrees(Math.atan(
@@ -65,8 +65,8 @@ public class EOV {
         double x = R * m0 * Math.log(Math.tan(Math.toRadians(45 + fi_ / 2))) + 200000;
         double y =  R * m0 * Math.toRadians(lambda_) + 650000;
 
-        return Arrays.asList((int) (1000 *  y) / 1000.0, (int) (1000 * x) / 1000.0,
-                (int) (1000 * geoIUGG67.get(2)) / 1000.0);
+        return Arrays.asList((int) (100 *  y) / 100.0, (int) (100 * x) / 100.0,
+                (int) (100 * geoIUGG67.get(2)) / 100.0);
     }
 
     private List<Double> getGeographicalCoordinatesForIUGG67(){
@@ -114,5 +114,11 @@ public class EOV {
     double z = deltaZ + kRxRyRz_20 * wgsX + kRxRyRz_21 * wgsY + kRxRyRz_22 * wgsZ;
 
     return Arrays.asList(x, y, z);
+    }
+
+    @Override
+    public String toString() {
+        List<Double> eovData = getCoordinatesForEOV();
+        return  eovData.get(0) + "m\t" + eovData.get(1) + "m\t" + eovData.get(2) + "m";
     }
 }
