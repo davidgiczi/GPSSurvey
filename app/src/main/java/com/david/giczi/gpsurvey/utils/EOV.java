@@ -9,10 +9,10 @@ public class EOV {
     private static final double b = 6356774.516;
     private static final double R = 6379743.001;
     private static final double m0 = 0.99993;
-    private static final double Fi_0 = 47.0 + 6.0 / 60.0;
+    private static final double fi_0 = 47.0 + 6.0 / 60.0;
     private static final double n = 1.000719704936;
     private static final double k_EOV = 1.003110007693;
-    private static final double Lambda_0 = 19.0 + 2.0 / 60.0 + 54.8584 / 3600.0;
+    private static final double lambda_0 = 19.0 + 2.0 / 60.0 + 54.8584 / 3600.0;
     private static final double e = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(a, 2));
     private static final double e_ = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(b, 2));
     private static final double deltaX = - 54.595;
@@ -22,29 +22,29 @@ public class EOV {
     private static final double eX = Math.toRadians(- 0.302264 / 3600.0);
     private static final double eY =  Math.toRadians(- 0.161038 / 3600.0);
     private static final double eZ =  Math.toRadians(- 0.292622 / 3600.0);
-    private double[][] Rx =
+    private final double[][] Rx =
             {{1.0, 0.0, 0.0},
             {0.0, Math.cos(eX), Math.sin(eX)},
             {0.0, - Math.sin(eX), Math.cos(eX)}};
-    private double[][] Ry =
+    private final double[][] Ry =
             {{Math.cos(eY), 0.0, - Math.sin(eY)},
             {0.0, 1.0, 0.0},
             {Math.sin(eY), 0.0, Math.cos(eY)}};
-    private double[][] Rz =
+    private final double[][] Rz =
             {{Math.cos(eZ), Math.sin(eZ), 0.0},
             {- Math.sin(eZ), Math.cos(eZ), 0.0},
             {0.0, 0.0, 1.0}};
 
-    private double wgsX;
-    private double wgsY;
-    private double wgsZ;
+    private final double wgsX;
+    private final double wgsY;
+    private final double wgsZ;
 
     public EOV(double wgsX, double wgsY, double wgsZ) {
         this.wgsX = wgsX;
         this.wgsY = wgsY;
         this.wgsZ = wgsZ;
     }
-    public double getCoordinatesForEOV(){
+    public List<Double> getCoordinatesForEOV(){
 
         List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();
         double sphereFi = 2 * Math.toDegrees(Math.atan(
@@ -52,9 +52,21 @@ public class EOV {
        Math.pow( (1 - e * Math.sin(Math.toRadians(geoIUGG67.get(0)))) /
                 (1 + e * Math.sin(Math.toRadians(geoIUGG67.get(0)))), n * e / 2.0)
         )) - 90;
-        double sphereLambda = n * (geoIUGG67.get(1) - Lambda_0);
+        double sphereLambda = n * (geoIUGG67.get(1) - lambda_0);
+        double fi_ = Math.toDegrees( Math.asin(
+                Math.sin(Math.toRadians(sphereFi)) * Math.cos(Math.toRadians(fi_0)) -
+                Math.cos(Math.toRadians(sphereFi)) * Math.sin(Math.toRadians(fi_0)) *
+                        Math.cos(Math.toRadians(sphereLambda)) ));
+        double lambda_ = Math.toDegrees(
+                Math.asin(
+                        Math.cos(Math.toRadians(sphereFi))  * Math.sin(Math.toRadians(sphereLambda))
+                        / Math.cos(Math.toRadians(fi_))
+                ));
+        double x = R * m0 * Math.log(Math.tan(Math.toRadians(45 + fi_ / 2))) + 200000;
+        double y =  R * m0 * Math.toRadians(lambda_) + 650000;
 
-        return sphereLambda;
+        return Arrays.asList((int) (1000 *  y) / 1000.0, (int) (1000 * x) / 1000.0,
+                (int) (1000 * geoIUGG67.get(2)) / 1000.0);
     }
 
     private List<Double> getGeographicalCoordinatesForIUGG67(){
@@ -103,12 +115,4 @@ public class EOV {
 
     return Arrays.asList(x, y, z);
     }
-
-    public static void main(String[] args) {
-
-        EOV eov = new EOV(4081882.463, 1410011.144, 4678199.470);
-
-        System.out.println(eov.getCoordinatesForEOV());
-    }
-
 }
