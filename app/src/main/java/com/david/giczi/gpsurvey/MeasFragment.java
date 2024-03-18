@@ -2,6 +2,7 @@ package com.david.giczi.gpsurvey;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -42,9 +43,12 @@ public class MeasFragment extends Fragment {
         MeasFragment.MM = (float) (Math.sqrt(Math.pow(getResources().getDisplayMetrics().widthPixels, 2) +
                 Math.pow(getResources().getDisplayMetrics().heightPixels, 2)) / 140F);
         this.bitmap = Bitmap.createBitmap(getResources().getDisplayMetrics().widthPixels,
-                getResources().getDisplayMetrics().heightPixels, Bitmap.Config.ARGB_8888);
+                (int) (85 * MM), Bitmap.Config.ARGB_8888);
         this.canvas = new Canvas(bitmap);
         this.paint = new Paint();
+        paint.setAntiAlias(true);
+        canvas.drawColor(Color.WHITE);
+        binding.drawingMeasuredPoint.setImageBitmap(bitmap);
         return binding.getRoot();
     }
 
@@ -55,9 +59,16 @@ public class MeasFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 IS_SAVE_POINT = true;
+                //displayMeasuredPointData();
             }
         });
     }
+
+    private void displayMeasuredPointData(){
+        transformMeasPoints();
+
+    }
+
     private void transformMeasPoints(){
         transformedMeasPointStore = new ArrayList<>();
         double Y = MainActivity.MEAS_POINT_LIST.get(0).getY();

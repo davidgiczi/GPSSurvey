@@ -20,4 +20,5 @@
     <string name="save_point">Pont mentése</string>
     <string name="eov">EOV:</string>
     <string name="dot_symbol">🌏</string>
+    <string name="measured_data">MeasuredPoints</string>
 </resources>

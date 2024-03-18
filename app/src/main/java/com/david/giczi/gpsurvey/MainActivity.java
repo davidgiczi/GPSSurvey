@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             PRE_MEAS_POINT.clear();
             MeasFragment.IS_SAVE_POINT = false;
             Toast.makeText(this,
-                    MEAS_POINT_LIST.size() + ". pont mentve.", Toast.LENGTH_SHORT).show();
+                    MEAS_POINT_LIST.size() + ". pont mentve", Toast.LENGTH_SHORT).show();
         }
     }
 
