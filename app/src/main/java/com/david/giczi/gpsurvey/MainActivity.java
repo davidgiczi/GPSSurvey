@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
+import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
@@ -27,6 +28,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,12 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private static final int REQUEST_LOCATION = 1;
     public static boolean GO_MEAS_FRAGMENT;
+    public static List<MeasPoint> MEAS_POINT_LIST;
+    private static List<EOV> PRE_MEAS_POINT;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
-    public static String X_WGS;
-    public static String Y_WGS;
-    public static String Z_WGS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
                             location.getLongitude(),
                             location.getAltitude()));
                     binding.altitudeData.setText(WGS84.getZ(location.getLatitude(),
-                            location.getLongitude(),
                             location.getAltitude()));
                 }
                 double X_WGS = Double.parseDouble(WGS84.getX(location.getLatitude(),
@@ -176,13 +178,12 @@ public class MainActivity extends AppCompatActivity {
                         location.getLongitude(),
                         location.getAltitude()).indexOf("m")));
                 double Z_WGS = Double.parseDouble(WGS84.getZ(location.getLatitude(),
-                        location.getLongitude(),
                         location.getAltitude()).substring(0, WGS84.getZ(location.getLatitude(),
-                        location.getLongitude(),
                         location.getAltitude()).indexOf("m")));
                 EOV eov = new EOV(X_WGS, Y_WGS, Z_WGS);
                 binding.eovText.setText(R.string.eov);
                 binding.eovData.setText(eov.toString());
+                measurePoint(eov);
             }
 
             @Override
@@ -202,6 +203,37 @@ public class MainActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, 0, locationListener);
+        PRE_MEAS_POINT = new ArrayList<>();
+        MEAS_POINT_LIST = new ArrayList<>();
+    }
+
+    private void measurePoint(EOV eov){
+      if( !MeasFragment.IS_SAVE_POINT ){
+          return;
+      }
+      if( 3 >  PRE_MEAS_POINT.size()){
+            PRE_MEAS_POINT.add(eov);
+        }
+        else {
+            double summaY = 0.0;
+            double summaX = 0.0;
+            double summaZ = 0.0;
+          for (EOV eovData : PRE_MEAS_POINT) {
+              List<Double> pointData = eovData.getCoordinatesForEOV();
+              summaY += pointData.get(0);
+              summaX += pointData.get(1);
+              summaZ += pointData.get(2);
+          }
+          int pointID = MEAS_POINT_LIST.size() + 1;
+          MEAS_POINT_LIST.add(new MeasPoint(pointID,
+                  (int) (100 * summaY / 3.0) / 100.0,
+                  (int) (100 * summaX / 3.0) / 100.0,
+                  (int) (100 * summaZ / 3.0) / 100.0));
+            PRE_MEAS_POINT.clear();
+            MeasFragment.IS_SAVE_POINT = false;
+            Toast.makeText(this,
+                    MEAS_POINT_LIST.size() + ". pont mentve.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void requestPermissions(){

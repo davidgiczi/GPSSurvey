@@ -1,5 +1,7 @@
 package com.david.giczi.gpsurvey.utils;
 
+import androidx.annotation.NonNull;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +46,7 @@ public class EOV {
         this.wgsY = wgsY;
         this.wgsZ = wgsZ;
     }
-    private List<Double> getCoordinatesForEOV(){
+    public List<Double> getCoordinatesForEOV(){
 
         List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();
         double sphereFi = 2 * Math.toDegrees(Math.atan(
@@ -116,6 +118,7 @@ public class EOV {
     return Arrays.asList(x, y, z);
     }
 
+    @NonNull
     @Override
     public String toString() {
         List<Double> eovData = getCoordinatesForEOV();

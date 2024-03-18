@@ -22,7 +22,7 @@ public class WGS84 {
         return String.format( "%.3fm", Y);
     }
 
-    public static String getZ(double latitude, double longitude, double altitude){
+    public static String getZ(double latitude, double altitude){
         double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(Math.toRadians(latitude)), 2));
         double Z = ((1 - e2) * N + altitude) * Math.sin(Math.toRadians(latitude));
         return String.format( "%.3fm", Z);
