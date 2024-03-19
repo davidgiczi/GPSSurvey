@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -29,20 +33,22 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private SensorManager sensorManager;
+    private Sensor sensor;
     private static final int REQUEST_LOCATION = 1;
     public static boolean GO_MEAS_FRAGMENT;
     public static List<MeasPoint> MEAS_POINT_LIST;
-    private static List<EOV> PRE_MEAS_POINT;
+    public static List<EOV> PRE_MEAS_POINT_LIST;
+    public static float AZIMUTH;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -66,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         else if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null  ){
             Toast.makeText(this, "A mérés elindítva.", Toast.LENGTH_SHORT).show();
         }
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
     }
 
     @Override
@@ -201,38 +209,25 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions();
             return;
         }
+        sensorManager.registerListener(this, sensor,
+                SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, 0, locationListener);
-        PRE_MEAS_POINT = new ArrayList<>();
+        PRE_MEAS_POINT_LIST = new ArrayList<>();
         MEAS_POINT_LIST = new ArrayList<>();
     }
 
     private void measurePoint(EOV eov){
-      if( !MeasFragment.IS_SAVE_POINT ){
+      if( !MeasFragment.IS_SAVED_MEAS_POINT ){
           return;
       }
-      if( 3 >  PRE_MEAS_POINT.size()){
-            PRE_MEAS_POINT.add(eov);
+      if( 3 >  PRE_MEAS_POINT_LIST.size() ){
+            PRE_MEAS_POINT_LIST.add(eov);
         }
         else {
-            double summaY = 0.0;
-            double summaX = 0.0;
-            double summaZ = 0.0;
-          for (EOV eovData : PRE_MEAS_POINT) {
-              List<Double> pointData = eovData.getCoordinatesForEOV();
-              summaY += pointData.get(0);
-              summaX += pointData.get(1);
-              summaZ += pointData.get(2);
-          }
-          int pointID = MEAS_POINT_LIST.size() + 1;
-          MEAS_POINT_LIST.add(new MeasPoint(pointID,
-                  (int) (100 * summaY / 3.0) / 100.0,
-                  (int) (100 * summaX / 3.0) / 100.0,
-                  (int) (100 * summaZ / 3.0) / 100.0));
-            PRE_MEAS_POINT.clear();
-            MeasFragment.IS_SAVE_POINT = false;
-            Toast.makeText(this,
-                    MEAS_POINT_LIST.size() + ". pont mentve", Toast.LENGTH_SHORT).show();
+         MEAS_POINT_LIST.add(new MeasPoint(MEAS_POINT_LIST.size() + 1, PRE_MEAS_POINT_LIST));
+         PRE_MEAS_POINT_LIST.clear();
+         MeasFragment.IS_SAVED_MEAS_POINT = false;
         }
     }
 
@@ -280,5 +275,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         System.exit(0);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        AZIMUTH =  - event.values[0];
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
