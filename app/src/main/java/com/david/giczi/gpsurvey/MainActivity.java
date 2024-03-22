@@ -27,11 +27,12 @@ import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
-
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,10 +45,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private LocationListener locationListener;
     private SensorManager sensorManager;
     private Sensor sensor;
+    public ViewGroup measuredDataContainer;
+    public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
     public static boolean GO_MEAS_FRAGMENT;
     public static List<MeasPoint> MEAS_POINT_LIST;
-    public static List<EOV> PRE_MEAS_POINT_LIST;
+    public static MeasPoint MEAS_POINT;
     public static float AZIMUTH;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
@@ -70,10 +73,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             startMeasureDialog();
         }
         else if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null  ){
-            Toast.makeText(this, "A mérés elindítva.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
         }
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        MEAS_POINT_LIST = new ArrayList<>();
     }
 
     @Override
@@ -90,10 +94,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (id == R.id.exit_option) {
             exitDialog();
         }
-        else if( id == R.id.start_measure_option ){
+        else if( id == R.id.gps_measure_option ){
 
          if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null){
-                Toast.makeText(this, "A mérés elindítva.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
             }
          else {
              startMeasure();
@@ -212,23 +216,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.registerListener(this, sensor,
                 SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                1000, 0, locationListener);
-        PRE_MEAS_POINT_LIST = new ArrayList<>();
+                500, 0, locationListener);
         MEAS_POINT_LIST = new ArrayList<>();
     }
 
     private void measurePoint(EOV eov){
-      if( !MeasFragment.IS_SAVED_MEAS_POINT ){
+      if( !MeasFragment.IS_RUN_MEAS_PROCESS){
           return;
       }
-      if( 3 >  PRE_MEAS_POINT_LIST.size() ){
-            PRE_MEAS_POINT_LIST.add(eov);
-        }
-        else {
-         MEAS_POINT_LIST.add(new MeasPoint(MEAS_POINT_LIST.size() + 1, PRE_MEAS_POINT_LIST));
-         PRE_MEAS_POINT_LIST.clear();
-         MeasFragment.IS_SAVED_MEAS_POINT = false;
-        }
+       MEAS_POINT.setMeasData(eov);
+       TextView measDataView = measuredDataContainer.findViewById(R.id.measured_position);
+       measDataView.setText(MEAS_POINT.toString());
     }
 
     private void requestPermissions(){
@@ -239,8 +237,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void startMeasureDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Mérés indítása");
-        builder.setMessage("Indítja a mérést?");
+        builder.setTitle("GPS bekapcsolása");
+        builder.setMessage("Bekapcsolja a GPS-t?");
 
         builder.setPositiveButton("Igen", (dialog, which) -> {
             startMeasure();

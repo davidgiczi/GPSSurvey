@@ -2,11 +2,13 @@ package com.david.giczi.gpsurvey.domain;
 
 import com.david.giczi.gpsurvey.utils.EOV;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MeasPoint {
 
     private int pointID;
+    private final List<EOV> preMeasPointData = new ArrayList<>();
     private double Y;
     private double qY;
     private double X;
@@ -15,75 +17,89 @@ public class MeasPoint {
     private double qZ;
     private double Q;
 
-    public MeasPoint(){
+    public MeasPoint() {
     }
-    public MeasPoint(int pointID, List<EOV> preMeasData) {
-        this.pointID = pointID;
-       setCoordinates(preMeasData);
-       setReliability(preMeasData);
+
+    public MeasPoint(int pointID) {
+        this.pointID = pointID + 1;
     }
-    private void setCoordinates(List<EOV> preMeasData){
-        for (EOV measData : preMeasData) {
+    public void setMeasData(EOV measPointData) {
+       preMeasPointData.add(measPointData);
+       this.Y = 0.0;
+       this.X = 0.0;
+       this.Z = 0.0;
+       setCoordinates();
+       setReliability();
+    }
+    private void setCoordinates(){
+        for (EOV measData : preMeasPointData) {
             List<Double> eovData = measData.getCoordinatesForEOV();
-            Y += eovData.get(0);
-            X += eovData.get(1);
-            Z += eovData.get(2);
+            this.Y += eovData.get(0);
+            this.X += eovData.get(1);
+            this.Z += eovData.get(2);
         }
-        Y = (int) (100 * (Y / preMeasData.size())) / 100.0;
-        X = (int) (100 * (X / preMeasData.size())) / 100.0;
-        Z = (int) (100 * (Z / preMeasData.size())) / 100.0;
+        this.Y /= preMeasPointData.size();
+        this.X /= preMeasPointData.size();
+        this.Z /=  preMeasPointData.size();
     }
-    private void setReliability(List<EOV> preMeasData){
+    private void setReliability(){
         double vY = 0.0;
         double vX = 0.0;
         double vZ = 0.0;
-        for (EOV measData : preMeasData) {
+        for (EOV measData : preMeasPointData) {
             List<Double> eovData = measData.getCoordinatesForEOV();
             vY += Math.pow(Y - eovData.get(0), 2);
             vX += Math.pow(X - eovData.get(1), 2);
             vZ += Math.pow(Z - eovData.get(2), 2);
         }
-        qY = (int) 100 * Math.sqrt(vY / (preMeasData.size() - 1)) / 100.0;
-        qX = (int) 100 * Math.sqrt(vX / (preMeasData.size() - 1)) / 100.0;
-        qZ = (int) 100 * Math.sqrt(vZ / (preMeasData.size() - 1)) / 100.0;
-        Q = (int) 100 * Math.sqrt(Math.pow(qY, 2) + Math.pow(qX, 2) + Math.pow(qZ, 2)) / 100.0;
+        this.qY = Math.sqrt(vY / (preMeasPointData.size() - 1));
+        this.qX = Math.sqrt(vX / (preMeasPointData.size() - 1));
+        this.qZ = Math.sqrt(vZ / (preMeasPointData.size() - 1));
+        this.Q = Math.sqrt(Math.pow(qY, 2) + Math.pow(qX, 2));
     }
+
+    public boolean isNotMeasured(){
+        return preMeasPointData.isEmpty();
+    }
+
     public int getPointID() {
         return pointID;
     }
 
     public double getY() {
-        return Y;
+        return (int) (100 * Y) / 100.0;
     }
 
     public double getX() {
-        return X;
+        return (int) (100 * X) / 100.0;
     }
 
     public double getZ() {
-        return Z;
+        return (int) (100 * Z) / 100.0;
     }
 
     public double getQ() {
-        return Q;
+        return (int) (100 * Q) / 100.0;
     }
 
     public double getqY() {
-        return qY;
+        return (int) (100 * qY) / 100.0;
     }
 
     public double getqX() {
-        return qX;
+        return (int) (100 * qX) / 100.0;
     }
 
     public double getqZ() {
-        return qZ;
+        return (int) (100 * qZ) / 100.0;
     }
 
+    public List<EOV> getPreMeasPointData() {
+        return preMeasPointData;
+    }
     public void setPointID(int pointID) {
         this.pointID = pointID;
     }
-
     public void setY(double y) {
         Y = y;
     }
@@ -94,14 +110,12 @@ public class MeasPoint {
 
     @Override
     public String toString() {
-        return pointID +" {" +
-                "Y=" + Y +
-                ", ±qY=" + qY +
-                ", X=" + X +
-                ", ±qX=" + qX +
-                ", Z=" + Z +
-                ", ±qZ=" + qZ +
-                ", ±Q=" + Q +
-                '}';
+        return  pointID +". pont\t\t±Q=" + getQ() + "m" +
+                "\n\nY=" + getY() +
+                "m\t±" + getqY() +
+                "m\n\nX=" + getX() +
+                "m\t±" + getqX() +
+                "m\n\nZ=" + getZ() +
+                "m\t±" + getqZ() + "m";
     }
 }

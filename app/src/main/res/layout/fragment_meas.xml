@@ -12,11 +12,11 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/button_save"
+            android:id="@+id/button_start_measure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/save_point"
+            android:text="@string/start_point_measure"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -28,14 +28,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_save" />
+            app:layout_constraintTop_toBottomOf="@id/button_start_measure" />
 
         <ImageView
             android:id="@+id/drawing_measured_point"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            app:layout_constraintBottom_toTopOf="@+id/button_save"
+            app:layout_constraintBottom_toTopOf="@+id/button_start_measure"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
