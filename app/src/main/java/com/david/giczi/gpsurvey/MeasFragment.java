@@ -15,7 +15,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
 import com.david.giczi.gpsurvey.databinding.FragmentMeasBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
@@ -34,7 +33,7 @@ public class MeasFragment extends Fragment {
     private static float X_CENTER;
     private static float Y_CENTER;
     private static float MM;
-    private static float SCALE;
+    private static double SCALE;
 
     @Override
     public View onCreateView(
@@ -59,13 +58,10 @@ public class MeasFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.buttonStartMeasure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainActivity.MEAS_POINT = new MeasPoint(MainActivity.MEAS_POINT_LIST.size());
-                IS_RUN_MEAS_PROCESS = true;
-                popupMeasPointData();
-            }
+        binding.buttonStartMeasure.setOnClickListener(meas -> {
+            MainActivity.MEAS_POINT = new MeasPoint(MainActivity.MEAS_POINT_LIST.size());
+            IS_RUN_MEAS_PROCESS = true;
+            popupMeasPointData();
         });
     }
     private void popupMeasPointData() {
@@ -94,12 +90,12 @@ public class MeasFragment extends Fragment {
         init();
         setScaleValue();
         transformMeasPoints();
-        canvas.drawText("M = 1:" + (int) SCALE, (float) (3 * MM), (float) (87 * MM), paint);
+        canvas.drawText("M = 1:" + (int) SCALE, 3 * MM, 87 * MM, paint);
         paint.setTypeface(Typeface.DEFAULT);
         for (MeasPoint measPoint : transformedMeasPointStore) {
+            canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getY(), (float) measPoint.getX(), paint);
             canvas.drawText(String.valueOf(measPoint.getPointID()),
                     (float) measPoint.getY(), (float) (measPoint.getX() - 2 * MM), paint);
-            canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getY(), (float) measPoint.getX(), paint);
         }
     }
     private void init(){
@@ -133,27 +129,15 @@ public class MeasFragment extends Fragment {
     }
 
     private void setScaleValue(){
-
-        double theLongestDistance = getTheLongestDistance();
-        if( 0.0 == theLongestDistance ){
+        if( transformedMeasPointStore == null ) {
             SCALE = 1f;
         }
-        else if(1 >= theLongestDistance && 0.0 < theLongestDistance ){
+        else if( 2 > transformedMeasPointStore.size() ){
             SCALE = 100f;
         }
-        else if(10.0 >= theLongestDistance && 1.0 < theLongestDistance ){
-            SCALE = 200f;
-        }
-        else if(50.0 >= theLongestDistance && 10.0 < theLongestDistance ){
-            SCALE = 1000f;
-        }
-        else if(100.0 >= theLongestDistance && 50.0 < theLongestDistance ){
-            SCALE = 2000f;
-        }
         else {
-            SCALE = 10000f;
+            SCALE = getTheLongestDistance() / 0.05;
         }
-
     }
 
     private double getTheLongestDistance(){

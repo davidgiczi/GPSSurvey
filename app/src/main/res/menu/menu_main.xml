@@ -7,7 +7,7 @@
     <item
         android:id="@+id/gps_measure_option"
         android:orderInCategory="100"
-        android:title="@string/GPS_start_option"
+        android:title="@string/start_point_measure"
         app:showAsAction="never" />
         <item
             android:id="@+id/point_format_option"
@@ -39,13 +39,6 @@
             android:orderInCategory="100"
             android:title="@string/calc_option"
             app:showAsAction="never" />
-
-        <item
-            android:id="@+id/set_point_option"
-            android:orderInCategory="100"
-            android:title="@string/set_point_option"
-            app:showAsAction="never" />
-
         <item
             android:id="@+id/catching_option"
             android:orderInCategory="100"

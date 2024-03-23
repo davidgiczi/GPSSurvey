@@ -1,7 +1,7 @@
 package com.david.giczi.gpsurvey.domain;
 
+import androidx.annotation.NonNull;
 import com.david.giczi.gpsurvey.utils.EOV;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +108,7 @@ public class MeasPoint {
         X = x;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return  pointID +". pont\t\t±Q=" + getQ() + "m" +
@@ -115,7 +116,7 @@ public class MeasPoint {
                 "m\t±" + getqY() +
                 "m\n\nX=" + getX() +
                 "m\t±" + getqX() +
-                "m\n\nZ=" + getZ() +
+                "m\n\nH=" + getZ() +
                 "m\t±" + getqZ() + "m";
     }
 }
