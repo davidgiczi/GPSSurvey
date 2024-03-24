@@ -111,12 +111,12 @@ public class MeasPoint {
     @NonNull
     @Override
     public String toString() {
-        return  pointID +". pont\t\t±Q=" + getQ() + "m" +
+        return  pointID +". pont\t\t±Qyx=" + getQ() + "m" +
                 "\n\nY=" + getY() +
                 "m\t±" + getqY() +
                 "m\n\nX=" + getX() +
                 "m\t±" + getqX() +
-                "m\n\nH=" + getZ() +
+                "m\n\nh=" + getZ() +
                 "m\t±" + getqZ() + "m";
     }
 }

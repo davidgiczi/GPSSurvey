@@ -37,7 +37,7 @@ public class MeasFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
         binding = FragmentMeasBinding.inflate(inflater, container, false);
@@ -52,6 +52,7 @@ public class MeasFragment extends Fragment {
             MainActivity.measuredDataWindow
                     .showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 700);
         }
+
         return binding.getRoot();
     }
 
@@ -59,11 +60,12 @@ public class MeasFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         binding.buttonStartMeasure.setOnClickListener(meas -> {
-            MainActivity.MEAS_POINT = new MeasPoint(MainActivity.MEAS_POINT_LIST.size());
             IS_RUN_MEAS_PROCESS = true;
+            MainActivity.MEAS_POINT = new MeasPoint(MainActivity.MEAS_POINT_LIST.size());
             popupMeasPointData();
         });
     }
+
     private void popupMeasPointData() {
        ViewGroup measuredDataContainer = ((MainActivity) getActivity()).measuredDataContainer =
                (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_meas_point, null);
@@ -102,6 +104,7 @@ public class MeasFragment extends Fragment {
         Bitmap bitmap = Bitmap.createBitmap(getResources().getDisplayMetrics().widthPixels,
                 (int) (89 * MM), Bitmap.Config.ARGB_8888);
         this.canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
         this.paint = new Paint();
         paint.setAntiAlias(true);
         paint.setTextSize(50f);
@@ -129,11 +132,8 @@ public class MeasFragment extends Fragment {
     }
 
     private void setScaleValue(){
-        if( transformedMeasPointStore == null ) {
-            SCALE = 1f;
-        }
-        else if( 2 > transformedMeasPointStore.size() ){
-            SCALE = 100f;
+        if( 2 > MainActivity.MEAS_POINT_LIST.size() ){
+            SCALE = 100.0;
         }
         else {
             SCALE = getTheLongestDistance() / 0.05;
@@ -158,9 +158,10 @@ public class MeasFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         IS_RUN_MEAS_PROCESS = false;
+        if( MainActivity.measuredDataWindow != null ){
         MainActivity.measuredDataWindow.dismiss();
-        MainActivity.MEAS_POINT.getPreMeasPointData().clear();
-        MainActivity.MEAS_POINT_LIST.add(MainActivity.MEAS_POINT);
+        }
+        MainActivity.MEAS_POINT = null;
         binding = null;
     }
 

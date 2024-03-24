@@ -27,9 +27,12 @@ import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
+
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,13 +48,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private LocationListener locationListener;
     private SensorManager sensorManager;
     private Sensor sensor;
+    private  ViewGroup compassContainer;
     public ViewGroup measuredDataContainer;
     public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
     public static boolean GO_MEAS_FRAGMENT;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
-    public static float AZIMUTH;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -80,6 +83,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         MEAS_POINT_LIST = new ArrayList<>();
     }
 
+    private void popupCompassWindow(){
+        compassContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_compass, null);
+        PopupWindow compassWindow = new PopupWindow(compassContainer, 600,600, true);
+        compassWindow.showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 0);
+        ImageView compassView = compassContainer.findViewById(R.id.compass);
+        compassView.setImageResource(R.drawable.compass);
+    }
+
+    private void rotateCompass(float rotateAngle){
+        if( compassContainer == null ){
+            return;
+        }
+        ImageView compassView = compassContainer.findViewById(R.id.compass);
+        compassView.setRotation(rotateAngle);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -94,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (id == R.id.exit_option) {
             exitDialog();
         }
-        else if( id == R.id.gps_measure_option ){
+        else if( id == R.id.point_measure_option ){
 
          if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null){
                 Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
@@ -122,6 +141,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             angleMinSecFormat = true;
             decimalFormat = false;
             xyzFormat = false;
+        }
+        else if( id == R.id.compass_option ){
+            popupCompassWindow();
         }
 
         return super.onOptionsItemSelected(item);
@@ -277,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        AZIMUTH =  - event.values[0];
+        rotateCompass( - event.values[0] );
     }
 
     @Override

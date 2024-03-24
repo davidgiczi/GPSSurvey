@@ -5,10 +5,15 @@
 
     <group android:id="@+id/measure_options">
     <item
-        android:id="@+id/gps_measure_option"
+        android:id="@+id/point_measure_option"
         android:orderInCategory="100"
         android:title="@string/start_point_measure"
         app:showAsAction="never" />
+        <item
+            android:id="@+id/compass_option"
+            android:orderInCategory="100"
+            android:title="@string/compass"
+            app:showAsAction="never" />
         <item
             android:id="@+id/point_format_option"
             android:orderInCategory="100"

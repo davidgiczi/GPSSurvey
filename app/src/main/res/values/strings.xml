@@ -9,7 +9,7 @@
     <string name="calc_option">Távolság/terület számítása</string>
     <string name="set_point_option">Pont bevitele</string>
     <string name="save_data_option">Adatok fájlba mentése</string>
-    <string name="point_catching_option">Pont kitűzése</string>
+    <string name="point_catching_option">Pont felkeresése</string>
     <string name="exit_option">Kilépés</string>
     <!-- Strings used for fragments for navigation -->
     <string name="latitude">Φ:</string>
@@ -22,4 +22,5 @@
     <string name="eov">EOV:</string>
     <string name="dot_symbol">🌏</string>
     <string name="measured_data">MeasuredPoints</string>
+    <string name="compass">Iránytű</string>
 </resources>
