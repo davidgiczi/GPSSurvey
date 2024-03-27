@@ -23,4 +23,9 @@
     <string name="dot_symbol">🌏</string>
     <string name="measured_data">MeasuredPoints</string>
     <string name="compass">Iránytű</string>
+    <string name="distance">Távolság:</string>
+    <string name="perimeter">Kerület:</string>
+    <string name="area">Terület:</string>
+    <string name="elevation">Δm:</string>
+    <string name="use_all_measured_points">Az összes mért pont használata, a mérés sorrendjében</string>
 </resources>

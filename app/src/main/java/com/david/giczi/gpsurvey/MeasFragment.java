@@ -42,7 +42,6 @@ public class MeasFragment extends Fragment {
     ) {
         binding = FragmentMeasBinding.inflate(inflater, container, false);
         binding.buttonStartMeasure.setBackgroundColor(Color.DKGRAY);
-        MainActivity.GO_MEAS_FRAGMENT = false;
         MeasFragment.MM = (float) (Math.sqrt(Math.pow(getResources().getDisplayMetrics().widthPixels, 2) +
                 Math.pow(getResources().getDisplayMetrics().heightPixels, 2)) / 140F);
         MeasFragment.X_CENTER = getResources().getDisplayMetrics().widthPixels / 2F;
@@ -52,7 +51,7 @@ public class MeasFragment extends Fragment {
             MainActivity.measuredDataWindow
                     .showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 700);
         }
-
+        MainActivity.PAGE_NUMBER_VALUE = 1;
         return binding.getRoot();
     }
 

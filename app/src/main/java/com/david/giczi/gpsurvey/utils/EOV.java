@@ -24,6 +24,9 @@ public class EOV {
     private static final double eX = Math.toRadians(- 0.302264 / 3600.0);
     private static final double eY =  Math.toRadians(- 0.161038 / 3600.0);
     private static final double eZ =  Math.toRadians(- 0.292622 / 3600.0);
+    private double fi_WGS;
+    private double lambda_WGS;
+    private double h_WGS;
     private static final double[][] Rx =
             {{1.0, 0.0, 0.0},
             {0.0, Math.cos(eX), Math.sin(eX)},
@@ -46,6 +49,31 @@ public class EOV {
         this.wgsY = wgsY;
         this.wgsZ = wgsZ;
     }
+
+    public double getFi_WGS() {
+        return fi_WGS;
+    }
+
+    public void setFi_WGS(double fi_WGS) {
+        this.fi_WGS = fi_WGS;
+    }
+
+    public double getLambda_WGS() {
+        return lambda_WGS;
+    }
+
+    public void setLambda_WGS(double lambda_WGS) {
+        this.lambda_WGS = lambda_WGS;
+    }
+
+    public double getH_WGS() {
+        return h_WGS;
+    }
+
+    public void setH_WGS(double h_WGS) {
+        this.h_WGS = h_WGS;
+    }
+
     public List<Double> getCoordinatesForEOV(){
 
         List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();

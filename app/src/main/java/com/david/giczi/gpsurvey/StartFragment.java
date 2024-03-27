@@ -23,7 +23,7 @@ public class StartFragment extends Fragment {
     ) {
       binding = FragmentStartBinding.inflate(inflater, container, false);
       binding.startPage.setBackground(((MainActivity) getActivity()).getDrawable(R.drawable.background_satellite));
-      MainActivity.GO_MEAS_FRAGMENT = true;
+      MainActivity.PAGE_NUMBER_VALUE = 0;
         return binding.getRoot();
     }
 

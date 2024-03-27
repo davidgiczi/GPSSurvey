@@ -28,7 +28,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/latitude_data_row">
 
         <TextView
             android:id="@+id/latitude_text"
@@ -50,7 +51,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/longitude_data_row">
+
         <TextView
             android:id="@+id/longitude_text"
             android:layout_width="wrap_content"
@@ -70,7 +73,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/altitude_data_row">
+
         <TextView
             android:id="@+id/altitude_text"
             android:layout_width="wrap_content"
@@ -90,7 +95,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/eov_data_row">
+
         <TextView
             android:id="@+id/eov_text"
             android:layout_width="wrap_content"

@@ -31,6 +31,7 @@ import com.david.giczi.gpsurvey.utils.WGS84;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -52,9 +53,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public ViewGroup measuredDataContainer;
     public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
-    public static boolean GO_MEAS_FRAGMENT;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
+    public static int PAGE_NUMBER_VALUE;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -62,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
@@ -121,11 +121,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
          else {
              startMeasure();
          }
-
-            if(  GO_MEAS_FRAGMENT ) {
-                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
-                        .navigate(R.id.action_StartFragment_to_MeasFragment);
-            }
+          navigateToMeasFragment();
         }
         else if( id == R.id.decimal_format ){
             decimalFormat = true;
@@ -145,8 +141,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if( id == R.id.compass_option ){
             popupCompassWindow();
         }
+        else if( id == R.id.calc_option ){
+            navigateToCalcFragment();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void navigateToMeasFragment(){
+        switch (PAGE_NUMBER_VALUE){
+            case 0:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_StartFragment_to_MeasFragment);
+                break;
+            case 2:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_CalcFragment_to_MeasFragment);
+        }
+    }
+
+    private void navigateToCalcFragment(){
+        switch (PAGE_NUMBER_VALUE){
+            case 0:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_StartFragment_to_CalcFragment);
+                break;
+            case 1 :
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_MeasFragment_to_CalcFragment);
+        }
     }
 
     @Override
@@ -215,6 +238,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         location.getAltitude()).substring(0, WGS84.getZ(location.getLatitude(),
                         location.getAltitude()).indexOf("m")));
                 EOV eov = new EOV(X_WGS, Y_WGS, Z_WGS);
+                eov.setFi_WGS(location.getLatitude());
+                eov.setLambda_WGS(location.getLongitude());
+                eov.setH_WGS(location.getAltitude());
                 binding.eovText.setText(R.string.eov);
                 binding.eovData.setText(eov.toString());
                 measurePoint(eov);

@@ -9,15 +9,28 @@
         android:id="@+id/StartFragment"
         android:name="com.david.giczi.gpsurvey.StartFragment"
         tools:layout="@layout/fragment_start">
-
         <action
             android:id="@+id/action_StartFragment_to_MeasFragment"
             app:destination="@id/MeasFragment" />
+        <action
+            android:id="@+id/action_StartFragment_to_CalcFragment"
+            app:destination="@id/CalcFragment" />
     </fragment>
     <fragment
         android:id="@+id/MeasFragment"
         android:name="com.david.giczi.gpsurvey.MeasFragment"
         tools:layout="@layout/fragment_meas">
-
+        <action
+            android:id="@+id/action_MeasFragment_to_CalcFragment"
+            app:destination="@id/CalcFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/CalcFragment"
+        android:name="com.david.giczi.gpsurvey.CalcFragment"
+        tools:layout="@layout/fragment_calc">
+        <action
+            android:id="@+id/action_CalcFragment_to_MeasFragment"
+            app:destination="@id/MeasFragment" />
+    </fragment>
+
 </navigation>
