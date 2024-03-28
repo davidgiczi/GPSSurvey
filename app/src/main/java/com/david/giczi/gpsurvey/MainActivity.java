@@ -204,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
                     binding.altitudeText.setText(R.string.altitude);
-                    String latitude = location.getLatitude() + "°";
-                    String longitude = location.getLongitude() + "°";
+                    String latitude = String.format("%.6f°", location.getLatitude());
+                    String longitude = String.format("%.6f°", location.getLongitude());
                     binding.latitudeData.setText(latitude);
                     binding.longitudeData.setText(longitude);
                     String altitude = location.getAltitude() + "m";

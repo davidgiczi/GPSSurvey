@@ -1,16 +1,12 @@
 package com.david.giczi.gpsurvey.utils;
 
 import com.david.giczi.gpsurvey.domain.MeasPoint;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CalcData {
 
-    private List<MeasPoint> pointStore;
+    private final List<MeasPoint> pointStore;
 
-    public CalcData() {
-        this.pointStore = new ArrayList<>();
-    }
 
     public CalcData(List<MeasPoint> pointStore) {
         this.pointStore = pointStore;
@@ -75,7 +71,40 @@ public class CalcData {
         }
         double reliable = 0.0;
 
-        return reliable;
+        for (int i = 0; i < pointStore.size() - 1; i++) {
+
+            double distance2 = Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) +
+                    Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2);
+
+            reliable += ( Math.pow(pointStore.get(i).getqY(), 2) *
+                    (Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) / distance2) +
+
+                    Math.pow(pointStore.get(i + 1).getqY(), 2) *
+                            (Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) / distance2) +
+
+                    Math.pow(pointStore.get(i).getqX(), 2) *
+                            (Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2) / distance2) +
+
+                    Math.pow(pointStore.get(i + 1).getqX(), 2) *
+                            (Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2) / distance2) );
+        }
+        double distance2 = Math.pow((pointStore.get(0).getY() - pointStore.get(pointStore.size() - 1).getY()), 2) +
+                Math.pow((pointStore.get(0).getX() - pointStore.get(pointStore.size() - 1).getX()), 2);
+
+        reliable += ( Math.pow(pointStore.get(pointStore.size() - 1).getqY(), 2) *
+                (Math.pow((pointStore.get(pointStore.size() - 1).getY() - pointStore.get(0).getY()), 2) / distance2) +
+
+                Math.pow(pointStore.get(0).getqY(), 2) *
+                        (Math.pow((pointStore.get(pointStore.size() - 1).getY() - pointStore.get(0).getY()), 2) / distance2) +
+
+                Math.pow(pointStore.get(pointStore.size() - 1).getqX(), 2) *
+                        (Math.pow((pointStore.get(pointStore.size() - 1).getX() - pointStore.get(0).getX()), 2) / distance2) +
+
+                Math.pow(pointStore.get(0).getqX(), 2) *
+                        (Math.pow((pointStore.get(pointStore.size() - 1).getX() - pointStore.get(0).getX()), 2) / distance2) );
+
+        return (int) (100 * Math.sqrt(reliable)) / 100.0;
+
     }
 
     public double calcElevation(){
@@ -125,6 +154,12 @@ public class CalcData {
         }
         double reliable = 0.0;
 
-        return reliable;
+        for (int i = 0; i < pointStore.size() - 1; i++) {
+            reliable += ((Math.pow(pointStore.get(i + 1).getX(), 2) * Math.pow(pointStore.get(i).getqY(), 2)) -
+                    (Math.pow(pointStore.get(i + 1).getY(), 2) * Math.pow(pointStore.get(i).getqX(), 2)));
+            reliable += ((Math.pow(pointStore.get(0).getX(), 2) * Math.pow(pointStore.get(pointStore.size() - 1).getqY(), 2)) -
+                    (Math.pow(pointStore.get(0).getY(), 2) * Math.pow(pointStore.get(pointStore.size() - 1).getqX(), 2)));
+        }
+        return (int) (10 * Math.sqrt(reliable)) / 10.0;
     }
 }
