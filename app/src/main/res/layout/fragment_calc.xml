@@ -34,12 +34,20 @@
 
         <TextView
             android:id="@+id/distance_value"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/distance_reliable"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-light"
+            android:gravity="start"
+            android:textSize="20sp"/>
 
     </LinearLayout>
 
@@ -60,12 +68,20 @@
             android:textStyle="bold"/>
         <TextView
             android:id="@+id/perimeter_value"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
             android:textSize="20sp"
             android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/perimeter_reliable"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-light"
+            android:gravity="start"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -86,12 +102,20 @@
             android:textStyle="bold"/>
         <TextView
             android:id="@+id/area_value"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
             android:textSize="20sp"
             android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/area_reliable"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-light"
+            android:gravity="start"
+            android:textSize="20sp"/>
 
     </LinearLayout>
     <LinearLayout
@@ -111,12 +135,20 @@
             android:textStyle="bold"/>
         <TextView
             android:id="@+id/elevation_value"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:fontFamily="sans-serif-light"
             android:textSize="20sp"
             android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/elevation_reliable"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:fontFamily="sans-serif-light"
+            android:textSize="20sp"/>
 
     </LinearLayout>
     <View
@@ -134,12 +166,13 @@
         android:gravity="center"
         android:text="@string/use_all_measured_points"
         android:textSize="16sp"
+        android:fontFamily="sans-serif-light"
         android:checked="true"/>
 
     <Spinner
         android:id="@+id/point_spinner"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="80dp"
         android:layout_gravity="center"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"

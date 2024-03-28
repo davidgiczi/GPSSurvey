@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -35,16 +35,16 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
                              @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentCalcBinding.inflate(inflater, container, false);
-        this.chosenMeasPointStore = new ArrayList<>(MainActivity.MEAS_POINT_LIST);
+        this.chosenMeasPointStore = new ArrayList<>();
         MainActivity.PAGE_NUMBER_VALUE = 2;
-        onClickCheckBox();
+        addOnClickListenerForCheckBox();
         initSpinner();
-        displayCalculatedData();
-        displayAllMeasuredPoints();
+        displayCalculatedData(MainActivity.MEAS_POINT_LIST);
+        displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
         return binding.getRoot();
     }
 
-    private void displayAllMeasuredPoints(){
+    private void displayMeasuredPoint(List<MeasPoint> chosenMeasPointStore){
         this.displayedMeasuredPointLinearLayoutStore = new ArrayList<>();
         for (MeasPoint measPoint : chosenMeasPointStore) {
             LinearLayout measPointIDLayout = new LinearLayout(getContext());
@@ -70,54 +70,77 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     private void clearDisplayedPointData(){
+        if( displayedMeasuredPointLinearLayoutStore == null ){
+            return;
+        }
         for (LinearLayout linearLayout : displayedMeasuredPointLinearLayoutStore) {
             binding.calcLinearlayout.removeView(linearLayout);
         }
         displayedMeasuredPointLinearLayoutStore = null;
     }
 
-    private void displayCalculatedData(){
+    private void displayCalculatedData(List<MeasPoint> chosenMeasPointStore){
         CalcData calcData = new CalcData(chosenMeasPointStore);
         String distanceValue = String.format("%4.2fm", calcData.calcDistance());
+        String distanceReliableValue = String.format("±%4.2fm", calcData.calcDistanceReliable());
         binding.distanceValue.setText(distanceValue);
+        binding.distanceReliable.setText(distanceReliableValue);
         String perimeterValue = String.format("%4.2fm", calcData.calcPerimeter());
+        String perimeterReliableValue = String.format("±%4.2fm", calcData.calcPerimeterReliable());
         binding.perimeterValue.setText(perimeterValue);
-        String areaValue = String.format("%6.2fm2", calcData.calcArea());
+        binding.perimeterReliable.setText(perimeterReliableValue);
+        String areaValue = String.format("%4.1fm2", calcData.calcArea());
+        String areaReliableValue = String.format("±%4.1fm2", calcData.calcAreaReliable());
         binding.areaValue.setText(areaValue);
+        binding.areaReliable.setText(areaReliableValue);
         String elevationValue = String.format("%4.2fm", calcData.calcElevation());
+        String elevationReliableValue = String.format("±%4.2fm", calcData.calcElevationReliable());
         binding.elevationValue.setText(elevationValue);
+        binding.elevationReliable.setText(elevationReliableValue);
     }
 
     private void initSpinner(){
         List<String> ITEMS = new ArrayList<>();
         ITEMS.add(0, "Válassz pontokat");
-        for (MeasPoint measPoint : chosenMeasPointStore) {
+        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             ITEMS.add(measPoint.getPointIDAsString());
         }
         binding.pointSpinner.setOnItemSelectedListener(this);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),  android.R.layout.simple_spinner_item, ITEMS);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
+                R.layout.point_spinner, ITEMS);
         binding.pointSpinner.setAdapter(arrayAdapter);
         binding.pointSpinner.setEnabled(false);
     }
+    private void clearCalculatedData(){
+        String zeroValue = String.format("%4.2fm", 0.0);
+        binding.distanceValue.setText(zeroValue);
+        binding.perimeterValue.setText(zeroValue);
+        binding.elevationValue.setText(zeroValue);
+        String zeroReliableValue = String.format("±%4.2fm", 0.0);
+        binding.distanceReliable.setText(zeroReliableValue);
+        binding.perimeterReliable.setText(zeroReliableValue);
+        binding.elevationReliable.setText(zeroReliableValue);
+        zeroValue = String.format("%4.1fm2", 0.0);
+        zeroReliableValue = String.format("±%4.1fm2", 0.0);
+        binding.areaValue.setText(zeroValue);
+        binding.areaReliable.setText(zeroReliableValue);
+        chosenMeasPointStore.clear();
+    }
 
-    private void onClickCheckBox(){
+    private void addOnClickListenerForCheckBox(){
         binding.allPointsCheckbox.setOnClickListener(c -> {
+
+            clearDisplayedPointData();
 
             if( binding.allPointsCheckbox.isChecked() ){
                 binding.pointSpinner.setEnabled(false);
                 initSpinner();
-                displayAllMeasuredPoints();
-                displayCalculatedData();
+                displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
+                displayCalculatedData(MainActivity.MEAS_POINT_LIST);
             }
             else {
                 binding.pointSpinner.setEnabled(true);
-                String zeroValue = String.format("%4.2fm", 0.0);
-                binding.distanceValue.setText(zeroValue);
-                binding.perimeterValue.setText(zeroValue);
-                binding.elevationValue.setText(zeroValue);
-                zeroValue = String.format("%6.2fm2", 0.0);
-                binding.areaValue.setText(zeroValue);
-                clearDisplayedPointData();
+                clearCalculatedData();
             }
         });
     }
@@ -135,10 +158,14 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if( !parent.getItemAtPosition(position).equals("Válassz pontokat") ){
-                    String item = (String) parent.getItemAtPosition(position);
-                    Toast.makeText(getContext(), item, Toast.LENGTH_SHORT).show();
+                    int pointId = Integer.parseInt((String) parent.getItemAtPosition(position)) - 1;
+                    if( !chosenMeasPointStore.contains(MainActivity.MEAS_POINT_LIST.get(pointId)) ){
+                        chosenMeasPointStore.add(MainActivity.MEAS_POINT_LIST.get(pointId) );
+                    }
+                    clearDisplayedPointData();
+                    displayMeasuredPoint(chosenMeasPointStore);
+                    displayCalculatedData(chosenMeasPointStore);
                 }
-
     }
 
     @Override
