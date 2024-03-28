@@ -139,11 +139,11 @@ public class CalcData {
         for (int i = 0; i < pointStore.size() - 1; i++) {
             area += pointStore.get(i).getY() * pointStore.get(i + 1).getX();
         }
-        area += (pointStore.get(pointStore.size() - 1).getY() * pointStore.get(0).getX());
+        area += pointStore.get(pointStore.size() - 1).getY() * pointStore.get(0).getX();
         for (int i = 0; i < pointStore.size() - 1; i++) {
             area -= pointStore.get(i).getX() * pointStore.get(i + 1).getY();
         }
-        area -= (pointStore.get(pointStore.size() - 1).getX() * pointStore.get(0).getY());
+        area -= pointStore.get(pointStore.size() - 1).getX() * pointStore.get(0).getY();
 
         return (int) (10 * Math.abs(0.5 * area)) / 10.0;
     }
@@ -153,13 +153,12 @@ public class CalcData {
             return 0.0;
         }
         double reliable = 0.0;
-
         for (int i = 0; i < pointStore.size() - 1; i++) {
-            reliable += ((Math.pow(pointStore.get(i + 1).getX(), 2) * Math.pow(pointStore.get(i).getqY(), 2)) -
-                    (Math.pow(pointStore.get(i + 1).getY(), 2) * Math.pow(pointStore.get(i).getqX(), 2)));
-            reliable += ((Math.pow(pointStore.get(0).getX(), 2) * Math.pow(pointStore.get(pointStore.size() - 1).getqY(), 2)) -
-                    (Math.pow(pointStore.get(0).getY(), 2) * Math.pow(pointStore.get(pointStore.size() - 1).getqX(), 2)));
+          reliable += ( Math.pow(pointStore.get(i + 1).getX(), 2) * Math.pow(pointStore.get(i).getqY(), 2) +
+                        Math.pow(pointStore.get(i).getY(), 2) * Math.pow(pointStore.get(i + 1).getqX(), 2) -
+                        Math.pow(pointStore.get(i).getX(), 2) * Math.pow(pointStore.get(i + 1).getqY(), 2) -
+                        Math.pow(pointStore.get(i + 1).getY(), 2)  * Math.pow(pointStore.get(i).getqX(), 2) );
         }
-        return (int) (10 * Math.sqrt(reliable)) / 10.0;
+        return (int) (10 * Math.sqrt(0.5 * reliable)) / 10.0;
     }
 }
