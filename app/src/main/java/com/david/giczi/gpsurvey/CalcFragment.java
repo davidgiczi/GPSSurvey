@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CalcFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class CalcFragment extends Fragment {
 
     private FragmentCalcBinding binding;
     private List<LinearLayout> displayedMeasuredPointLinearLayoutStore;
@@ -59,6 +59,7 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
             displayedMeasuredPointLinearLayoutStore.add(measPointIDLayout);
             binding.calcLinearlayout.addView(measPointIDLayout);
             TextView measPointData = new TextView(getContext());
+            measPointData.setTextIsSelectable(true);
             measPointData.setText(measPoint.getMeasPontData());
             measPointData.setTextSize(16f);
             LinearLayout measPointDataLayout = new LinearLayout(getContext());
@@ -105,7 +106,29 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             ITEMS.add(measPoint.getPointIDAsString());
         }
-        binding.pointSpinner.setOnItemSelectedListener(this);
+        binding.pointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if( !parent.getItemAtPosition(position).equals("Válassz pontokat") ){
+                    int pointId = Integer.parseInt((String) parent.getItemAtPosition(position)) - 1;
+                    if( !chosenMeasPointStore.contains(MainActivity.MEAS_POINT_LIST.get(pointId)) ){
+                        chosenMeasPointStore.add(MainActivity.MEAS_POINT_LIST.get(pointId) );
+                    }
+                    clearDisplayedPointData();
+                    displayMeasuredPoint(chosenMeasPointStore);
+                    displayCalculatedData(chosenMeasPointStore);
+                }
+                else if( !binding.allPointsCheckbox.isChecked() ) {
+                    clearDisplayedPointData();
+                    clearCalculatedData();
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
                 R.layout.point_spinner, ITEMS);
         binding.pointSpinner.setAdapter(arrayAdapter);
@@ -128,6 +151,7 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     private void addOnClickListenerForCheckBox(){
+        binding.allPointsCheckbox.setChecked(true);
         binding.allPointsCheckbox.setOnClickListener(c -> {
 
             clearDisplayedPointData();
@@ -152,24 +176,5 @@ public class CalcFragment extends Fragment implements AdapterView.OnItemSelected
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if( !parent.getItemAtPosition(position).equals("Válassz pontokat") ){
-                    int pointId = Integer.parseInt((String) parent.getItemAtPosition(position)) - 1;
-                    if( !chosenMeasPointStore.contains(MainActivity.MEAS_POINT_LIST.get(pointId)) ){
-                        chosenMeasPointStore.add(MainActivity.MEAS_POINT_LIST.get(pointId) );
-                    }
-                    clearDisplayedPointData();
-                    displayMeasuredPoint(chosenMeasPointStore);
-                    displayCalculatedData(chosenMeasPointStore);
-                }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 }
