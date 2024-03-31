@@ -25,7 +25,7 @@ public class MeasPoint {
     }
 
     public MeasPoint(int pointID) {
-        this.pointID = pointID + 1;
+        this.pointID = pointID;
     }
     public void setMeasData(EOV measPointData) {
        preMeasPointData.add(measPointData);

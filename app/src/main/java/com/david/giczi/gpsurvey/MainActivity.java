@@ -27,11 +27,9 @@ import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
-
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -39,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -55,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
+    public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
@@ -204,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
                     binding.altitudeText.setText(R.string.altitude);
-                    String latitude = String.format("%.6f°", location.getLatitude());
-                    String longitude = String.format("%.6f°", location.getLongitude());
+                    String latitude = String.format(Locale.getDefault(),"%.6f°", location.getLatitude());
+                    String longitude = String.format(Locale.getDefault(), "%.6f°", location.getLongitude());
                     binding.latitudeData.setText(latitude);
                     binding.longitudeData.setText(longitude);
                     String altitude = location.getAltitude() + "m";
@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("Alkalmazás bezárása");
-        builder.setMessage("Biztos, hogy ki akarsz lépni az alkalmazásból?\n\nA nem mentett adatok elvesznek.");
+        builder.setMessage("Biztos, hogy ki akar lépni az alkalmazásból?\n\nA nem mentett adatok elvesznek.");
 
         builder.setPositiveButton("Igen", (dialog, which) -> {
             dialog.dismiss();

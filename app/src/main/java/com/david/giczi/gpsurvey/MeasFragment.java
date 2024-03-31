@@ -18,9 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentMeasBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 public class MeasFragment extends Fragment {
@@ -60,13 +60,19 @@ public class MeasFragment extends Fragment {
 
         binding.buttonStartMeasure.setOnClickListener(meas -> {
             IS_RUN_MEAS_PROCESS = true;
-            MainActivity.MEAS_POINT = new MeasPoint(MainActivity.MEAS_POINT_LIST.size());
+            if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
+                MainActivity.NEXT_POINT_NUMBER = 1;
+            }
+            else {
+                MainActivity.NEXT_POINT_NUMBER++;
+            }
+            MainActivity.MEAS_POINT = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
             popupMeasPointData();
         });
     }
 
     private void popupMeasPointData() {
-       ViewGroup measuredDataContainer = ((MainActivity) getActivity()).measuredDataContainer =
+       ViewGroup measuredDataContainer = ((MainActivity) requireActivity()).measuredDataContainer =
                (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_meas_point, null);
        MainActivity.measuredDataWindow =
                new PopupWindow(measuredDataContainer, 1000, 670, false);

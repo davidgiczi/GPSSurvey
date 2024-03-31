@@ -10,16 +10,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentCalcBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.CalcData;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class CalcFragment extends Fragment {
@@ -51,6 +53,9 @@ public class CalcFragment extends Fragment {
             measPointIDLayout.setOrientation(LinearLayout.HORIZONTAL);
             measPointIDLayout.setGravity(Gravity.CENTER);
             TextView measPointId = new TextView(getContext());
+            measPointId.setOnClickListener( d ->{
+                deletePointDialog(((TextView) d).getText().toString());
+            });
             String pointID = measPoint.getPointID() + ". pont\t\t±Qyx=" + measPoint.getQ() + "m";
             measPointId.setText(pointID);
             measPointId.setTextSize(18f);
@@ -70,6 +75,38 @@ public class CalcFragment extends Fragment {
         }
     }
 
+    private void deletePointDialog(String pointText) {
+        String pointNumber = pointText.split("\\.")[0];
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(pointNumber + ". pont törlése");
+        builder.setMessage("Biztos, hogy törli a pontot?");
+        builder.setPositiveButton("Igen", (dialog, which) -> {
+            int pointId = Integer.parseInt(pointNumber);
+            for (int i = MainActivity.MEAS_POINT_LIST.size() - 1; i >= 0; i--) {
+                if ( pointId == MainActivity.MEAS_POINT_LIST.get(i).getPointID() ) {
+                  MeasPoint deletedPoint = MainActivity.MEAS_POINT_LIST.remove(i);
+                  chosenMeasPointStore.remove(deletedPoint);
+                }
+            }
+            clearCalculatedData();
+            clearDisplayedPointData();
+            initSpinner();
+            if( binding.allPointsCheckbox.isChecked() ){
+                displayCalculatedData(MainActivity.MEAS_POINT_LIST);
+                displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
+            }
+            else if( !chosenMeasPointStore.isEmpty() ){
+                displayCalculatedData(chosenMeasPointStore);
+                displayMeasuredPoint(chosenMeasPointStore);
+            }
+        });
+
+        builder.setNegativeButton("Nem", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void clearDisplayedPointData(){
         if( displayedMeasuredPointLinearLayoutStore == null ){
             return;
@@ -82,20 +119,20 @@ public class CalcFragment extends Fragment {
 
     private void displayCalculatedData(List<MeasPoint> chosenMeasPointStore){
         CalcData calcData = new CalcData(chosenMeasPointStore);
-        String distanceValue = String.format("%4.2fm", calcData.calcDistance());
-        String distanceReliableValue = String.format("±%4.2fm", calcData.calcDistanceReliable());
+        String distanceValue = String.format(Locale.getDefault(),"%4.2fm", calcData.calcDistance());
+        String distanceReliableValue = String.format(Locale.getDefault(), "±%4.2fm", calcData.calcDistanceReliable());
         binding.distanceValue.setText(distanceValue);
         binding.distanceReliable.setText(distanceReliableValue);
-        String perimeterValue = String.format("%4.2fm", calcData.calcPerimeter());
-        String perimeterReliableValue = String.format("±%4.2fm", calcData.calcPerimeterReliable());
+        String perimeterValue = String.format(Locale.getDefault(), "%4.2fm", calcData.calcPerimeter());
+        String perimeterReliableValue = String.format(Locale.getDefault(), "±%4.2fm", calcData.calcPerimeterReliable());
         binding.perimeterValue.setText(perimeterValue);
         binding.perimeterReliable.setText(perimeterReliableValue);
-        String areaValue = String.format("%4.1fm2", calcData.calcArea());
-        String areaReliableValue = String.format("±%4.1fm2", calcData.calcAreaReliable());
+        String areaValue = String.format(Locale.getDefault(), "%4.1fm2", calcData.calcArea());
+        String areaReliableValue = String.format(Locale.getDefault(), "±%4.1fm2", calcData.calcAreaReliable());
         binding.areaValue.setText(areaValue);
         binding.areaReliable.setText(areaReliableValue);
-        String elevationValue = String.format("%4.2fm", calcData.calcElevation());
-        String elevationReliableValue = String.format("±%4.2fm", calcData.calcElevationReliable());
+        String elevationValue = String.format(Locale.getDefault(), "%4.2fm", calcData.calcElevation());
+        String elevationReliableValue = String.format(Locale.getDefault(), "±%4.2fm", calcData.calcElevationReliable());
         binding.elevationValue.setText(elevationValue);
         binding.elevationReliable.setText(elevationReliableValue);
     }
@@ -111,9 +148,15 @@ public class CalcFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if( !parent.getItemAtPosition(position).equals("Válassz pontokat") ){
-                    int pointId = Integer.parseInt((String) parent.getItemAtPosition(position)) - 1;
-                    if( !chosenMeasPointStore.contains(MainActivity.MEAS_POINT_LIST.get(pointId)) ){
-                        chosenMeasPointStore.add(MainActivity.MEAS_POINT_LIST.get(pointId) );
+                    int pointId = Integer.parseInt((String) parent.getItemAtPosition(position));
+                    MeasPoint chosenPoint = null;
+                    for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+                        if( pointId == measPoint.getPointID() ){
+                            chosenPoint = measPoint;
+                        }
+                    }
+                    if( chosenPoint != null ){
+                        chosenMeasPointStore.add(chosenPoint);
                     }
                     clearDisplayedPointData();
                     displayMeasuredPoint(chosenMeasPointStore);
@@ -129,22 +172,22 @@ public class CalcFragment extends Fragment {
 
             }
         });
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(),
                 R.layout.point_spinner, ITEMS);
         binding.pointSpinner.setAdapter(arrayAdapter);
         binding.pointSpinner.setEnabled(false);
     }
     private void clearCalculatedData(){
-        String zeroValue = String.format("%4.2fm", 0.0);
+        String zeroValue = String.format(Locale.getDefault(), "%4.2fm", 0.0);
         binding.distanceValue.setText(zeroValue);
         binding.perimeterValue.setText(zeroValue);
         binding.elevationValue.setText(zeroValue);
-        String zeroReliableValue = String.format("±%4.2fm", 0.0);
+        String zeroReliableValue = String.format(Locale.getDefault(), "±%4.2fm", 0.0);
         binding.distanceReliable.setText(zeroReliableValue);
         binding.perimeterReliable.setText(zeroReliableValue);
         binding.elevationReliable.setText(zeroReliableValue);
-        zeroValue = String.format("%4.1fm2", 0.0);
-        zeroReliableValue = String.format("±%4.1fm2", 0.0);
+        zeroValue = String.format(Locale.getDefault(), "%4.1fm2", 0.0);
+        zeroReliableValue = String.format(Locale.getDefault(), "±%4.1fm2", 0.0);
         binding.areaValue.setText(zeroValue);
         binding.areaReliable.setText(zeroReliableValue);
         chosenMeasPointStore.clear();
