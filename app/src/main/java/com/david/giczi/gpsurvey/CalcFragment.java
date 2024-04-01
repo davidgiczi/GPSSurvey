@@ -155,9 +155,10 @@ public class CalcFragment extends Fragment {
                             chosenPoint = measPoint;
                         }
                     }
-                    if( chosenPoint != null ){
-                        chosenMeasPointStore.add(chosenPoint);
+                    if( chosenMeasPointStore.contains(chosenPoint) ){
+                        return;
                     }
+                    chosenMeasPointStore.add(chosenPoint);
                     clearDisplayedPointData();
                     displayMeasuredPoint(chosenMeasPointStore);
                     displayCalculatedData(chosenMeasPointStore);
