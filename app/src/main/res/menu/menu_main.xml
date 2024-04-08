@@ -49,13 +49,6 @@
             android:orderInCategory="100"
             android:title="@string/point_catching_option"
             app:showAsAction="never" />
-
-        <item
-            android:id="@+id/save_data_option"
-            android:orderInCategory="100"
-            android:title="@string/save_data_option"
-            app:showAsAction="never" />
-
     </group>
 
     <group android:id="@+id/exit">

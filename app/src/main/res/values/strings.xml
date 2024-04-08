@@ -19,6 +19,7 @@
     <string name="Y">Y:</string>
     <string name="Z">Z:</string>
     <string name="save_point">Pont mentése</string>
+    <string name="save_data">Mentés</string>
     <string name="eov">EOV:</string>
     <string name="dot_symbol">🌏</string>
     <string name="measured_data">MeasuredPoints</string>

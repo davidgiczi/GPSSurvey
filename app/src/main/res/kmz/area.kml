@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml  xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>DDIP_vedosav_pntk.txt</name>
+    <Style id="placemark">
+      <IconStyle>
+        <scale>0.5</scale>
+        <Icon>
+          <href>http://pf-prg.hu/markers/kml-marker-kor-red.png</href>
+        </Icon>
+        <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+      </IconStyle>
+      <BalloonStyle><text></text></BalloonStyle>
+      <LabelStyle>
+        <color>FF00FFFF</color>
+        <scale>0.70</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="linestyle">
+      <LineStyle>
+        <color>ffff00ff</color>
+        <width>2</width>
+      </LineStyle>
+    </Style>
+    <Folder>
+      <name>Placemarks</name>
+      <Placemark>
+        <name>Útvonal-1</name>
+        <styleUrl>#linestyle</styleUrl>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates>
+            21.6291156799,47.4623603205,40.78
+            21.6296157509,47.4623402669,40.78
+            21.6292375896,47.4600501474,40.79
+            21.6215085069,47.4563575504,40.80
+            21.5566578946,47.4505732240,40.85
+            21.5497069216,47.4738366773,40.83
+            21.5373269571,47.4951847476,40.80
+            21.5397033463,47.5146674610,40.75
+            21.5402082890,47.5147649346,40.75
+            21.5378009228,47.4952319344,40.80
+            21.5501535005,47.4739260957,40.83
+            21.5570225219,47.4509197503,40.85
+            21.6213338044,47.4566606674,40.80
+            21.6287774322,47.4602341505,40.79
+			21.6291156799,47.4623603205,40.78
+          </coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

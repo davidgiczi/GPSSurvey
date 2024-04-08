@@ -1,7 +1,9 @@
 package com.david.giczi.gpsurvey;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -19,6 +21,10 @@ import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentCalcBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.CalcData;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +49,9 @@ public class CalcFragment extends Fragment {
         initSpinner();
         displayCalculatedData(MainActivity.MEAS_POINT_LIST);
         displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
+        if( !MainActivity.MEAS_POINT_LIST.isEmpty() ){
+            savePointDialog(true);
+        }
         return binding.getRoot();
     }
 
@@ -53,9 +62,7 @@ public class CalcFragment extends Fragment {
             measPointIDLayout.setOrientation(LinearLayout.HORIZONTAL);
             measPointIDLayout.setGravity(Gravity.CENTER);
             TextView measPointId = new TextView(getContext());
-            measPointId.setOnClickListener( d ->{
-                deletePointDialog(((TextView) d).getText().toString());
-            });
+            measPointId.setOnClickListener( d -> deletePointDialog(((TextView) d).getText().toString()));
             String pointID = measPoint.getPointID() + ". pont\t\t±Qyx=" + measPoint.getQ() + "m";
             measPointId.setText(pointID);
             measPointId.setTextSize(18f);
@@ -77,7 +84,7 @@ public class CalcFragment extends Fragment {
 
     private void deletePointDialog(String pointText) {
         String pointNumber = pointText.split("\\.")[0];
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(pointNumber + ". pont törlése");
         builder.setMessage("Biztos, hogy törli a pontot?");
         builder.setPositiveButton("Igen", (dialog, which) -> {
@@ -105,6 +112,31 @@ public class CalcFragment extends Fragment {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void savePointDialog(boolean saveAllPoints) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Adatok fájlba mentése");
+        if( saveAllPoints ){
+            builder.setMessage("Menteni kívánja az összes mért pontot és/vagy a pontokból számított adatokat?");
+        }
+        else{
+            builder.setMessage("Menteni kívánja a mért és kiválasztott pontokat és/vagy a pontokból számított adatokat?");
+
+        }
+        builder.setPositiveButton("Igen", (dialog, which) -> popupSaveWindow());
+
+        builder.setNegativeButton("Nem", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void popupSaveWindow(){
+        ViewGroup saveDataContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_save, null);
+        PopupWindow saveDataWindow = new PopupWindow(saveDataContainer, 900,1600, true);
+        saveDataWindow.showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 0);
+        saveDataContainer.findViewById(R.id.button_save).setBackgroundColor(Color.DKGRAY);
     }
 
     private void clearDisplayedPointData(){
@@ -162,6 +194,7 @@ public class CalcFragment extends Fragment {
                     clearDisplayedPointData();
                     displayMeasuredPoint(chosenMeasPointStore);
                     displayCalculatedData(chosenMeasPointStore);
+                    savePointDialog(false);
                 }
                 else if( !binding.allPointsCheckbox.isChecked() ) {
                     clearDisplayedPointData();
@@ -211,6 +244,26 @@ public class CalcFragment extends Fragment {
                 clearCalculatedData();
             }
         });
+    }
+
+    private void saveProjectFile(String fileName) {
+
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + fileName + ".txt");
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_SHORT).show();
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
