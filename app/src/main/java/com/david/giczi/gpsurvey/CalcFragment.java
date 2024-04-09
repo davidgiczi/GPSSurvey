@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -26,6 +28,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +39,11 @@ public class CalcFragment extends Fragment {
     private FragmentCalcBinding binding;
     private List<LinearLayout> displayedMeasuredPointLinearLayoutStore;
     private List<MeasPoint> chosenMeasPointStore;
+    private  ViewGroup saveDataContainer;
+    private static final List<String> ITEMS_FOR_KMZ = Arrays.asList("Pontok", "Vonal", "Kerület");
+    private static final List<String> ITEMS_FOR_TXT =
+            Arrays.asList("EOV koordináták és számítások", "WGS - decimális",
+                    "WGS - fok-perc-mperc", "WGS - XYZ");
 
     @Nullable
     @Override
@@ -46,12 +55,9 @@ public class CalcFragment extends Fragment {
         this.chosenMeasPointStore = new ArrayList<>();
         MainActivity.PAGE_NUMBER_VALUE = 2;
         addOnClickListenerForCheckBox();
-        initSpinner();
+        initPointSpinner();
         displayCalculatedData(MainActivity.MEAS_POINT_LIST);
         displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
-        if( !MainActivity.MEAS_POINT_LIST.isEmpty() ){
-            savePointDialog(true);
-        }
         return binding.getRoot();
     }
 
@@ -97,7 +103,7 @@ public class CalcFragment extends Fragment {
             }
             clearCalculatedData();
             clearDisplayedPointData();
-            initSpinner();
+            initPointSpinner();
             if( binding.allPointsCheckbox.isChecked() ){
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
@@ -133,11 +139,37 @@ public class CalcFragment extends Fragment {
     }
 
     private void popupSaveWindow(){
-        ViewGroup saveDataContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_save, null);
+        saveDataContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_save, null);
         PopupWindow saveDataWindow = new PopupWindow(saveDataContainer, 900,1600, true);
         saveDataWindow.showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 0);
         saveDataContainer.findViewById(R.id.button_save).setBackgroundColor(Color.DKGRAY);
+        RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kmz_format));
+        radioButtonForKMZ.setChecked(true);
+        initDataTypeSpinner();
+        saveDataContainer.findViewById(R.id.kmz_format).setOnClickListener( r -> {initDataTypeSpinner();});
+        saveDataContainer.findViewById(R.id.txt_format).setOnClickListener( r -> {initDataTypeSpinner();});
     }
+
+    private void initDataTypeSpinner(){
+      Spinner dataTypeSpinner = saveDataContainer.findViewById(R.id.data_type_spinner);
+        ArrayAdapter<String> arrayAdapter;
+        RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kmz_format));
+        RadioButton radioButtonForTXT = ((RadioButton) saveDataContainer.findViewById(R.id.txt_format));
+        if( radioButtonForKMZ.isChecked() ){
+            arrayAdapter = new ArrayAdapter<>(requireContext(),
+                    R.layout.data_type_spinner, ITEMS_FOR_KMZ );
+        }
+        else if( radioButtonForTXT.isChecked() ){
+            arrayAdapter = new ArrayAdapter<>(requireContext(),
+                    R.layout.data_type_spinner, ITEMS_FOR_TXT );
+        }
+        else{
+            arrayAdapter = new ArrayAdapter<>(requireContext(),
+                    R.layout.data_type_spinner, Collections.singletonList("-"));
+        }
+        ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).setAdapter(arrayAdapter);
+    }
+
 
     private void clearDisplayedPointData(){
         if( displayedMeasuredPointLinearLayoutStore == null ){
@@ -169,7 +201,7 @@ public class CalcFragment extends Fragment {
         binding.elevationReliable.setText(elevationReliableValue);
     }
 
-    private void initSpinner(){
+    private void initPointSpinner(){
         List<String> ITEMS = new ArrayList<>();
         ITEMS.add(0, "Válassz pontokat");
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
@@ -235,13 +267,16 @@ public class CalcFragment extends Fragment {
 
             if( binding.allPointsCheckbox.isChecked() ){
                 binding.pointSpinner.setEnabled(false);
-                initSpinner();
+                initPointSpinner();
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
             }
             else {
                 binding.pointSpinner.setEnabled(true);
                 clearCalculatedData();
+                if( !MainActivity.MEAS_POINT_LIST.isEmpty() ){
+                    savePointDialog(true);
+                }
             }
         });
     }
@@ -267,6 +302,7 @@ public class CalcFragment extends Fragment {
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
     }
 
