@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml  xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>SAJGOD_285-286_288-289_OSZLOPOK.txt</name>
+    <Style id="placemark">
+      <IconStyle>
+        <scale>0.5</scale>
+        <Icon>
+          <href>http://pf-prg.hu/markers/kml-marker-kor-red.png</href>
+        </Icon>
+        <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+      </IconStyle>
+      <BalloonStyle><text></text></BalloonStyle>
+      <LabelStyle>
+        <color>FF00FFFF</color>
+        <scale>0.70</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="linestyle">
+      <LineStyle>
+        <color>ffff00ff</color>
+        <width>2</width>
+      </LineStyle>
+    </Style>
+    <Folder>
+      <name>Points</name>
+      <Placemark>
+        <name>285</name>
+        <description><![CDATA[Name=285]]></description>
+        <styleUrl>#placemark</styleUrl>
+        <Point>
+          <coordinates>19.7049156659,47.6868174610,42.74</coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>286</name>
+        <description><![CDATA[Name=286]]></description>
+        <styleUrl>#placemark</styleUrl>
+        <Point>
+          <coordinates>19.6991441862,47.6862622048,42.74</coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>288</name>
+        <description><![CDATA[Name=288]]></description>
+        <styleUrl>#placemark</styleUrl>
+        <Point>
+          <coordinates>19.6902007600,47.6872648444,42.76</coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>289</name>
+        <description><![CDATA[Name=289]]></description>
+        <styleUrl>#placemark</styleUrl>
+        <Point>
+          <coordinates>19.6851602259,47.6887918604,42.76</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>

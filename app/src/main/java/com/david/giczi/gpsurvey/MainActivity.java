@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-    private String setAngleMinSecFormat(double data){
+    public static String convertAngleMinSecFormat(double data){
 
         int angle = (int) data;
         int min = (int) ((data - angle) * 60);
@@ -195,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
                     binding.altitudeText.setText(R.string.altitude);
-                    binding.latitudeData.setText(setAngleMinSecFormat(location.getLatitude()));
-                    binding.longitudeData.setText(setAngleMinSecFormat(location.getLongitude()));
+                    binding.latitudeData.setText(convertAngleMinSecFormat(location.getLatitude()));
+                    binding.longitudeData.setText(convertAngleMinSecFormat(location.getLongitude()));
                     String altitude = location.getAltitude() + "m";
                     binding.altitudeData.setText(altitude);
                 }

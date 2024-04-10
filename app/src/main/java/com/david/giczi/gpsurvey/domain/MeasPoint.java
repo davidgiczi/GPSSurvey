@@ -1,9 +1,14 @@
 package com.david.giczi.gpsurvey.domain;
 
 import androidx.annotation.NonNull;
+
+import com.david.giczi.gpsurvey.MainActivity;
 import com.david.giczi.gpsurvey.utils.EOV;
+import com.david.giczi.gpsurvey.utils.WGS84;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MeasPoint {
@@ -124,23 +129,33 @@ public class MeasPoint {
         X = x;
     }
 
-    public double getFi_WGS() {
-        return fi_WGS;
-    }
-
-    public double getLambda_WGS() {
-        return lambda_WGS;
-    }
-
-    public double getH_WGS() {
-        return h_WGS;
-    }
-
     public String getMeasPontData(){
         return "Y=" + getY() + "m ±" + getqY() +
                 "m\tX=" + getX() + "m ±" + getqX() +
                 "m\nh=" + getZ() + "m ±" + getqZ() + "m";
     }
+
+    public String getEOVMeasPontData(){
+        return pointID +  "," + getY() + "," + getX() + "," + getZ()
+                + "," + getQ() + "," + getqY() + "," + getqX() + "," + getqZ();
+    }
+    public String getWGSMeasPointDataInDecimalFormat(){
+        return pointID + "," + String.format(Locale.getDefault(), "%.6f", fi_WGS) + "," +
+                String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
+                String.format(Locale.getDefault(), "%.3f", h_WGS);
+    }
+    public String getWGSMeasPointDataInAngelMinSecFormat(){
+        return pointID + "," + MainActivity.convertAngleMinSecFormat(fi_WGS) + "," +
+                MainActivity.convertAngleMinSecFormat(lambda_WGS) + "," + h_WGS;
+    }
+
+    public String getWGSMeasPointDataInXYZFormat(){
+        String X = WGS84.getX(lambda_WGS, fi_WGS, h_WGS).substring(0, WGS84.getX(lambda_WGS, fi_WGS, h_WGS).indexOf("m"));
+        String Y = WGS84.getY(lambda_WGS, fi_WGS, h_WGS).substring(0, WGS84.getY(lambda_WGS, fi_WGS, h_WGS).indexOf("m"));
+        String Z = WGS84.getZ(lambda_WGS,h_WGS).substring(0, WGS84.getZ(lambda_WGS,h_WGS).indexOf("m"));
+        return pointID + "," + X + "," + Y + "," + Z;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

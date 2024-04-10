@@ -171,4 +171,12 @@ public class CalcData {
 
         return (int) (10 * Math.sqrt(reliable)) / 10.0;
     }
+
+    public String getCalculatedData(){
+        return "Távolság: " + calcDistance() + "m ±" + calcDistanceReliable() + "m\n" +
+               "Kerület: " + calcPerimeter() + "m ±" + calcPerimeterReliable() + "m\n" +
+               "Terület: " + calcArea() + "m2 ±" + calcAreaReliable() + "m2\n" +
+               "Δm: " + calcElevation() + "m ±" + calcElevationReliable() + "m";
+    }
+
 }

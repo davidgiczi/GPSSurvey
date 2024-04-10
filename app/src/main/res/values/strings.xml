@@ -33,6 +33,6 @@
     <string name="file_name">fájlnév</string>
     <string name="set_file_type">Fájltípus megadása</string>
     <string name="set_data_type">Adattípus megadása</string>
-    <string name="kmz_format">kmz</string>
+    <string name="kml_format">kml</string>
     <string name="txt_format">txt</string>
 </resources>

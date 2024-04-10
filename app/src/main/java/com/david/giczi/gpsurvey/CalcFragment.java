@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
@@ -38,7 +40,7 @@ public class CalcFragment extends Fragment {
 
     private FragmentCalcBinding binding;
     private List<LinearLayout> displayedMeasuredPointLinearLayoutStore;
-    private List<MeasPoint> chosenMeasPointStore;
+    private List<MeasPoint> chosenMeasPointList;
     private  ViewGroup saveDataContainer;
     private static final List<String> ITEMS_FOR_KMZ = Arrays.asList("Pontok", "Vonal", "Kerület");
     private static final List<String> ITEMS_FOR_TXT =
@@ -52,7 +54,7 @@ public class CalcFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentCalcBinding.inflate(inflater, container, false);
-        this.chosenMeasPointStore = new ArrayList<>();
+        this.chosenMeasPointList = new ArrayList<>();
         MainActivity.PAGE_NUMBER_VALUE = 2;
         addOnClickListenerForCheckBox();
         initPointSpinner();
@@ -88,6 +90,7 @@ public class CalcFragment extends Fragment {
         }
     }
 
+
     private void deletePointDialog(String pointText) {
         String pointNumber = pointText.split("\\.")[0];
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -98,7 +101,7 @@ public class CalcFragment extends Fragment {
             for (int i = MainActivity.MEAS_POINT_LIST.size() - 1; i >= 0; i--) {
                 if ( pointId == MainActivity.MEAS_POINT_LIST.get(i).getPointID() ) {
                   MeasPoint deletedPoint = MainActivity.MEAS_POINT_LIST.remove(i);
-                  chosenMeasPointStore.remove(deletedPoint);
+                  chosenMeasPointList.remove(deletedPoint);
                 }
             }
             clearCalculatedData();
@@ -108,9 +111,9 @@ public class CalcFragment extends Fragment {
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
             }
-            else if( !chosenMeasPointStore.isEmpty() ){
-                displayCalculatedData(chosenMeasPointStore);
-                displayMeasuredPoint(chosenMeasPointStore);
+            else if( !chosenMeasPointList.isEmpty() ){
+                displayCalculatedData(chosenMeasPointList);
+                displayMeasuredPoint(chosenMeasPointList);
             }
         });
 
@@ -124,13 +127,13 @@ public class CalcFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Adatok fájlba mentése");
         if( saveAllPoints ){
-            builder.setMessage("Menteni kívánja az összes mért pontot és/vagy a pontokból számított adatokat?");
+            builder.setMessage("Menteni kívánja az összes mért pontot és a pontokból számított adatokat?");
         }
         else{
-            builder.setMessage("Menteni kívánja a mért és kiválasztott pontokat és/vagy a pontokból számított adatokat?");
+            builder.setMessage("Menteni kívánja a mért, kiválasztott pontokat és a pontokból számított adatokat?");
 
         }
-        builder.setPositiveButton("Igen", (dialog, which) -> popupSaveWindow());
+        builder.setPositiveButton("Igen", (dialog, which) -> popupSaveWindow(saveAllPoints));
 
         builder.setNegativeButton("Nem", (dialog, which) -> dialog.dismiss());
 
@@ -138,22 +141,53 @@ public class CalcFragment extends Fragment {
         alert.show();
     }
 
-    private void popupSaveWindow(){
+
+    private void setFileName(boolean saveAllPoints){
+        boolean isKMLFormat = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format)).isChecked();
+        if( saveAllPoints ) {
+            ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field))
+                    .setText(getSaveFileName(MainActivity.MEAS_POINT_LIST, isKMLFormat));
+        }
+        else {
+            ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field))
+                    .setText(getSaveFileName(chosenMeasPointList, isKMLFormat));
+        }
+    }
+
+    private String getSaveFileName(List<MeasPoint> points, boolean isKML){
+        if( points.size() == 1){
+            return "_" + points.get(0).getPointID() + "_pont" + (isKML ? ".kml" : ".txt");
+        }
+        return "_" + points.get(0).getPointID() + "-"
+                + points.get(points.size() - 1).getPointID() + "_pontok" + (isKML ? ".kml" : ".txt");
+    }
+
+    private void popupSaveWindow(boolean saveAllPoints){
         saveDataContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_save, null);
         PopupWindow saveDataWindow = new PopupWindow(saveDataContainer, 900,1600, true);
         saveDataWindow.showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 0);
-        saveDataContainer.findViewById(R.id.button_save).setBackgroundColor(Color.DKGRAY);
-        RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kmz_format));
-        radioButtonForKMZ.setChecked(true);
+        Button saveButton = (Button) saveDataContainer.findViewById(R.id.button_save);
+        saveButton.setBackgroundColor(Color.DKGRAY);
+        saveButton.setOnClickListener(s -> {
+            saveDataProcess();
+            saveDataWindow.dismiss();});
+        RadioButton radioButtonForKML = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
+        radioButtonForKML.setChecked(true);
+        setFileName(saveAllPoints);
         initDataTypeSpinner();
-        saveDataContainer.findViewById(R.id.kmz_format).setOnClickListener( r -> {initDataTypeSpinner();});
-        saveDataContainer.findViewById(R.id.txt_format).setOnClickListener( r -> {initDataTypeSpinner();});
+        saveDataContainer.findViewById(R.id.kml_format).setOnClickListener( r -> {
+            initDataTypeSpinner();
+            setFileName(saveAllPoints);});
+        saveDataContainer.findViewById(R.id.txt_format).setOnClickListener( r -> {
+            initDataTypeSpinner();
+            setFileName(saveAllPoints);});
+
     }
 
     private void initDataTypeSpinner(){
       Spinner dataTypeSpinner = saveDataContainer.findViewById(R.id.data_type_spinner);
         ArrayAdapter<String> arrayAdapter;
-        RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kmz_format));
+        RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
         RadioButton radioButtonForTXT = ((RadioButton) saveDataContainer.findViewById(R.id.txt_format));
         if( radioButtonForKMZ.isChecked() ){
             arrayAdapter = new ArrayAdapter<>(requireContext(),
@@ -169,7 +203,6 @@ public class CalcFragment extends Fragment {
         }
         ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).setAdapter(arrayAdapter);
     }
-
 
     private void clearDisplayedPointData(){
         if( displayedMeasuredPointLinearLayoutStore == null ){
@@ -219,13 +252,13 @@ public class CalcFragment extends Fragment {
                             chosenPoint = measPoint;
                         }
                     }
-                    if( chosenMeasPointStore.contains(chosenPoint) ){
+                    if( chosenMeasPointList.contains(chosenPoint) ){
                         return;
                     }
-                    chosenMeasPointStore.add(chosenPoint);
+                    chosenMeasPointList.add(chosenPoint);
                     clearDisplayedPointData();
-                    displayMeasuredPoint(chosenMeasPointStore);
-                    displayCalculatedData(chosenMeasPointStore);
+                    displayMeasuredPoint(chosenMeasPointList);
+                    displayCalculatedData(chosenMeasPointList);
                     savePointDialog(false);
                 }
                 else if( !binding.allPointsCheckbox.isChecked() ) {
@@ -256,7 +289,7 @@ public class CalcFragment extends Fragment {
         zeroReliableValue = String.format(Locale.getDefault(), "±%4.1fm2", 0.0);
         binding.areaValue.setText(zeroValue);
         binding.areaReliable.setText(zeroReliableValue);
-        chosenMeasPointStore.clear();
+        chosenMeasPointList.clear();
     }
 
     private void addOnClickListenerForCheckBox(){
@@ -281,15 +314,57 @@ public class CalcFragment extends Fragment {
         });
     }
 
-    private void saveProjectFile(String fileName) {
+    private void saveDataProcess(){
+       String fileName = ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field)).getText().toString();
+       if( fileName.isEmpty() ){
+           Toast.makeText(getContext(), "Fájlnév megadása szükséges.", Toast.LENGTH_SHORT).show();
+           return;
+       }
+       boolean isTXTFormat = ((RadioButton) saveDataContainer.findViewById(R.id.txt_format)).isChecked();
+       String dataType = (String) ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).getSelectedItem();
 
+       if( isTXTFormat ){
+
+           if( dataType.equals(ITEMS_FOR_TXT.get(0)) ){
+               saveAllMeasPointsAndCalculatedDataInEOVFormat(fileName);
+           }
+           else if( dataType.equals(ITEMS_FOR_TXT.get(1)) ){
+               saveAllMeasPointsDataInWGSDecimalFormat(fileName);
+           }
+           else if( dataType.equals(ITEMS_FOR_TXT.get(2)) ){
+                saveAllMeasPointsDataInWGSAngleSecMinFormat(fileName);
+           }
+           else if( dataType.equals(ITEMS_FOR_TXT.get(3)) ){
+                saveAllMeasPointsDataInWGSXYZFormat(fileName);
+           }
+
+       }
+       else {
+
+
+       }
+    }
+
+    private void saveAllMeasPointsAndCalculatedDataInEOVFormat(String fileName) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
                         "/Documents/" + fileName + ".txt");
+
+        if( projectFile.exists() ){
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nlétező projekt fájl, mentés sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
 
+            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+                bw.write(measPoint.getEOVMeasPontData());
+                bw.newLine();
+            }
+            bw.write(new CalcData(MainActivity.MEAS_POINT_LIST).getCalculatedData());
+            bw.newLine();
             bw.close();
         } catch (IOException e) {
             Toast.makeText(getContext(), projectFile.getName() +
@@ -300,9 +375,93 @@ public class CalcFragment extends Fragment {
                 "Projekt fájl mentve:\n"
                         + projectFile.getName() , Toast.LENGTH_SHORT).show();
     }
+
+    private void saveAllMeasPointsDataInWGSDecimalFormat(String fileName) {
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + fileName + ".txt");
+
+        if( projectFile.exists() ){
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nlétező projekt fájl, mentés sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+                bw.write(measPoint.getWGSMeasPointDataInDecimalFormat());
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveAllMeasPointsDataInWGSAngleSecMinFormat(String fileName) {
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + fileName + ".txt");
+
+        if( projectFile.exists() ){
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nlétező projekt fájl, mentés sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+                bw.write(measPoint.getWGSMeasPointDataInAngelMinSecFormat());
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveAllMeasPointsDataInWGSXYZFormat(String fileName) {
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + fileName + ".txt");
+
+        if( projectFile.exists() ){
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nlétező projekt fájl, mentés sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+                bw.write(measPoint.getWGSMeasPointDataInXYZFormat());
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
     }
 
