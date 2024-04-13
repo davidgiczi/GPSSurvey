@@ -84,10 +84,10 @@ public class WrapDataInKML {
         kmlDataList.add("<Placemark>");
         kmlDataList.add( "<name>" +
                 measPointList.get(0).getPointID() + "-" +
-                measPointList.get(measPointList.size() - 1) +  "_track</name>");
+                measPointList.get(measPointList.size() - 1).getPointID() +  "_track</name>");
         kmlDataList.add("<styleUrl>#linestyle</styleUrl>");
         kmlDataList.add("<LineString>");
-        kmlDataList.add("<tessellate>1</tessellate");
+        kmlDataList.add("<tessellate>1</tessellate>");
         kmlDataList.add("<coordinates>");
         for (MeasPoint measPoint : measPointList) {
             kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormat());
@@ -106,10 +106,10 @@ public class WrapDataInKML {
         kmlDataList.add("<Placemark>");
         kmlDataList.add( "<name>" +
                 measPointList.get(0).getPointID() + "-" +
-                measPointList.get(measPointList.size() - 1) +  "_track</name>");
+                measPointList.get(measPointList.size() - 1).getPointID() +  "_perimeter</name>");
         kmlDataList.add("<styleUrl>#linestyle</styleUrl>");
         kmlDataList.add("<LineString>");
-        kmlDataList.add("<tessellate>1</tessellate");
+        kmlDataList.add("<tessellate>1</tessellate>");
         kmlDataList.add("<coordinates>");
         for (MeasPoint measPoint : measPointList) {
             kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormat());
