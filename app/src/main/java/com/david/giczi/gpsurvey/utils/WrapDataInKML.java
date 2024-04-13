@@ -27,15 +27,15 @@ public class WrapDataInKML {
         return kmlDataList;
     }
     public void createDataListForKML(){
+        getTemplateDataForKML();
         if( dataType.equals("Pontok") ){
-            getTemplateDataForKML();
             wrapPointsInKML();
         }
         else if( dataType.equals("Vonal") ){
-
+            wrapPointsForLineInKML();
         }
         else if( dataType.equals("Kerület") ){
-
+            wrapPointsForPerimeterInKML();
         }
     }
 
@@ -49,7 +49,7 @@ public class WrapDataInKML {
                     kmlDataList.add("<name>" + fileName + "</name>");
                     continue;
                 }
-                kmlDataList.add(row);
+                kmlDataList.add(row.trim());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -76,6 +76,51 @@ public class WrapDataInKML {
               kmlDataList.add("<coordinates>" + measPoint.getWGSMeasPointDataInDecimalFormat() + "</coordinates>");
               kmlDataList.add("</Point>");
               kmlDataList.add("</Placemark>");
+    }
+
+    private void wrapPointsForLineInKML(){
+        kmlDataList.add("<Folder>");
+        kmlDataList.add("<name>Line</name>");
+        kmlDataList.add("<Placemark>");
+        kmlDataList.add( "<name>" +
+                measPointList.get(0).getPointID() + "-" +
+                measPointList.get(measPointList.size() - 1) +  "_track</name>");
+        kmlDataList.add("<styleUrl>#linestyle</styleUrl>");
+        kmlDataList.add("<LineString>");
+        kmlDataList.add("<tessellate>1</tessellate");
+        kmlDataList.add("<coordinates>");
+        for (MeasPoint measPoint : measPointList) {
+            kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormat());
+        }
+        kmlDataList.add("</coordinates>");
+        kmlDataList.add("</LineString>");
+        kmlDataList.add("</Placemark>");
+        kmlDataList.add("</Folder>");
+        kmlDataList.add("</Document>");
+        kmlDataList.add("</kml>");
+    }
+
+    private void wrapPointsForPerimeterInKML(){
+        kmlDataList.add("<Folder>");
+        kmlDataList.add("<name>Line</name>");
+        kmlDataList.add("<Placemark>");
+        kmlDataList.add( "<name>" +
+                measPointList.get(0).getPointID() + "-" +
+                measPointList.get(measPointList.size() - 1) +  "_track</name>");
+        kmlDataList.add("<styleUrl>#linestyle</styleUrl>");
+        kmlDataList.add("<LineString>");
+        kmlDataList.add("<tessellate>1</tessellate");
+        kmlDataList.add("<coordinates>");
+        for (MeasPoint measPoint : measPointList) {
+            kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormat());
+        }
+        kmlDataList.add(measPointList.get(0).getWGSMeasPointDataInDecimalFormat());
+        kmlDataList.add("</coordinates>");
+        kmlDataList.add("</LineString>");
+        kmlDataList.add("</Placemark>");
+        kmlDataList.add("</Folder>");
+        kmlDataList.add("</Document>");
+        kmlDataList.add("</kml>");
     }
 
 }
