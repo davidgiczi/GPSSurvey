@@ -42,7 +42,7 @@ public class CalcFragment extends Fragment {
     private List<LinearLayout> displayedMeasuredPointLinearLayoutStore;
     private List<MeasPoint> chosenMeasPointList;
     private  ViewGroup saveDataContainer;
-    private static final List<String> ITEMS_FOR_KMZ = Arrays.asList("Pontok", "Vonal", "Kerület");
+    private static final List<String> ITEMS_FOR_KML = Arrays.asList("Pontok", "Vonal", "Kerület");
     private static final List<String> ITEMS_FOR_TXT =
             Arrays.asList("EOV koordináták és számítások", "WGS - decimális",
                     "WGS - fok-perc-mperc", "WGS - XYZ");
@@ -169,7 +169,7 @@ public class CalcFragment extends Fragment {
         Button saveButton = (Button) saveDataContainer.findViewById(R.id.button_save);
         saveButton.setBackgroundColor(Color.DKGRAY);
         saveButton.setOnClickListener(s -> {
-            saveDataProcess();
+            saveDataProcess(saveAllPoints);
             saveDataWindow.dismiss();});
         RadioButton radioButtonForKML = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
         radioButtonForKML.setChecked(true);
@@ -191,7 +191,7 @@ public class CalcFragment extends Fragment {
         RadioButton radioButtonForTXT = ((RadioButton) saveDataContainer.findViewById(R.id.txt_format));
         if( radioButtonForKMZ.isChecked() ){
             arrayAdapter = new ArrayAdapter<>(requireContext(),
-                    R.layout.data_type_spinner, ITEMS_FOR_KMZ );
+                    R.layout.data_type_spinner, ITEMS_FOR_KML);
         }
         else if( radioButtonForTXT.isChecked() ){
             arrayAdapter = new ArrayAdapter<>(requireContext(),
@@ -314,7 +314,7 @@ public class CalcFragment extends Fragment {
         });
     }
 
-    private void saveDataProcess(){
+    private void saveDataProcess(boolean saveAllPoints){
        String fileName = ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field)).getText().toString();
        if( fileName.isEmpty() ){
            Toast.makeText(getContext(), "Fájlnév megadása szükséges.", Toast.LENGTH_SHORT).show();
@@ -326,26 +326,35 @@ public class CalcFragment extends Fragment {
        if( isTXTFormat ){
 
            if( dataType.equals(ITEMS_FOR_TXT.get(0)) ){
-               saveAllMeasPointsAndCalculatedDataInEOVFormat(fileName);
+               saveMeasPointAndCalculatedDataInEOVFormat(fileName, saveAllPoints);
            }
            else if( dataType.equals(ITEMS_FOR_TXT.get(1)) ){
-               saveAllMeasPointsDataInWGSDecimalFormat(fileName);
+               saveMeasPointDataInWGSDecimalFormat(fileName, saveAllPoints);
            }
            else if( dataType.equals(ITEMS_FOR_TXT.get(2)) ){
-                saveAllMeasPointsDataInWGSAngleSecMinFormat(fileName);
+                saveMeasPointDataInWGSAngleMinSecFormat(fileName, saveAllPoints);
            }
            else if( dataType.equals(ITEMS_FOR_TXT.get(3)) ){
-                saveAllMeasPointsDataInWGSXYZFormat(fileName);
+                saveMeasPointDataInWGSXYZFormat(fileName, saveAllPoints);
            }
 
        }
        else {
 
+           if( dataType.equals(ITEMS_FOR_KML.get(0)) ){
+
+           }
+           else if( dataType.equals(ITEMS_FOR_KML.get(1)) ){
+
+           }
+           else if( dataType.equals(ITEMS_FOR_KML.get(2)) ){
+
+           }
 
        }
     }
 
-    private void saveAllMeasPointsAndCalculatedDataInEOVFormat(String fileName) {
+    private void saveMeasPointAndCalculatedDataInEOVFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
                         "/Documents/" + fileName + ".txt");
@@ -359,7 +368,7 @@ public class CalcFragment extends Fragment {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
 
-            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
                 bw.write(measPoint.getEOVMeasPontData());
                 bw.newLine();
             }
@@ -376,7 +385,7 @@ public class CalcFragment extends Fragment {
                         + projectFile.getName() , Toast.LENGTH_SHORT).show();
     }
 
-    private void saveAllMeasPointsDataInWGSDecimalFormat(String fileName) {
+    private void saveMeasPointDataInWGSDecimalFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
                         "/Documents/" + fileName + ".txt");
@@ -389,7 +398,7 @@ public class CalcFragment extends Fragment {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
-            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
                 bw.write(measPoint.getWGSMeasPointDataInDecimalFormat());
                 bw.newLine();
             }
@@ -404,7 +413,7 @@ public class CalcFragment extends Fragment {
                         + projectFile.getName() , Toast.LENGTH_SHORT).show();
     }
 
-    private void saveAllMeasPointsDataInWGSAngleSecMinFormat(String fileName) {
+    private void saveMeasPointDataInWGSAngleMinSecFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
                         "/Documents/" + fileName + ".txt");
@@ -417,7 +426,7 @@ public class CalcFragment extends Fragment {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
-            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
                 bw.write(measPoint.getWGSMeasPointDataInAngelMinSecFormat());
                 bw.newLine();
             }
@@ -432,7 +441,7 @@ public class CalcFragment extends Fragment {
                         + projectFile.getName() , Toast.LENGTH_SHORT).show();
     }
 
-    private void saveAllMeasPointsDataInWGSXYZFormat(String fileName) {
+    private void saveMeasPointDataInWGSXYZFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
                         "/Documents/" + fileName + ".txt");
@@ -445,7 +454,7 @@ public class CalcFragment extends Fragment {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
-            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
                 bw.write(measPoint.getWGSMeasPointDataInXYZFormat());
                 bw.newLine();
             }

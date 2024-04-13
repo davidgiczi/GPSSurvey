@@ -140,13 +140,13 @@ public class MeasPoint {
                 + "," + getQ() + "," + getqY() + "," + getqX() + "," + getqZ();
     }
     public String getWGSMeasPointDataInDecimalFormat(){
-        return pointID + "," + String.format(Locale.getDefault(), "%.6f", fi_WGS) + "," +
-                String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
-                String.format(Locale.getDefault(), "%.3f", h_WGS);
+        return pointID + "," + String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
+                String.format(Locale.getDefault(), "%.6f", fi_WGS) + "," +
+                String.format(Locale.getDefault(), "%.2f", h_WGS);
     }
     public String getWGSMeasPointDataInAngelMinSecFormat(){
-        return pointID + "," + MainActivity.convertAngleMinSecFormat(fi_WGS) + "," +
-                MainActivity.convertAngleMinSecFormat(lambda_WGS) + "," + h_WGS;
+        return pointID + "," + MainActivity.convertAngleMinSecFormat(lambda_WGS) + "," +
+                MainActivity.convertAngleMinSecFormat(fi_WGS) + "," + ((int) (100 * h_WGS) / 100.0);
     }
 
     public String getWGSMeasPointDataInXYZFormat(){

@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int angle = (int) data;
         int min = (int) ((data - angle) * 60);
         double sec = ((int) (10000 * ((data - angle) * 3600 - min * 60))) / 10000.0;
-        return angle + "° " + (9 < min ? min : "0" + min) + "' " + (9 < sec ? sec : "0" + sec) + "\"";
+        return angle + "°" + (9 < min ? min : "0" + min) + "'" + (9 < sec ? sec : "0" + sec) + "\"";
     }
 
     private void startMeasure(){
