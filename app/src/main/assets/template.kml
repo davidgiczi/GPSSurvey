@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml  xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name> </name>
+    <Style id="placemark">
+      <IconStyle>
+        <scale>0.5</scale>
+        <Icon>
+          <href>http://pf-prg.hu/markers/kml-marker-kor-red.png</href>
+        </Icon>
+        <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+      </IconStyle>
+      <LabelStyle>
+        <color>FF00FFFF</color>
+        <scale>0.70</scale>
+      </LabelStyle>
+    </Style>
+    <Style id="linestyle">
+      <LineStyle>
+        <color>ffff00ff</color>
+        <width>2</width>
+      </LineStyle>
+    </Style>

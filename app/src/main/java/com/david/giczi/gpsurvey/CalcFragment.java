@@ -25,6 +25,8 @@ import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentCalcBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.CalcData;
+import com.david.giczi.gpsurvey.utils.WrapDataInKML;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -170,7 +172,8 @@ public class CalcFragment extends Fragment {
         saveButton.setBackgroundColor(Color.DKGRAY);
         saveButton.setOnClickListener(s -> {
             saveDataProcess(saveAllPoints);
-            saveDataWindow.dismiss();});
+            saveDataWindow.dismiss();
+        });
         RadioButton radioButtonForKML = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
         radioButtonForKML.setChecked(true);
         setFileName(saveAllPoints);
@@ -185,7 +188,6 @@ public class CalcFragment extends Fragment {
     }
 
     private void initDataTypeSpinner(){
-      Spinner dataTypeSpinner = saveDataContainer.findViewById(R.id.data_type_spinner);
         ArrayAdapter<String> arrayAdapter;
         RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
         RadioButton radioButtonForTXT = ((RadioButton) saveDataContainer.findViewById(R.id.txt_format));
@@ -340,24 +342,53 @@ public class CalcFragment extends Fragment {
 
        }
        else {
-
-           if( dataType.equals(ITEMS_FOR_KML.get(0)) ){
-
-           }
-           else if( dataType.equals(ITEMS_FOR_KML.get(1)) ){
-
-           }
-           else if( dataType.equals(ITEMS_FOR_KML.get(2)) ){
-
-           }
-
+            saveMeasDataInKMLFormat(fileName, dataType, saveAllPoints);
        }
+    }
+
+    private void saveMeasDataInKMLFormat(String fileName, String dataType, boolean saveAllPoints){
+        WrapDataInKML wrapDataInKML;
+        if( saveAllPoints ){
+            wrapDataInKML =
+                    new WrapDataInKML(MainActivity.MEAS_POINT_LIST, dataType, fileName);
+        }
+        else{
+            wrapDataInKML =
+                    new WrapDataInKML(chosenMeasPointList, dataType, fileName);
+        }
+        wrapDataInKML.createDataListForKML();
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + fileName);
+
+        if( projectFile.exists() ){
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nlétező projekt fájl, mentés sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+
+            for (String dataForKML : wrapDataInKML.getKmlDataList()) {
+                bw.write(dataForKML);
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_SHORT).show();
     }
 
     private void saveMeasPointAndCalculatedDataInEOVFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
-                        "/Documents/" + fileName + ".txt");
+                        "/Documents/" + fileName);
 
         if( projectFile.exists() ){
             Toast.makeText(getContext(), projectFile.getName() +
@@ -388,7 +419,7 @@ public class CalcFragment extends Fragment {
     private void saveMeasPointDataInWGSDecimalFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
-                        "/Documents/" + fileName + ".txt");
+                        "/Documents/" + fileName);
 
         if( projectFile.exists() ){
             Toast.makeText(getContext(), projectFile.getName() +
@@ -399,7 +430,7 @@ public class CalcFragment extends Fragment {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
             for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
-                bw.write(measPoint.getWGSMeasPointDataInDecimalFormat());
+                bw.write(measPoint.getPointID() + "," + measPoint.getWGSMeasPointDataInDecimalFormat());
                 bw.newLine();
             }
             bw.close();
@@ -416,7 +447,7 @@ public class CalcFragment extends Fragment {
     private void saveMeasPointDataInWGSAngleMinSecFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
-                        "/Documents/" + fileName + ".txt");
+                        "/Documents/" + fileName);
 
         if( projectFile.exists() ){
             Toast.makeText(getContext(), projectFile.getName() +
@@ -444,7 +475,7 @@ public class CalcFragment extends Fragment {
     private void saveMeasPointDataInWGSXYZFormat(String fileName, boolean saveAllPoints) {
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
-                        "/Documents/" + fileName + ".txt");
+                        "/Documents/" + fileName);
 
         if( projectFile.exists() ){
             Toast.makeText(getContext(), projectFile.getName() +

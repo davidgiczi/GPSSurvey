@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor sensor;
     private  ViewGroup compassContainer;
     public ViewGroup measuredDataContainer;
+    public static Context CONTEXT;
     public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        CONTEXT = getApplicationContext();
         MEAS_POINT_LIST = new ArrayList<>();
     }
 

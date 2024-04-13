@@ -140,7 +140,7 @@ public class MeasPoint {
                 + "," + getQ() + "," + getqY() + "," + getqX() + "," + getqZ();
     }
     public String getWGSMeasPointDataInDecimalFormat(){
-        return pointID + "," + String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
+        return  String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
                 String.format(Locale.getDefault(), "%.6f", fi_WGS) + "," +
                 String.format(Locale.getDefault(), "%.2f", h_WGS);
     }

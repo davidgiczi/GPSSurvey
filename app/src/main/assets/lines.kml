@@ -10,7 +10,6 @@
         </Icon>
         <hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
       </IconStyle>
-      <BalloonStyle><text></text></BalloonStyle>
       <LabelStyle>
         <color>FF00FFFF</color>
         <scale>0.70</scale>
