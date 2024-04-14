@@ -102,7 +102,7 @@ public class WrapDataInKML {
 
     private void wrapPointsForPerimeterInKML(){
         kmlDataList.add("<Folder>");
-        kmlDataList.add("<name>Line</name>");
+        kmlDataList.add("<name>Perimeter</name>");
         kmlDataList.add("<Placemark>");
         kmlDataList.add( "<name>" +
                 measPointList.get(0).getPointID() + "-" +
