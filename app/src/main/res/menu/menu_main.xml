@@ -45,7 +45,7 @@
             android:title="@string/calc_option"
             app:showAsAction="never" />
         <item
-            android:id="@+id/catching_option"
+            android:id="@+id/finding_option"
             android:orderInCategory="100"
             android:title="@string/point_catching_option"
             app:showAsAction="never" />

@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_StartFragment_to_CalcFragment"
             app:destination="@id/CalcFragment" />
+        <action
+            android:id="@+id/action_StartFragment_to_FindPointFragment"
+            app:destination="@id/FindPointFragment" />
     </fragment>
     <fragment
         android:id="@+id/MeasFragment"
@@ -23,6 +26,9 @@
         <action
             android:id="@+id/action_MeasFragment_to_CalcFragment"
             app:destination="@id/CalcFragment" />
+        <action
+            android:id="@+id/action_MeasFragment_to_FindPointFragment"
+            app:destination="@id/FindPointFragment" />
     </fragment>
     <fragment
         android:id="@+id/CalcFragment"
@@ -31,6 +37,21 @@
         <action
             android:id="@+id/action_CalcFragment_to_MeasFragment"
             app:destination="@id/MeasFragment" />
+        <action
+            android:id="@+id/action_CalcFragment_to_FindPointFragment"
+            app:destination="@id/FindPointFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/FindPointFragment"
+        android:name="com.david.giczi.gpsurvey.FindPointFragment"
+        tools:layout="@layout/fragment_find_point">
+        <action
+            android:id="@+id/action_FindPointFragment_to_MeasFragment"
+            app:destination="@id/MeasFragment" />
+        <action
+            android:id="@+id/action_FindPointFragment_to_CalcFragment"
+            app:destination="@id/CalcFragment" />
     </fragment>
 
 </navigation>

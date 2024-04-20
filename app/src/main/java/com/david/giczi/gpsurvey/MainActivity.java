@@ -35,6 +35,9 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -50,13 +53,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor sensor;
     private  ViewGroup compassContainer;
     public ViewGroup measuredDataContainer;
-    public static Context CONTEXT;
     public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
+    public static double AZIMUTH;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -81,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        CONTEXT = getApplicationContext();
         MEAS_POINT_LIST = new ArrayList<>();
     }
 
@@ -146,8 +148,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if( id == R.id.calc_option ){
             navigateToCalcFragment();
         }
+        else if( id == R.id.finding_option ){
+            if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationListener == null){
+                startMeasure();
+            }
+            navigateToFindPointFragment();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void navigateToFindPointFragment(){
+        switch (PAGE_NUMBER_VALUE){
+            case 0:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_StartFragment_to_FindPointFragment);
+                break;
+            case 1:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_MeasFragment_to_FindPointFragment);
+                break;
+            case 2:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_CalcFragment_to_FindPointFragment);
+                break;
+
+        }
     }
 
     private void navigateToMeasFragment(){
@@ -159,6 +185,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case 2:
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_CalcFragment_to_MeasFragment);
+                break;
+            case 3:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_FindPointFragment_to_MeasFragment);
+                break;
         }
     }
 
@@ -171,6 +202,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case 1 :
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_MeasFragment_to_CalcFragment);
+                break;
+            case 3:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_FindPointFragment_to_CalcFragment);
+                break;
         }
     }
 
@@ -328,6 +364,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         rotateCompass( - event.values[0] );
+        AZIMUTH = event.values[0];
     }
 
     @Override

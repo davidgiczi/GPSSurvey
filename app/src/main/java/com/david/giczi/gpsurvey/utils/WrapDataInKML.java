@@ -1,5 +1,7 @@
 package com.david.giczi.gpsurvey.utils;
 
+import androidx.fragment.app.Fragment;
+
 import com.david.giczi.gpsurvey.MainActivity;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import java.io.BufferedReader;
@@ -8,8 +10,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class WrapDataInKML {
+public class WrapDataInKML extends Fragment {
 
     private final List<MeasPoint> measPointList;
     private final String dataType;
@@ -41,8 +44,8 @@ public class WrapDataInKML {
 
     private void getTemplateDataForKML()  {
         kmlDataList = new ArrayList<>();
-        try(InputStream is = MainActivity.CONTEXT.getAssets().open("template.kml");
-            BufferedReader bf = new BufferedReader(new InputStreamReader(is))) {
+        try( InputStream is = requireContext().getAssets().open("template.kml");
+            BufferedReader bf = new BufferedReader(new InputStreamReader(is)) ) {
             String row;
             while((row = bf.readLine()) != null){
                 if( row.contains("<name>") ){
