@@ -1,5 +1,7 @@
 package com.david.giczi.gpsurvey.utils;
 
+import java.util.Locale;
+
 public class WGS84 {
 
     private static final double a = 6378137.0;
@@ -13,19 +15,19 @@ public class WGS84 {
         double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(Math.toRadians(latitude)), 2));
         double X = (N + altitude) * Math.cos(Math.toRadians(latitude))
                 * Math.cos(Math.toRadians(longitude));
-        return String.format( "%.3fm", X);
+        return String.format(Locale.getDefault() ,"%.3fm", X);
     }
     public static String getY(double latitude, double longitude, double altitude){
         double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(Math.toRadians(latitude)), 2));
         double Y = (N + altitude) * Math.cos(Math.toRadians(latitude))
                 * Math.sin(Math.toRadians(longitude));
-        return String.format( "%.3fm", Y);
+        return String.format(Locale.getDefault(), "%.3fm", Y);
     }
 
     public static String getZ(double latitude, double altitude){
         double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(Math.toRadians(latitude)), 2));
         double Z = ((1 - e2) * N + altitude) * Math.sin(Math.toRadians(latitude));
-        return String.format( "%.3fm", Z);
+        return String.format(Locale.getDefault(), "%.3fm", Z);
     }
 
 }

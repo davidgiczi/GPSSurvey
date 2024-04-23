@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
+    public LocationManager locationManager;
+    public LocationListener locationListener;
     private SensorManager sensorManager;
     private Sensor sensor;
     private  ViewGroup compassContainer;
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
+    public static EOV ACTUAL_POSITION;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -148,10 +149,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else if( id == R.id.calc_option ){
             navigateToCalcFragment();
         }
-        else if( id == R.id.finding_option ){
-            if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationListener == null){
-                startMeasure();
-            }
+        else if( id == R.id.finding_point_option ){
             navigateToFindPointFragment();
         }
 
@@ -224,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return angle + "°" + (9 < min ? min : "0" + min) + "'" + (9 < sec ? sec : "0" + sec) + "\"";
     }
 
-    private void startMeasure(){
+    public void startMeasure(){
 
         locationListener = new LocationListener() {
             @Override
@@ -275,13 +273,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double Z_WGS = Double.parseDouble(WGS84.getZ(location.getLatitude(),
                         location.getAltitude()).substring(0, WGS84.getZ(location.getLatitude(),
                         location.getAltitude()).indexOf("m")));
-                EOV eov = new EOV(X_WGS, Y_WGS, Z_WGS);
-                eov.setFi_WGS(location.getLatitude());
-                eov.setLambda_WGS(location.getLongitude());
-                eov.setH_WGS(location.getAltitude());
+                ACTUAL_POSITION = new EOV(X_WGS, Y_WGS, Z_WGS);
+                ACTUAL_POSITION.setFi_WGS(location.getLatitude());
+                ACTUAL_POSITION.setLambda_WGS(location.getLongitude());
+                ACTUAL_POSITION.setH_WGS(location.getAltitude());
                 binding.eovText.setText(R.string.eov);
-                binding.eovData.setText(eov.toString());
-                measurePoint(eov);
+                binding.eovData.setText(ACTUAL_POSITION.toString());
+                measurePoint(ACTUAL_POSITION);
             }
 
             @Override
