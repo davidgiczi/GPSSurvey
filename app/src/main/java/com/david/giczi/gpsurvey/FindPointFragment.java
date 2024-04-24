@@ -31,6 +31,7 @@ public class FindPointFragment extends Fragment {
     private FragmentFindPointBinding binding;
     private String chosenPointId;
     private int findPointDistance;
+    private Handler handler;
     private Runnable findPointProcess;
 
     @Nullable
@@ -84,11 +85,11 @@ public class FindPointFragment extends Fragment {
         }
         String[] input1stData = binding.findPoint1stCoordinate.getText().toString().split("\\.");
         String[] input2ndData = binding.findPoint2ndCoordinate.getText().toString().split("\\.");
-        if( 2 > input1stData[0].length() || 8 < input1stData[0].length() ){
+        if( 2 > input1stData[0].length() || (2 < input1stData[0].length() && input1stData[0].length() < 6) ){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( 2 > input2ndData[0].length() || 8 < input2ndData[0].length() ){
+        else if( 2 > input2ndData[0].length() || (2 < input2ndData[0].length() && input2ndData[0].length() < 6) ){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -139,7 +140,7 @@ public class FindPointFragment extends Fragment {
     }
 
     private void calcFindPointDirectionAndDistance() {
-        Handler handler = new Handler();
+        handler = new Handler();
         findPointProcess = new Runnable() {
             @Override
             public void run() {
