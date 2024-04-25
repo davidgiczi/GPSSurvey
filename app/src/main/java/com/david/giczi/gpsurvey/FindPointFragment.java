@@ -108,6 +108,14 @@ public class FindPointFragment extends Fragment {
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
+        else if( input1stData[0].length() >= 6 &&  Double.parseDouble(input1stData[0]) < 400000 ){
+            Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if( input2ndData[0].length() >= 6 &&  Double.parseDouble(input2ndData[0]) > 400000 ){
+            Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         return true;
     }
