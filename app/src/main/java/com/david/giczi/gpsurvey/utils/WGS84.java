@@ -30,4 +30,17 @@ public class WGS84 {
         return String.format(Locale.getDefault(), "%.3fm", Z);
     }
 
+    public static double getDoubleX(double latitude, double longitude, double altitude){
+        return Double.parseDouble(getX(latitude, longitude, altitude)
+                .substring(0, getX(latitude, longitude, altitude).indexOf("m")));
+    }
+    public static double getDoubleY(double latitude, double longitude, double altitude){
+        return Double.parseDouble(getY(latitude, longitude, altitude)
+                .substring(0, getY(latitude, longitude, altitude).indexOf("m")));
+    }
+    public static double getDoubleZ(double latitude, double altitude){
+        return Double.parseDouble(getZ(latitude, altitude)
+                .substring(0, getZ(latitude, altitude).indexOf("m")));
+    }
+
 }

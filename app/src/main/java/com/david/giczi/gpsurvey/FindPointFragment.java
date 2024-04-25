@@ -1,7 +1,6 @@
 package com.david.giczi.gpsurvey;
 
 import android.graphics.Color;
-import android.graphics.Point;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,28 +10,30 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentFindPointBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
+import com.david.giczi.gpsurvey.utils.EOV;
+import com.david.giczi.gpsurvey.utils.WGS84;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 
 public class FindPointFragment extends Fragment {
 
 
     private FragmentFindPointBinding binding;
-    private String chosenPointId;
+    private MeasPoint findPoint;
     private int findPointDistance;
     private Handler handler;
     private Runnable findPointProcess;
+    private boolean isRunningFindPointProcess;
+    private static final String CHOOSE_POINT = "Válassz pontot";
 
     @Nullable
     @Override
@@ -47,14 +48,26 @@ public class FindPointFragment extends Fragment {
     }
 
     private void init(){
-
+        handler.removeCallbacks(findPointProcess);
+        initPointSpinner();
+        binding.findPoint1stCoordinate.setEnabled(true);
+        binding.findPoint2ndCoordinate.setEnabled(true);
+        binding.findPoint1stCoordinate.setText("");
+        binding.findPoint2ndCoordinate.setText("");
+        binding.pointSpinner.setEnabled(true);
+        binding.lookForPointButton.setText(R.string.point_catching_option);
+        binding.findPointDirectionArrow.setImageResource(android.R.color.transparent);
+        binding.directionText.setText(R.string.find_point_direction);
+        binding.distanceText.setText(R.string.distance);
+        binding.velocityText.setText(R.string.velocity);
+        isRunningFindPointProcess = false;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.lookForPointButton.setOnClickListener(p -> {
-           if( findPointProcess != null ){
+           if( isRunningFindPointProcess ){
                 init();
                 return;
             }
@@ -66,6 +79,8 @@ public class FindPointFragment extends Fragment {
                     ((MainActivity) requireActivity()).locationListener == null){
                 ((MainActivity) requireActivity()).startMeasure();
             }
+           setFindPoint(binding.pointSpinner.getSelectedItem().toString());
+           isRunningFindPointProcess = true;
            binding.lookForPointButton.setText(R.string.stop);
            binding.findPoint1stCoordinate.setEnabled(false);
            binding.findPoint2ndCoordinate.setEnabled(false);
@@ -99,7 +114,7 @@ public class FindPointFragment extends Fragment {
 
     private void initPointSpinner(){
         List<String> ITEMS = new ArrayList<>();
-        ITEMS.add(0, "Válassz pontot");
+        ITEMS.add(0, CHOOSE_POINT);
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             ITEMS.add(measPoint.getPointIDAsString());
         }
@@ -107,10 +122,10 @@ public class FindPointFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if( !parent.getItemAtPosition(position).equals("Válassz pontot") ){
-                    chosenPointId = (String) parent.getItemAtPosition(position);
-                    String Y = String.valueOf(getFindPoint(chosenPointId).getY());
-                    String X = String.valueOf(getFindPoint(chosenPointId).getX());
+                if( !parent.getItemAtPosition(position).equals(CHOOSE_POINT) ){
+                    String chosenPointId = (String) parent.getItemAtPosition(position);
+                    String Y = String.valueOf(getChosenPoint(chosenPointId).getY());
+                    String X = String.valueOf(getChosenPoint(chosenPointId).getX());
                     binding.findPoint1stCoordinate.setText(Y);
                     binding.findPoint2ndCoordinate.setText(X);
                 }
@@ -129,7 +144,35 @@ public class FindPointFragment extends Fragment {
         binding.pointSpinner.setAdapter(arrayAdapter);
     }
 
-    private MeasPoint getFindPoint(String findPointId){
+    private void setFindPoint(String findPointId){
+        if(  findPointId.equals(CHOOSE_POINT) ) {
+            String[] input1stData = binding.findPoint1stCoordinate.getText().toString().split("\\.");
+            String[] input2ndData = binding.findPoint2ndCoordinate.getText().toString().split("\\.");
+            MainActivity.NEXT_POINT_NUMBER++;
+            findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
+            if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
+                double X = WGS84.getDoubleX(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()),
+                        Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()), 0d);
+                double Y = WGS84.getDoubleY(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()),
+                        Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()), 0d);
+                double Z = WGS84.getDoubleZ(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()), 0d);
+                EOV eov = new EOV(X, Y, Z);
+                List<Double> pointEOV = eov.getCoordinatesForEOV();
+                findPoint.setY(pointEOV.get(0));
+                findPoint.setX(pointEOV.get(1));
+            }
+            else {
+                findPoint.setY(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()));
+                findPoint.setX(Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()));
+            }
+            MainActivity.MEAS_POINT_LIST.add(findPoint);
+        }
+        else {
+            findPoint = getChosenPoint(findPointId);
+        }
+    }
+
+    private MeasPoint getChosenPoint(String findPointId){
         MeasPoint chosenPoint = null;
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             if( measPoint.getPointID() == Integer.parseInt(findPointId) ){
@@ -141,27 +184,25 @@ public class FindPointFragment extends Fragment {
 
     private void calcFindPointDirectionAndDistance() {
         handler = new Handler();
-        findPointProcess = new Runnable() {
-            @Override
-            public void run() {
-                MeasPoint actualPosition = new MeasPoint();
-                actualPosition.setY(MainActivity.ACTUAL_POSITION.getCoordinatesForEOV().get(0));
-                actualPosition.setX(MainActivity.ACTUAL_POSITION.getCoordinatesForEOV().get(1));
-                MeasPoint chosenPointPosition= new MeasPoint();
-                chosenPointPosition.setY(getFindPoint(chosenPointId).getY());
-                chosenPointPosition.setX(getFindPoint(chosenPointId).getX());
-                AzimuthAndDistance findPointData = new AzimuthAndDistance(actualPosition, chosenPointPosition);
-                double direction = 0 > Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH ?
-                        Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH + 360 :
-                        Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH;
-                addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointData.calcDistance()));
-                String findPointDirection = "Irány: " + String.format(Locale.getDefault(),"%5.1f°", direction);
-                String findPointDistance = "Távolság: " +
-                        String.format(Locale.getDefault(),"%5.0fm", findPointData.calcDistance());
-                binding.directionText.setText(findPointDirection);
-                binding.distanceText.setText(findPointDistance);
-                handler.postDelayed(findPointProcess, 1000);
+        findPointProcess = () -> {
+            handler.postDelayed(findPointProcess, 1000);
+            if( MainActivity.ACTUAL_POSITION == null ){
+                return;
             }
+            MeasPoint actualPosition = new MeasPoint();
+            actualPosition.setY(MainActivity.ACTUAL_POSITION.getCoordinatesForEOV().get(0));
+            actualPosition.setX(MainActivity.ACTUAL_POSITION.getCoordinatesForEOV().get(1));
+            AzimuthAndDistance findPointData = new AzimuthAndDistance(actualPosition, findPoint);
+            double direction = 0 > Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH ?
+                    Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH + 360 :
+                    Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH;
+            addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointData.calcDistance()));
+            String findPointDirection = getString(R.string.find_point_direction) + " "
+                    + String.format(Locale.getDefault(),"%.1f°", direction);
+            String findPointDistance = getString(R.string.distance) + " " +
+                    String.format(Locale.getDefault(),"%.0fm", findPointData.calcDistance());
+            binding.directionText.setText(findPointDirection);
+            binding.distanceText.setText(findPointDistance);
         };
         handler.postDelayed(findPointProcess, 1000);
     }
@@ -180,6 +221,7 @@ public class FindPointFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        init();
         super.onDestroyView();
     }
 }

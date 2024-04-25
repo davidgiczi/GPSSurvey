@@ -1,5 +1,6 @@
 package com.david.giczi.gpsurvey;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -81,6 +82,9 @@ public class CalcFragment extends Fragment {
             displayedMeasuredPointLinearLayoutStore.add(measPointIDLayout);
             binding.calcLinearlayout.addView(measPointIDLayout);
             TextView measPointData = new TextView(getContext());
+            if( measPoint.getZ() == 0.0 ){
+                measPointData.setTextColor(Color.parseColor("#6750a4"));
+            }
             measPointData.setTextIsSelectable(true);
             measPointData.setText(measPoint.getMeasPontData());
             measPointData.setTextSize(16f);
