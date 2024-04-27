@@ -38,7 +38,8 @@
     <string name="add_find_point_text">WGS vagy EOV koordináta megadása:</string>
     <string name="find_point_direction">Irány:</string>
     <string name="velocity">Sebesség:</string>
-    <string name="find_point_hint">Decimális Φ, Λ vagy Y, X</string>
+    <string name="first_point_hint">Decimális Φ vagy Y</string>
+    <string name="second_point_hint">Decimális Λ vagy X</string>
     <string name="find_point_arrow">find_point_arrow</string>
     <string name="stop">Stop</string>
 </resources>

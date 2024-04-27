@@ -209,8 +209,11 @@ public class FindPointFragment extends Fragment {
                     + String.format(Locale.getDefault(),"%.1f°", direction);
             String findPointDistance = getString(R.string.distance) + " " +
                     String.format(Locale.getDefault(),"%.0fm", findPointData.calcDistance());
+            String velocity = getString(R.string.velocity) + " " +
+                    String.format(Locale.getDefault(),"%.0fkm/h", MainActivity.VELOCITY);
             binding.directionText.setText(findPointDirection);
             binding.distanceText.setText(findPointDistance);
+            binding.velocityText.setText(velocity);
         };
         handler.postDelayed(findPointProcess, 1000);
     }

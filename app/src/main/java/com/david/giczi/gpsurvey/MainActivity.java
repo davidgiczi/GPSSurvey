@@ -16,6 +16,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Handler;
 import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuCompat;
@@ -25,6 +27,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
+import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
 import android.view.Gravity;
@@ -35,9 +38,6 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -57,9 +57,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
+    private MeasPoint prePositionForVelocity;
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
+    public static double VELOCITY;
     public static EOV ACTUAL_POSITION;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
@@ -280,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 binding.eovText.setText(R.string.eov);
                 binding.eovData.setText(ACTUAL_POSITION.toString());
                 measurePoint(ACTUAL_POSITION);
+                measureVelocity(ACTUAL_POSITION);
             }
 
             @Override
@@ -311,6 +314,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
        MEAS_POINT.setMeasData(eov);
        TextView measDataView = measuredDataContainer.findViewById(R.id.measured_position);
        measDataView.setText(MEAS_POINT.toString());
+    }
+
+    private void measureVelocity(EOV eov){
+        prePositionForVelocity = new MeasPoint();
+        prePositionForVelocity.setY(eov.getCoordinatesForEOV().get(0));
+        prePositionForVelocity.setX(eov.getCoordinatesForEOV().get(1));
+        Handler handler = new Handler();
+       handler.postDelayed(new Runnable() {
+           @Override
+           public void run() {
+               if( prePositionForVelocity != null ){
+                  MeasPoint actualPosition = new MeasPoint();
+                  actualPosition.setY(eov.getCoordinatesForEOV().get(0));
+                  actualPosition.setX(eov.getCoordinatesForEOV().get(1));
+                  VELOCITY = 3.6 * new AzimuthAndDistance(prePositionForVelocity, actualPosition).calcDistance();
+                  prePositionForVelocity = null;
+               }
+               handler.postDelayed(this, 1000);
+           }
+       }, 1000);
+
     }
 
     private void requestPermissions(){

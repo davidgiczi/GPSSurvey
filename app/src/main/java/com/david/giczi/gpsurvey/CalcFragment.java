@@ -1,6 +1,5 @@
 package com.david.giczi.gpsurvey;
 
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -172,13 +171,13 @@ public class CalcFragment extends Fragment {
         saveDataContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_save, null);
         PopupWindow saveDataWindow = new PopupWindow(saveDataContainer, 900,1600, true);
         saveDataWindow.showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 0);
-        Button saveButton = (Button) saveDataContainer.findViewById(R.id.button_save);
+        Button saveButton = saveDataContainer.findViewById(R.id.button_save);
         saveButton.setBackgroundColor(Color.DKGRAY);
         saveButton.setOnClickListener(s -> {
             saveDataProcess(saveAllPoints);
             saveDataWindow.dismiss();
         });
-        RadioButton radioButtonForKML = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
+        RadioButton radioButtonForKML = saveDataContainer.findViewById(R.id.kml_format);
         radioButtonForKML.setChecked(true);
         setFileName(saveAllPoints);
         initDataTypeSpinner();
@@ -193,8 +192,8 @@ public class CalcFragment extends Fragment {
 
     private void initDataTypeSpinner(){
         ArrayAdapter<String> arrayAdapter;
-        RadioButton radioButtonForKMZ = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format));
-        RadioButton radioButtonForTXT = ((RadioButton) saveDataContainer.findViewById(R.id.txt_format));
+        RadioButton radioButtonForKMZ = saveDataContainer.findViewById(R.id.kml_format);
+        RadioButton radioButtonForTXT = saveDataContainer.findViewById(R.id.txt_format);
         if( radioButtonForKMZ.isChecked() ){
             arrayAdapter = new ArrayAdapter<>(requireContext(),
                     R.layout.data_type_spinner, ITEMS_FOR_KML);

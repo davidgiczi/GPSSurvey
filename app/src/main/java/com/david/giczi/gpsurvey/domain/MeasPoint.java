@@ -150,9 +150,9 @@ public class MeasPoint {
     }
 
     public String getWGSMeasPointDataInXYZFormat(){
-        String X = WGS84.getX(lambda_WGS, fi_WGS, h_WGS).substring(0, WGS84.getX(lambda_WGS, fi_WGS, h_WGS).indexOf("m"));
-        String Y = WGS84.getY(lambda_WGS, fi_WGS, h_WGS).substring(0, WGS84.getY(lambda_WGS, fi_WGS, h_WGS).indexOf("m"));
-        String Z = WGS84.getZ(lambda_WGS,h_WGS).substring(0, WGS84.getZ(lambda_WGS,h_WGS).indexOf("m"));
+        double X = WGS84.getDoubleX(lambda_WGS, fi_WGS, h_WGS);
+        double Y = WGS84.getDoubleY(lambda_WGS, fi_WGS, h_WGS);
+        double Z = WGS84.getDoubleZ(lambda_WGS,h_WGS);
         return pointID + "," + X + "," + Y + "," + Z;
     }
 
