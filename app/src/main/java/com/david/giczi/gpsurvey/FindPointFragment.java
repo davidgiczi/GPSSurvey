@@ -48,7 +48,9 @@ public class FindPointFragment extends Fragment {
     }
 
     private void init(){
-        handler.removeCallbacks(findPointProcess);
+        if( handler != null ){
+            handler.removeCallbacks(findPointProcess);
+        }
         initPointSpinner();
         binding.findPoint1stCoordinate.setEnabled(true);
         binding.findPoint2ndCoordinate.setEnabled(true);
@@ -59,7 +61,6 @@ public class FindPointFragment extends Fragment {
         binding.findPointDirectionArrow.setImageResource(android.R.color.transparent);
         binding.directionText.setText(R.string.find_point_direction);
         binding.distanceText.setText(R.string.distance);
-        binding.velocityText.setText(R.string.velocity);
         isRunningFindPointProcess = false;
     }
 
@@ -113,6 +114,16 @@ public class FindPointFragment extends Fragment {
             return false;
         }
         else if( input2ndData[0].length() >= 6 &&  Double.parseDouble(input2ndData[0]) > 400000 ){
+            Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if( input1stData[0].length() == 2 &&  (Double.parseDouble(input1stData[0]) < 45 ||
+                Double.parseDouble(input1stData[0]) > 48) ){
+            Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if( input2ndData[0].length() == 2 &&  (Double.parseDouble(input2ndData[0]) < 16  ||
+                Double.parseDouble(input2ndData[0]) > 22)){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -209,11 +220,8 @@ public class FindPointFragment extends Fragment {
                     + String.format(Locale.getDefault(),"%.1f°", direction);
             String findPointDistance = getString(R.string.distance) + " " +
                     String.format(Locale.getDefault(),"%.0fm", findPointData.calcDistance());
-            String velocity = getString(R.string.velocity) + " " +
-                    String.format(Locale.getDefault(),"%.0fkm/h", MainActivity.VELOCITY);
             binding.directionText.setText(findPointDirection);
             binding.distanceText.setText(findPointDistance);
-            binding.velocityText.setText(velocity);
         };
         handler.postDelayed(findPointProcess, 1000);
     }
