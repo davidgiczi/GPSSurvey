@@ -1,5 +1,7 @@
 package com.david.giczi.gpsurvey.utils;
 
+import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 
 import com.david.giczi.gpsurvey.MainActivity;
@@ -10,7 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class WrapDataInKML extends Fragment {
 
@@ -29,22 +30,24 @@ public class WrapDataInKML extends Fragment {
     public List<String> getKmlDataList() {
         return kmlDataList;
     }
-    public void createDataListForKML(){
-        getTemplateDataForKML();
-        if( dataType.equals("Pontok") ){
-            wrapPointsInKML();
-        }
-        else if( dataType.equals("Vonal") ){
-            wrapPointsForLineInKML();
-        }
-        else if( dataType.equals("Kerület") ){
-            wrapPointsForPerimeterInKML();
+    public void createDataListForKML(Context context){
+        getTemplateDataForKML(context);
+        switch (dataType) {
+            case "Pontok":
+                wrapPointsInKML();
+                break;
+            case "Vonal":
+                wrapPointsForLineInKML();
+                break;
+            case "Kerület":
+                wrapPointsForPerimeterInKML();
+                break;
         }
     }
 
-    private void getTemplateDataForKML()  {
+    private void getTemplateDataForKML(Context context)  {
         kmlDataList = new ArrayList<>();
-        try( InputStream is = requireContext().getAssets().open("template.kml");
+        try(InputStream is = context.getAssets().open("template.kml");
             BufferedReader bf = new BufferedReader(new InputStreamReader(is)) ) {
             String row;
             while((row = bf.readLine()) != null){

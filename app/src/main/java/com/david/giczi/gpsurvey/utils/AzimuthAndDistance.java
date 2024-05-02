@@ -1,7 +1,6 @@
 package com.david.giczi.gpsurvey.utils;
 
 
-import android.graphics.Point;
 
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 
@@ -47,13 +46,5 @@ public class AzimuthAndDistance {
 				+ Math.pow(pointA.getY() - pointB.getY(), 2));
 	}
 
-	public MeasPoint getPointA() {
-		return pointA;
-	}
 
-	public MeasPoint getPointB() {
-		return pointB;
-	}
-	
-	
 }

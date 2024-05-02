@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
 import com.david.giczi.gpsurvey.databinding.FragmentStartBinding;
+
 
 
 public class StartFragment extends Fragment {
@@ -16,11 +16,11 @@ public class StartFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
       binding = FragmentStartBinding.inflate(inflater, container, false);
-      binding.startPage.setBackground(((MainActivity) getActivity()).getDrawable(R.drawable.background_satellite));
+      binding.startPage.setBackground(((MainActivity) requireActivity()).getDrawable(R.drawable.background_satellite));
       MainActivity.PAGE_NUMBER_VALUE = 0;
         return binding.getRoot();
     }

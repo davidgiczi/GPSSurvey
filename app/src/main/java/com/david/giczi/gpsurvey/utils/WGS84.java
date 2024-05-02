@@ -6,10 +6,10 @@ public class WGS84 {
 
     private static final double a = 6378137.0;
     private static final double b = 6356752.314;
-    private static final double f = (a - b) / a;
+    //private static final double f = (a - b) / a;
 
     private static final double e2 = ( Math.pow(a, 2) - Math.pow(b, 2) ) / Math.pow(a, 2);
-    private static final double  e_ = Math.sqrt(( Math.pow(a, 2) - Math.pow(b, 2) ) / Math.pow(b, 2));
+    //private static final double  e_ = Math.sqrt(( Math.pow(a, 2) - Math.pow(b, 2) ) / Math.pow(b, 2));
 
     public static String getX(double latitude, double longitude, double altitude){
         double N = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(Math.toRadians(latitude)), 2));

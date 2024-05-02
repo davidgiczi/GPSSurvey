@@ -359,7 +359,7 @@ public class CalcFragment extends Fragment {
             wrapDataInKML =
                     new WrapDataInKML(chosenMeasPointList, dataType, fileName);
         }
-        wrapDataInKML.createDataListForKML();
+        wrapDataInKML.createDataListForKML(getContext());
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
                         "/Documents/" + fileName);

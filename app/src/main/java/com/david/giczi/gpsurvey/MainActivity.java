@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
 import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuCompat;
@@ -27,7 +26,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
-import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
 import android.view.Gravity;
@@ -57,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
-    private MeasPoint prePositionForVelocity;
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
