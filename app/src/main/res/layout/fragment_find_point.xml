@@ -72,8 +72,8 @@
 
     <ImageView
         android:id="@+id/find_point_direction_arrow"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginTop="40dp"
         android:contentDescription="@string/find_point_arrow"
         app:layout_constraintEnd_toEndOf="parent"
@@ -110,7 +110,7 @@
         app:layout_constraintHorizontal_bias="0.076"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/direction_text"
-        app:layout_constraintVertical_bias="0.317" />
+        app:layout_constraintVertical_bias="0.065" />
 
     <Button
         android:id="@+id/look_for_point_button"
