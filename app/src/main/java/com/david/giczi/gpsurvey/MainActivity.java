@@ -258,19 +258,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.altitudeData.setText(WGS84.getZ(location.getLatitude(),
                             location.getAltitude()));
                 }
-                double X_WGS = Double.parseDouble(WGS84.getX(location.getLatitude(),
+                double X_WGS = WGS84.getDoubleX(location.getLatitude(),
                         location.getLongitude(),
-                        location.getAltitude()).substring(0, WGS84.getX(location.getLatitude(),
+                        location.getAltitude());
+                double Y_WGS = WGS84.getDoubleY(location.getLatitude(),
                         location.getLongitude(),
-                        location.getAltitude()).indexOf("m")));
-                double Y_WGS = Double.parseDouble(WGS84.getY(location.getLatitude(),
-                        location.getLongitude(),
-                        location.getAltitude()).substring(0, WGS84.getY(location.getLatitude(),
-                        location.getLongitude(),
-                        location.getAltitude()).indexOf("m")));
-                double Z_WGS = Double.parseDouble(WGS84.getZ(location.getLatitude(),
-                        location.getAltitude()).substring(0, WGS84.getZ(location.getLatitude(),
-                        location.getAltitude()).indexOf("m")));
+                        location.getAltitude());
+                double Z_WGS = WGS84.getDoubleZ(location.getLatitude(),
+                        location.getAltitude());
                 ACTUAL_POSITION = new EOV(X_WGS, Y_WGS, Z_WGS);
                 ACTUAL_POSITION.setFi_WGS(location.getLatitude());
                 ACTUAL_POSITION.setLambda_WGS(location.getLongitude());

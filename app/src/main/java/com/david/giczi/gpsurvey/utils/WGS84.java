@@ -31,15 +31,15 @@ public class WGS84 {
     }
 
     public static double getDoubleX(double latitude, double longitude, double altitude){
-        return Double.parseDouble(getX(latitude, longitude, altitude)
+        return Double.parseDouble(getX(latitude, longitude, altitude).replace(",", ".")
                 .substring(0, getX(latitude, longitude, altitude).indexOf("m")));
     }
     public static double getDoubleY(double latitude, double longitude, double altitude){
-        return Double.parseDouble(getY(latitude, longitude, altitude)
+        return Double.parseDouble(getY(latitude, longitude, altitude).replace(",", ".")
                 .substring(0, getY(latitude, longitude, altitude).indexOf("m")));
     }
     public static double getDoubleZ(double latitude, double altitude){
-        return Double.parseDouble(getZ(latitude, altitude)
+        return Double.parseDouble(getZ(latitude, altitude).replace(",", ".")
                 .substring(0, getZ(latitude, altitude).indexOf("m")));
     }
 
