@@ -156,7 +156,7 @@ public class CalcFragment extends Fragment {
             Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if( !saveAllPoints && chosenMeasPointList.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(2))){
+        else if( !saveAllPoints && chosenMeasPointList.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(1))){
             Toast.makeText(getContext(), "Vonal mentéséhez legalább 2 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -180,7 +180,6 @@ public class CalcFragment extends Fragment {
             ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field))
                     .setText(getSaveFileName(chosenMeasPointList));
         }
-        saveDataContainer.findViewById(R.id.button_save).setEnabled(true);
     }
 
     private String getSaveFileName(List<MeasPoint> points){
