@@ -146,25 +146,90 @@ public class CalcFragment extends Fragment {
         alert.show();
     }
 
+    private boolean isNotCorrectDataForSaving(boolean saveAllPoints){
+        String dataType = (String) ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).getSelectedItem();
+        if( saveAllPoints && MainActivity.MEAS_POINT_LIST.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(1))){
+            Toast.makeText(getContext(), "Vonal mentéséhez legalább 2 pont szükséges.", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        else if( saveAllPoints && MainActivity.MEAS_POINT_LIST.size()  < 3 && dataType.equals(ITEMS_FOR_KML.get(2))){
+            Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        else if( !saveAllPoints && chosenMeasPointList.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(2))){
+            Toast.makeText(getContext(), "Vonal mentéséhez legalább 2 pont szükséges.", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        else if( !saveAllPoints && chosenMeasPointList.size()  < 3 && dataType.equals(ITEMS_FOR_KML.get(2))){
+            Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return false;
+    }
 
     private void setFileName(boolean saveAllPoints){
-        boolean isKMLFormat = ((RadioButton) saveDataContainer.findViewById(R.id.kml_format)).isChecked();
+        if(isNotCorrectDataForSaving(saveAllPoints)){
+            return;
+        }
         if( saveAllPoints ) {
             ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field))
-                    .setText(getSaveFileName(MainActivity.MEAS_POINT_LIST, isKMLFormat));
+                    .setText(getSaveFileName(MainActivity.MEAS_POINT_LIST));
         }
         else {
             ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field))
-                    .setText(getSaveFileName(chosenMeasPointList, isKMLFormat));
+                    .setText(getSaveFileName(chosenMeasPointList));
         }
+        saveDataContainer.findViewById(R.id.button_save).setEnabled(true);
     }
 
-    private String getSaveFileName(List<MeasPoint> points, boolean isKML){
-        if( points.size() == 1){
-            return "_" + points.get(0).getPointID() + "_pont" + (isKML ? ".kml" : ".txt");
+    private String getSaveFileName(List<MeasPoint> points){
+        String dataType = (String) ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).getSelectedItem();
+        String fileName = "";
+        if( points.size() == 1 && dataType.equals(ITEMS_FOR_KML.get(0))){
+            fileName = "_" + points.get(0).getPointID() + "_pont.kml";
         }
-        return "_" + points.get(0).getPointID() + "-"
-                + points.get(points.size() - 1).getPointID() + "_pontok" + (isKML ? ".kml" : ".txt");
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_KML.get(0))){
+            fileName = "_" + points.get(0).getPointID() + "-"
+                    + points.get(points.size() - 1).getPointID() + "_pontok.kml";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_KML.get(1))){
+            fileName = "_" + points.get(0).getPointID() + "-"
+                    + points.get(points.size() - 1).getPointID() + "_vonal.kml";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_KML.get(2))){
+            fileName = "_" + points.get(0).getPointID() + "-"
+                            + points.get(points.size() - 1).getPointID() + "_kerulet.kml";
+        }
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(0))){
+            fileName = "_" + points.get(0).getPointID() + "_pont_EOV.txt";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(0))){
+            fileName = "_" + points.get(0).getPointID() + "-"
+                    + points.get(points.size() - 1).getPointID() + "_pontok_EOV.txt";
+        }
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(1))){
+            fileName = "_" + points.get(0).getPointID() + "_pont_WGS.txt";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(1))){
+            fileName = "_" + points.get(0).getPointID() + "-"
+                    + points.get(points.size() - 1).getPointID() + "_pontok_WGS.txt";
+        }
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(2))){
+            fileName = "_" + points.get(0).getPointID() + "_pont_WGS-fpmp.txt";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(2))){
+            fileName = "_" + points.get(0).getPointID() + "-" + points.get(points.size() - 1).getPointID()
+                    + "_pontok_WGS-fpmp.txt";
+        }
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(3))){
+            fileName = "_" + points.get(0).getPointID() + "_pont_WGS-XYZ.txt";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(3))){
+            fileName = "_" + points.get(0).getPointID() + "-" + points.get(points.size() - 1).getPointID()
+                    + "_pontok_WGS-XYZ.txt";
+        }
+        return fileName;
     }
 
     private void popupSaveWindow(boolean saveAllPoints){
@@ -174,23 +239,26 @@ public class CalcFragment extends Fragment {
         Button saveButton = saveDataContainer.findViewById(R.id.button_save);
         saveButton.setBackgroundColor(Color.DKGRAY);
         saveButton.setOnClickListener(s -> {
+           if(isNotCorrectDataForSaving(saveAllPoints)){
+               return;
+            }
             saveDataProcess(saveAllPoints);
             saveDataWindow.dismiss();
         });
         RadioButton radioButtonForKML = saveDataContainer.findViewById(R.id.kml_format);
         radioButtonForKML.setChecked(true);
+        radioButtonForKML.setOnClickListener(e -> {
+            initDataTypeSpinner(saveAllPoints);
+            setFileName(saveAllPoints);});
+        RadioButton radioButtonForTXT = saveDataContainer.findViewById(R.id.txt_format);
+        radioButtonForTXT.setOnClickListener(e -> {
+            initDataTypeSpinner(saveAllPoints);
+            setFileName(saveAllPoints);});
+        initDataTypeSpinner(saveAllPoints);
         setFileName(saveAllPoints);
-        initDataTypeSpinner();
-        saveDataContainer.findViewById(R.id.kml_format).setOnClickListener( r -> {
-            initDataTypeSpinner();
-            setFileName(saveAllPoints);});
-        saveDataContainer.findViewById(R.id.txt_format).setOnClickListener( r -> {
-            initDataTypeSpinner();
-            setFileName(saveAllPoints);});
-
     }
 
-    private void initDataTypeSpinner(){
+    private void initDataTypeSpinner(boolean saveAllPoints){
         ArrayAdapter<String> arrayAdapter;
         RadioButton radioButtonForKMZ = saveDataContainer.findViewById(R.id.kml_format);
         RadioButton radioButtonForTXT = saveDataContainer.findViewById(R.id.txt_format);
@@ -207,6 +275,18 @@ public class CalcFragment extends Fragment {
                     R.layout.data_type_spinner, Collections.singletonList("-"));
         }
         ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).setAdapter(arrayAdapter);
+        ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner))
+                .setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        setFileName(saveAllPoints);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
     }
 
     private void clearDisplayedPointData(){
