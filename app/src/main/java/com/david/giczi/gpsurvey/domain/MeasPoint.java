@@ -122,11 +122,23 @@ public class MeasPoint {
         this.pointID = pointID;
     }
     public void setY(double y) {
-        Y = y;
+        this.Y = y;
     }
 
     public void setX(double x) {
-        X = x;
+        this.X = x;
+    }
+
+    public void setFi_WGS(double fi_WGS) {
+        this.fi_WGS = fi_WGS;
+    }
+
+    public void setLambda_WGS(double lambda_WGS) {
+        this.lambda_WGS = lambda_WGS;
+    }
+
+    public void setH_WGS(double h_WGS) {
+        this.h_WGS = h_WGS;
     }
 
     public String getMeasPontData(){

@@ -180,10 +180,8 @@ public class FindPointFragment extends Fragment {
                 findPoint.setY(pointEOV.get(0));
                 findPoint.setX(pointEOV.get(1));
             }
-            else {
-                findPoint.setY(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()));
-                findPoint.setX(Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()));
-            }
+            findPoint.setFi_WGS(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()));
+            findPoint.setLambda_WGS(Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()));
             MainActivity.MEAS_POINT_LIST.add(findPoint);
         }
         else {
