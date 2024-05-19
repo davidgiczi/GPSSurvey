@@ -17,7 +17,6 @@ import com.david.giczi.gpsurvey.databinding.FragmentFindPointBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.EOV;
-import com.david.giczi.gpsurvey.utils.WGS84;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,8 +142,8 @@ public class FindPointFragment extends Fragment {
 
                 if( !parent.getItemAtPosition(position).equals(CHOOSE_POINT) ){
                     String chosenPointId = (String) parent.getItemAtPosition(position);
-                    String Y = String.valueOf(getChosenPoint(chosenPointId).getY());
-                    String X = String.valueOf(getChosenPoint(chosenPointId).getX());
+                    String Y = String.valueOf(getChosenPoint(chosenPointId).getY_EOV());
+                    String X = String.valueOf(getChosenPoint(chosenPointId).getX_EOV());
                     binding.findPoint1stCoordinate.setText(Y);
                     binding.findPoint2ndCoordinate.setText(X);
                 }
@@ -170,15 +169,11 @@ public class FindPointFragment extends Fragment {
             MainActivity.NEXT_POINT_NUMBER++;
             findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
             if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
-                double X = WGS84.getDoubleX(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()),
-                        Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()), 0d);
-                double Y = WGS84.getDoubleY(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()),
-                        Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()), 0d);
-                double Z = WGS84.getDoubleZ(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()), 0d);
-                EOV eov = new EOV(X, Y, Z);
-                List<Double> pointEOV = eov.getCoordinatesForEOV();
-                findPoint.setY(pointEOV.get(0));
-                findPoint.setX(pointEOV.get(1));
+                EOV eov = new EOV();
+                eov.toEOV(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()),
+                          Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()), 0d);
+                findPoint.setY_EOV(eov.getY_EOV());
+                findPoint.setX_EOV(eov.getX_EOV());
             }
             findPoint.setFi_WGS(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()));
             findPoint.setLambda_WGS(Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()));
@@ -207,8 +202,8 @@ public class FindPointFragment extends Fragment {
                 return;
             }
             MeasPoint actualPosition = new MeasPoint();
-            actualPosition.setY(MainActivity.ACTUAL_POSITION.getCoordinatesForEOV().get(0));
-            actualPosition.setX(MainActivity.ACTUAL_POSITION.getCoordinatesForEOV().get(1));
+            actualPosition.setY_EOV(MainActivity.ACTUAL_POSITION.getY_EOV());
+            actualPosition.setX_EOV(MainActivity.ACTUAL_POSITION.getX_EOV());
             AzimuthAndDistance findPointData = new AzimuthAndDistance(actualPosition, findPoint);
             double direction = 0 > Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH ?
                     Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH + 360 :

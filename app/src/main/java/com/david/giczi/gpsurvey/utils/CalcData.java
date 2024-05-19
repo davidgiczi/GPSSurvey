@@ -30,20 +30,20 @@ public class CalcData {
         }
         double reliable = 0.0;
         for (int i = 0; i < pointStore.size() - 1; i++) {
-            double distance2 = Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) +
-                    Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2);
+            double distance2 = Math.pow((pointStore.get( i + 1 ).getY_EOV() - pointStore.get(i).getY_EOV()), 2) +
+                    Math.pow((pointStore.get( i + 1 ).getX_EOV() - pointStore.get(i).getX_EOV()), 2);
 
             reliable += ( Math.pow(pointStore.get(i).getqY(), 2) *
-                    (Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) / distance2) +
+                    (Math.pow((pointStore.get( i + 1 ).getY_EOV() - pointStore.get(i).getY_EOV()), 2) / distance2) +
 
                     Math.pow(pointStore.get(i + 1).getqY(), 2) *
-                            (Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) / distance2) +
+                            (Math.pow((pointStore.get( i + 1 ).getY_EOV() - pointStore.get(i).getY_EOV()), 2) / distance2) +
 
                     Math.pow(pointStore.get(i).getqX(), 2) *
-                            (Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2) / distance2) +
+                            (Math.pow((pointStore.get( i + 1 ).getX_EOV() - pointStore.get(i).getX_EOV()), 2) / distance2) +
 
                     Math.pow(pointStore.get(i + 1).getqX(), 2) *
-                            (Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2) / distance2) );
+                            (Math.pow((pointStore.get( i + 1 ).getX_EOV() - pointStore.get(i).getX_EOV()), 2) / distance2) );
         }
 
         return (int) (100 * Math.sqrt(reliable)) / 100.0;
@@ -73,35 +73,35 @@ public class CalcData {
 
         for (int i = 0; i < pointStore.size() - 1; i++) {
 
-            double distance2 = Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) +
-                    Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2);
+            double distance2 = Math.pow((pointStore.get( i + 1 ).getY_EOV() - pointStore.get(i).getY_EOV()), 2) +
+                    Math.pow((pointStore.get( i + 1 ).getX_EOV() - pointStore.get(i).getX_EOV()), 2);
 
             reliable += ( Math.pow(pointStore.get(i).getqY(), 2) *
-                    (Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) / distance2) +
+                    (Math.pow((pointStore.get( i + 1 ).getY_EOV() - pointStore.get(i).getY_EOV()), 2) / distance2) +
 
                     Math.pow(pointStore.get(i + 1).getqY(), 2) *
-                            (Math.pow((pointStore.get( i + 1 ).getY() - pointStore.get(i).getY()), 2) / distance2) +
+                            (Math.pow((pointStore.get( i + 1 ).getY_EOV() - pointStore.get(i).getY_EOV()), 2) / distance2) +
 
                     Math.pow(pointStore.get(i).getqX(), 2) *
-                            (Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2) / distance2) +
+                            (Math.pow((pointStore.get( i + 1 ).getX_EOV() - pointStore.get(i).getX_EOV()), 2) / distance2) +
 
                     Math.pow(pointStore.get(i + 1).getqX(), 2) *
-                            (Math.pow((pointStore.get( i + 1 ).getX() - pointStore.get(i).getX()), 2) / distance2) );
+                            (Math.pow((pointStore.get( i + 1 ).getX_EOV() - pointStore.get(i).getX_EOV()), 2) / distance2) );
         }
-        double distance2 = Math.pow((pointStore.get(0).getY() - pointStore.get(pointStore.size() - 1).getY()), 2) +
-                Math.pow((pointStore.get(0).getX() - pointStore.get(pointStore.size() - 1).getX()), 2);
+        double distance2 = Math.pow((pointStore.get(0).getY_EOV() - pointStore.get(pointStore.size() - 1).getY_EOV()), 2) +
+                Math.pow((pointStore.get(0).getX_EOV() - pointStore.get(pointStore.size() - 1).getX_EOV()), 2);
 
         reliable += ( Math.pow(pointStore.get(pointStore.size() - 1).getqY(), 2) *
-                (Math.pow((pointStore.get(pointStore.size() - 1).getY() - pointStore.get(0).getY()), 2) / distance2) +
+                (Math.pow((pointStore.get(pointStore.size() - 1).getY_EOV() - pointStore.get(0).getY_EOV()), 2) / distance2) +
 
                 Math.pow(pointStore.get(0).getqY(), 2) *
-                        (Math.pow((pointStore.get(pointStore.size() - 1).getY() - pointStore.get(0).getY()), 2) / distance2) +
+                        (Math.pow((pointStore.get(pointStore.size() - 1).getY_EOV() - pointStore.get(0).getY_EOV()), 2) / distance2) +
 
                 Math.pow(pointStore.get(pointStore.size() - 1).getqX(), 2) *
-                        (Math.pow((pointStore.get(pointStore.size() - 1).getX() - pointStore.get(0).getX()), 2) / distance2) +
+                        (Math.pow((pointStore.get(pointStore.size() - 1).getX_EOV() - pointStore.get(0).getX_EOV()), 2) / distance2) +
 
                 Math.pow(pointStore.get(0).getqX(), 2) *
-                        (Math.pow((pointStore.get(pointStore.size() - 1).getX() - pointStore.get(0).getX()), 2) / distance2) );
+                        (Math.pow((pointStore.get(pointStore.size() - 1).getX_EOV() - pointStore.get(0).getX_EOV()), 2) / distance2) );
 
         return (int) (100 * Math.sqrt(reliable)) / 100.0;
 
@@ -114,7 +114,7 @@ public class CalcData {
         double elevation = 0.0;
 
         for (int i = 0; i < pointStore.size() - 1; i++) {
-            elevation += (pointStore.get(i + 1).getZ() - pointStore.get(i).getZ());
+            elevation += (pointStore.get(i + 1).getZ_EOV() - pointStore.get(i).getZ_EOV());
         }
         return (int) (100 * elevation) / 100.0;
     }
@@ -137,13 +137,13 @@ public class CalcData {
         }
         double area = 0.0;
         for (int i = 0; i < pointStore.size() - 1; i++) {
-            area += pointStore.get(i).getY() * pointStore.get(i + 1).getX();
+            area += pointStore.get(i).getY_EOV() * pointStore.get(i + 1).getX_EOV();
         }
-        area += pointStore.get(pointStore.size() - 1).getY() * pointStore.get(0).getX();
+        area += pointStore.get(pointStore.size() - 1).getY_EOV() * pointStore.get(0).getX_EOV();
         for (int i = 0; i < pointStore.size() - 1; i++) {
-            area -= pointStore.get(i).getX() * pointStore.get(i + 1).getY();
+            area -= pointStore.get(i).getX_EOV() * pointStore.get(i + 1).getY_EOV();
         }
-        area -= pointStore.get(pointStore.size() - 1).getX() * pointStore.get(0).getY();
+        area -= pointStore.get(pointStore.size() - 1).getX_EOV() * pointStore.get(0).getY_EOV();
 
         return (int) (10 * Math.abs(0.5 * area)) / 10.0;
     }
@@ -155,18 +155,18 @@ public class CalcData {
         double reliable = 0.0;
 
         for ( int i = 0; i < pointStore.size() - 2; i++) {
-          reliable += Math.pow(0.5 * (pointStore.get( i ).getX() - pointStore.get( i + 2 ).getX()), 2)
+          reliable += Math.pow(0.5 * (pointStore.get( i ).getX_EOV() - pointStore.get( i + 2 ).getX_EOV()), 2)
                   * Math.pow(pointStore.get( i + 1 ).getqY(), 2);
-          reliable += Math.pow(0.5 * (pointStore.get( i ).getY() - pointStore.get( i + 2 ).getY()), 2)
+          reliable += Math.pow(0.5 * (pointStore.get( i ).getY_EOV() - pointStore.get( i + 2 ).getY_EOV()), 2)
                   * Math.pow(pointStore.get( i + 1 ).getqX(), 2);
         }
-        reliable += Math.pow(0.5 * (pointStore.get(0).getX() - pointStore.get( pointStore.size() - 2).getX()), 2)
+        reliable += Math.pow(0.5 * (pointStore.get(0).getX_EOV() - pointStore.get( pointStore.size() - 2).getX_EOV()), 2)
                 * Math.pow(pointStore.get(pointStore.size() - 1).getqY(), 2);
-        reliable += Math.pow(0.5 * (pointStore.get( pointStore.size() - 1 ).getX() - pointStore.get(1).getX()), 2)
+        reliable += Math.pow(0.5 * (pointStore.get( pointStore.size() - 1 ).getX_EOV() - pointStore.get(1).getX_EOV()), 2)
                 * Math.pow(pointStore.get(0).getqY(), 2);
-        reliable += Math.pow(0.5 * (pointStore.get(0).getY() - pointStore.get( pointStore.size() - 2).getY()), 2)
+        reliable += Math.pow(0.5 * (pointStore.get(0).getY_EOV() - pointStore.get( pointStore.size() - 2).getY_EOV()), 2)
                 * Math.pow(pointStore.get(pointStore.size() - 1).getqX(), 2);
-        reliable += Math.pow(0.5 * (pointStore.get( pointStore.size() - 1 ).getY() - pointStore.get(1).getY()), 2)
+        reliable += Math.pow(0.5 * (pointStore.get( pointStore.size() - 1 ).getY_EOV() - pointStore.get(1).getY_EOV()), 2)
                 * Math.pow(pointStore.get(0).getqX(), 2);
 
         return (int) (10 * Math.sqrt(reliable)) / 10.0;

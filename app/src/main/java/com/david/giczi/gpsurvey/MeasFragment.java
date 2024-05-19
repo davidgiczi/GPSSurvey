@@ -100,9 +100,9 @@ public class MeasFragment extends Fragment {
         canvas.drawText("M = 1:" + (int) SCALE, 3 * MM, 87 * MM, paint);
         paint.setTypeface(Typeface.DEFAULT);
         for (MeasPoint measPoint : transformedMeasPointStore) {
-            canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getY(), (float) measPoint.getX(), paint);
+            canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getY_EOV(), (float) measPoint.getX_EOV(), paint);
             canvas.drawText(String.valueOf(measPoint.getPointID()),
-                    (float) measPoint.getY(), (float) (measPoint.getX() - 2 * MM), paint);
+                    (float) measPoint.getY_EOV(), (float) (measPoint.getX_EOV() - 2 * MM), paint);
         }
     }
     private void init(){
@@ -123,17 +123,17 @@ public class MeasFragment extends Fragment {
         for (MeasPoint measuredPoint : MainActivity.MEAS_POINT_LIST) {
             MeasPoint transformedPoint = new MeasPoint();
             transformedPoint.setPointID(measuredPoint.getPointID());
-            transformedPoint.setY(X_CENTER + ((measuredPoint.getY() - Y) * 1000.0 * MM) / SCALE);
-            transformedPoint.setX(Y_CENTER - ((measuredPoint.getX() - X) * 1000.0 * MM)  / SCALE);
+            transformedPoint.setY_EOV(X_CENTER + ((measuredPoint.getY_EOV() - Y) * 1000.0 * MM) / SCALE);
+            transformedPoint.setX_EOV(Y_CENTER - ((measuredPoint.getX_EOV() - X) * 1000.0 * MM)  / SCALE);
             transformedMeasPointStore.add(transformedPoint);
         }
     }
 
     private double getMediumY(){
-        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getY).summaryStatistics().getAverage();
+        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getY_EOV).summaryStatistics().getAverage();
     }
     private double getMediumX(){
-        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getX).summaryStatistics().getAverage();
+        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getX_EOV).summaryStatistics().getAverage();
     }
 
     private void setScaleValue(){

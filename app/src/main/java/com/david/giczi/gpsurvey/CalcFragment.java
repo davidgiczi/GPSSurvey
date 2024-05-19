@@ -81,7 +81,7 @@ public class CalcFragment extends Fragment {
             displayedMeasuredPointLinearLayoutStore.add(measPointIDLayout);
             binding.calcLinearlayout.addView(measPointIDLayout);
             TextView measPointData = new TextView(getContext());
-            if( measPoint.getZ() == 0.0 ){
+            if( measPoint.getZ_EOV() == 0.0 ){
                 measPointData.setTextColor(Color.parseColor("#6750a4"));
             }
             measPointData.setTextIsSelectable(true);

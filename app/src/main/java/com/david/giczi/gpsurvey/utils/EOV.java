@@ -1,20 +1,20 @@
 package com.david.giczi.gpsurvey.utils;
 
 import androidx.annotation.NonNull;
-
 import java.util.Arrays;
 import java.util.List;
 
 public class EOV {
 
-    private static final double a = 6378160.0;
-    private static final double b = 6356774.516;
-    private static final double R = 6379743.001;
-    private static final double m0 = 0.99993;
-    private static final double fi_0 = 47.0 + 6.0 / 60.0;
-    private static final double n = 1.000719704936;
-    private static final double k_EOV = 1.003110007693;
-    private static final double lambda_0 = 19.0 + 2.0 / 60.0 + 54.8584 / 3600.0;
+    public static final double a = 6378160.0;
+    public static final double b = 6356774.516;
+    public static final double R = 6379743.001;
+    public static final double m0 = 0.99993;
+    public static final double fi_0 = 47.0 + 6.0 / 60.0;
+    public static final double n = 1.000719704936;
+    public static final double k = 1.003110007693;
+    public static final double lambda_0 = 19.0 + 2.0 / 60.0 + 54.8584 / 3600.0;
+    public static final double epszilon = 0.0818205679407;
     private static final double e = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(a, 2));
     private static final double e_ = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(b, 2));
     private static final double deltaX = - 54.595;
@@ -27,6 +27,9 @@ public class EOV {
     private double fi_WGS;
     private double lambda_WGS;
     private double h_WGS;
+    private double Y_EOV;
+    private double X_EOV;
+    private double Z_EOV;
     private static final double[][] Rx =
             {{1.0, 0.0, 0.0},
             {0.0, Math.cos(eX), Math.sin(eX)},
@@ -40,45 +43,46 @@ public class EOV {
             {- Math.sin(eZ), Math.cos(eZ), 0.0},
             {0.0, 0.0, 1.0}};
 
-    private final double wgsX;
-    private final double wgsY;
-    private final double wgsZ;
-
-    public EOV(double wgsX, double wgsY, double wgsZ) {
-        this.wgsX = wgsX;
-        this.wgsY = wgsY;
-        this.wgsZ = wgsZ;
+    public void toEOV(double fi_WGS, double lambda_WGS, double h_WGS){
+     this.fi_WGS = fi_WGS;
+     this.lambda_WGS = lambda_WGS;
+     this.h_WGS = h_WGS;
+     List<Double> EOV = getCoordinatesForEOV();
+     this.Y_EOV = EOV.get(0);
+     this.X_EOV = EOV.get(1);
+     this.Z_EOV = EOV.get(2);
     }
-
     public double getFi_WGS() {
         return fi_WGS;
     }
 
-    public void setFi_WGS(double fi_WGS) {
-        this.fi_WGS = fi_WGS;
-    }
 
     public double getLambda_WGS() {
         return lambda_WGS;
     }
 
-    public void setLambda_WGS(double lambda_WGS) {
-        this.lambda_WGS = lambda_WGS;
-    }
 
     public double getH_WGS() {
         return h_WGS;
     }
 
-    public void setH_WGS(double h_WGS) {
-        this.h_WGS = h_WGS;
+    public double getY_EOV() {
+        return Y_EOV;
     }
 
-    public List<Double> getCoordinatesForEOV(){
+    public double getX_EOV() {
+        return X_EOV;
+    }
+
+    public double getZ_EOV() {
+        return Z_EOV;
+    }
+
+    private List<Double> getCoordinatesForEOV(){
 
         List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();
         double sphereFi = 2 * Math.toDegrees(Math.atan(
-        k_EOV * Math.pow(Math.tan(Math.toRadians(45 + geoIUGG67.get(0) / 2.0)), n) *
+        k * Math.pow(Math.tan(Math.toRadians(45 + geoIUGG67.get(0) / 2.0)), n) *
        Math.pow( (1 - e * Math.sin(Math.toRadians(geoIUGG67.get(0)))) /
                 (1 + e * Math.sin(Math.toRadians(geoIUGG67.get(0)))), n * e / 2.0)
         )) - 90;
@@ -139,9 +143,17 @@ public class EOV {
     double kRxRyRz_12 = kRxRy_10 * Rz[0][2] + kRxRy_11 * Rz[1][2] + kRxRy_12 * Rz[2][2];
     double kRxRyRz_22 = kRxRy_20 * Rz[0][2] + kRxRy_21 * Rz[1][2] + kRxRy_22 * Rz[2][2];
 
-    double x = deltaX + kRxRyRz_00 * wgsX + kRxRyRz_01 * wgsY + kRxRyRz_02 * wgsZ;
-    double y = deltaY + kRxRyRz_10 * wgsX + kRxRyRz_11 * wgsY + kRxRyRz_12 * wgsZ;
-    double z = deltaZ + kRxRyRz_20 * wgsX + kRxRyRz_21 * wgsY + kRxRyRz_22 * wgsZ;
+    double x = deltaX + kRxRyRz_00 * WGS84.getDoubleX(fi_WGS, lambda_WGS, h_WGS) +
+                        kRxRyRz_01 * WGS84.getDoubleY(fi_WGS, lambda_WGS, h_WGS) +
+                        kRxRyRz_02 * WGS84.getDoubleZ(fi_WGS, h_WGS);
+
+    double y = deltaY + kRxRyRz_10 * WGS84.getDoubleX(fi_WGS, lambda_WGS, h_WGS) +
+                        kRxRyRz_11 *  WGS84.getDoubleY(fi_WGS, lambda_WGS, h_WGS) +
+                        kRxRyRz_12 * WGS84.getDoubleZ(fi_WGS, h_WGS);
+
+    double z = deltaZ + kRxRyRz_20 * WGS84.getDoubleX(fi_WGS, lambda_WGS, h_WGS) +
+                        kRxRyRz_21 * WGS84.getDoubleY(fi_WGS, lambda_WGS, h_WGS) +
+                        kRxRyRz_22 * WGS84.getDoubleZ(fi_WGS, h_WGS);
 
     return Arrays.asList(x, y, z);
     }
@@ -149,7 +161,6 @@ public class EOV {
     @NonNull
     @Override
     public String toString() {
-        List<Double> eovData = getCoordinatesForEOV();
-        return  eovData.get(0) + "m\t" + eovData.get(1) + "m\t" + eovData.get(2) + "m";
+        return  getY_EOV() + "m\t" + getX_EOV() + "m\t" + getZ_EOV() + "m";
     }
 }

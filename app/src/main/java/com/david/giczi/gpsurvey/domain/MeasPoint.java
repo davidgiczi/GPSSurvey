@@ -15,11 +15,11 @@ public class MeasPoint {
 
     private int pointID;
     private final List<EOV> preMeasPointData = new ArrayList<>();
-    private double Y;
+    private double Y_EOV;
     private double qY;
-    private double X;
+    private double X_EOV;
     private double qX;
-    private double Z;
+    private double Z_EOV;
     private double qZ;
     private double Q;
     private double fi_WGS;
@@ -34,9 +34,9 @@ public class MeasPoint {
     }
     public void setMeasData(EOV measPointData) {
        preMeasPointData.add(measPointData);
-       this.Y = 0.0;
-       this.X = 0.0;
-       this.Z = 0.0;
+       this.Y_EOV = 0.0;
+       this.X_EOV = 0.0;
+       this.Z_EOV = 0.0;
        this.fi_WGS = 0.0;
        this.lambda_WGS = 0.0;
        this.h_WGS = 0.0;
@@ -45,17 +45,16 @@ public class MeasPoint {
     }
     private void setCoordinates(){
         for (EOV measData : preMeasPointData) {
-            List<Double> eovData = measData.getCoordinatesForEOV();
-            this.Y += eovData.get(0);
-            this.X += eovData.get(1);
-            this.Z += eovData.get(2);
+            this.Y_EOV += measData.getY_EOV();
+            this.X_EOV += measData.getX_EOV();
+            this.Z_EOV += measData.getZ_EOV();
             this.fi_WGS += measData.getFi_WGS();
             this.lambda_WGS += measData.getLambda_WGS();
             this.h_WGS += measData.getH_WGS();
         }
-        this.Y /= preMeasPointData.size();
-        this.X /= preMeasPointData.size();
-        this.Z /=  preMeasPointData.size();
+        this.Y_EOV /= preMeasPointData.size();
+        this.X_EOV /= preMeasPointData.size();
+        this.Z_EOV /=  preMeasPointData.size();
         this.fi_WGS /= preMeasPointData.size();
         this.lambda_WGS /= preMeasPointData.size();
         this.h_WGS /=  preMeasPointData.size();
@@ -65,10 +64,9 @@ public class MeasPoint {
         double vX = 0.0;
         double vZ = 0.0;
         for (EOV measData : preMeasPointData) {
-            List<Double> eovData = measData.getCoordinatesForEOV();
-            vY += Math.pow(Y - eovData.get(0), 2);
-            vX += Math.pow(X - eovData.get(1), 2);
-            vZ += Math.pow(Z - eovData.get(2), 2);
+            vY += Math.pow(Y_EOV - measData.getY_EOV(), 2);
+            vX += Math.pow(X_EOV - measData.getX_EOV(), 2);
+            vZ += Math.pow(Z_EOV - measData.getZ_EOV(), 2);
         }
         this.qY = Math.sqrt(vY / (preMeasPointData.size() - 1));
         this.qX = Math.sqrt(vX / (preMeasPointData.size() - 1));
@@ -86,17 +84,11 @@ public class MeasPoint {
     public String getPointIDAsString() {
         return String.valueOf(pointID);
     }
+    public double getY_EOV() {return (int) (100 * Y_EOV) / 100.0;}
 
-    public double getY() {
-        return (int) (100 * Y) / 100.0;
-    }
+    public double getX_EOV() {return (int) (100 * X_EOV) / 100.0;}
 
-    public double getX() {
-        return (int) (100 * X) / 100.0;
-    }
-
-    public double getZ() {
-        return (int) (100 * Z) / 100.0;
+    public double getZ_EOV() {return (int) (100 * Z_EOV) / 100.0;
     }
 
     public double getQ() {
@@ -121,12 +113,12 @@ public class MeasPoint {
     public void setPointID(int pointID) {
         this.pointID = pointID;
     }
-    public void setY(double y) {
-        this.Y = y;
+    public void setY_EOV(double y) {
+        this.Y_EOV = y;
     }
 
-    public void setX(double x) {
-        this.X = x;
+    public void setX_EOV(double x) {
+        this.X_EOV = x;
     }
 
     public void setFi_WGS(double fi_WGS) {
@@ -137,18 +129,14 @@ public class MeasPoint {
         this.lambda_WGS = lambda_WGS;
     }
 
-    public void setH_WGS(double h_WGS) {
-        this.h_WGS = h_WGS;
-    }
-
     public String getMeasPontData(){
-        return "Y=" + getY() + "m ±" + getqY() +
-                "m\tX=" + getX() + "m ±" + getqX() +
-                "m\nh=" + getZ() + "m ±" + getqZ() + "m";
+        return "Y=" + getY_EOV() + "m ±" + getqY() +
+                "m\tX=" + getX_EOV() + "m ±" + getqX() +
+                "m\nh=" + getZ_EOV() + "m ±" + getqZ() + "m";
     }
 
     public String getEOVMeasPontData(){
-        return pointID +  "," + getY() + "," + getX() + "," + getZ()
+        return pointID +  "," + getY_EOV() + "," + getX_EOV() + "," + getZ_EOV()
                 + "," + getQ() + "," + getqY() + "," + getqX() + "," + getqZ();
     }
     public String getWGSMeasPointDataInDecimalFormat(){
@@ -185,11 +173,11 @@ public class MeasPoint {
     @Override
     public String toString() {
         return  pointID +". pont\t\t±Qyx=" + getQ() + "m" +
-                "\n\nY=" + getY() +
+                "\n\nY=" + getY_EOV() +
                 "m\t±" + getqY() +
-                "m\n\nX=" + getX() +
+                "m\n\nX=" + getX_EOV() +
                 "m\t±" + getqX() +
-                "m\n\nh=" + getZ() +
+                "m\n\nh=" + getZ_EOV() +
                 "m\t±" + getqZ() + "m";
     }
 }
