@@ -129,6 +129,10 @@ public class MeasPoint {
         this.lambda_WGS = lambda_WGS;
     }
 
+    public void setH_WGS(double h_WGS) {
+        this.h_WGS = h_WGS;
+    }
+
     public String getMeasPontData(){
         return "Y=" + getY_EOV() + "m ±" + getqY() +
                 "m\tX=" + getX_EOV() + "m ±" + getqX() +

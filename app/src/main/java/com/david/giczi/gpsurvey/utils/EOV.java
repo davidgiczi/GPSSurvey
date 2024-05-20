@@ -14,31 +14,30 @@ public class EOV {
     public static final double n = 1.000719704936;
     public static final double k = 1.003110007693;
     public static final double lambda_0 = 19.0 + 2.0 / 60.0 + 54.8584 / 3600.0;
-    public static final double epszilon = 0.0818205679407;
-    private static final double e = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(a, 2));
-    private static final double e_ = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(b, 2));
-    private static final double deltaX = - 54.595;
-    private static final double deltaY =  72.495;
-    private static final double deltaZ = 14.817;
-    private static final double k_WGS = 1 + (- 1.998606 / 1000000);
-    private static final double eX = Math.toRadians(- 0.302264 / 3600.0);
-    private static final double eY =  Math.toRadians(- 0.161038 / 3600.0);
-    private static final double eZ =  Math.toRadians(- 0.292622 / 3600.0);
+    public static final double e = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(a, 2));
+    private final double e_ = Math.sqrt((Math.pow(a, 2) - Math.pow(b, 2)) / Math.pow(b, 2));
+    private final double deltaX = - 54.595;
+    private final double deltaY =  72.495;
+    private final double deltaZ = 14.817;
+    private final double k_WGS = 1 + (- 1.998606 / 1000000);
+    private final double eX = Math.toRadians(- 0.302264 / 3600.0);
+    private final double eY =  Math.toRadians(- 0.161038 / 3600.0);
+    private final double eZ =  Math.toRadians(- 0.292622 / 3600.0);
     private double fi_WGS;
     private double lambda_WGS;
     private double h_WGS;
     private double Y_EOV;
     private double X_EOV;
     private double Z_EOV;
-    private static final double[][] Rx =
+    private final double[][] Rx =
             {{1.0, 0.0, 0.0},
             {0.0, Math.cos(eX), Math.sin(eX)},
             {0.0, - Math.sin(eX), Math.cos(eX)}};
-    private static final double[][] Ry =
+    private final double[][] Ry =
             {{Math.cos(eY), 0.0, - Math.sin(eY)},
             {0.0, 1.0, 0.0},
             {Math.sin(eY), 0.0, Math.cos(eY)}};
-    private static final double[][] Rz =
+    private final double[][] Rz =
             {{Math.cos(eZ), Math.sin(eZ), 0.0},
             {- Math.sin(eZ), Math.cos(eZ), 0.0},
             {0.0, 0.0, 1.0}};
@@ -47,7 +46,7 @@ public class EOV {
      this.fi_WGS = fi_WGS;
      this.lambda_WGS = lambda_WGS;
      this.h_WGS = h_WGS;
-     List<Double> EOV = getCoordinatesForEOV();
+     List<Double> EOV = getEOVCoordinatesByWGS();
      this.Y_EOV = EOV.get(0);
      this.X_EOV = EOV.get(1);
      this.Z_EOV = EOV.get(2);
@@ -78,7 +77,7 @@ public class EOV {
         return Z_EOV;
     }
 
-    private List<Double> getCoordinatesForEOV(){
+    private List<Double> getEOVCoordinatesByWGS(){
 
         List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();
         double sphereFi = 2 * Math.toDegrees(Math.atan(
@@ -104,7 +103,7 @@ public class EOV {
     }
 
     private List<Double> getGeographicalCoordinatesForIUGG67(){
-        List<Double> xyz = getXYZCoordinatesForIUGG67();
+        List<Double> xyz = transformWGSCoordinatesForIUGG67();
 
         double p = Math.sqrt(Math.pow(xyz.get(0), 2) + Math.pow(xyz.get(1), 2));
         double theta = Math.atan(xyz.get(2) * a / (p * b));
@@ -117,7 +116,7 @@ public class EOV {
         return Arrays.asList(Fi, Lambda, h);
     }
 
-    private List<Double> getXYZCoordinatesForIUGG67(){
+    private List<Double> transformWGSCoordinatesForIUGG67(){
 
     double kRxRy_00 = k_WGS * Rx[0][0] * Ry[0][0] + k_WGS * Rx[0][1] * Ry[1][0] + k_WGS * Rx[0][2] * Ry[2][0];
     double kRxRy_10 = k_WGS * Rx[1][0] * Ry[0][0] + k_WGS * Rx[1][1] * Ry[1][0] + k_WGS * Rx[1][2] * Ry[2][0];

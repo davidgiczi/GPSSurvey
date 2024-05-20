@@ -4,32 +4,49 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import hu.david.giczi.mvmxpert.wgs.ToWGS;
+
 public class WGS84 {
 
     private static final double a = 6378137.0;
     private static final double b = 6356752.314;
     private static final double e2 = ( Math.pow(a, 2) - Math.pow(b, 2) ) / Math.pow(a, 2);
-    private static final double deltaX = - 54.595;
-    private static final double deltaY =  72.495;
-    private static final double deltaZ = 14.817;
-    private static final double k_WGS = 1 + (- 1.998606 / 1000000);
-    private static final double eX = Math.toRadians(- 0.302264 / 3600.0);
-    private static final double eY =  Math.toRadians(- 0.161038 / 3600.0);
-    private static final double eZ =  Math.toRadians(- 0.292622 / 3600.0);
     private double Y_EOV;
     private double X_EOV;
     private double Z_EOV;
-    public double fi_WGS;
-    public double lambda_WGS;
-    public double h_WGS;
+    private double fi_WGS;
+    private double lambda_WGS;
+    private double h_WGS;
+
+    public double getFi_WGS() {
+        return fi_WGS;
+    }
+
+    public double getLambda_WGS() {
+        return lambda_WGS;
+    }
+
+    public double getH_WGS() {
+        return h_WGS;
+    }
 
     public void toWGS84(double Y_EOV, double X_EOV, double Z_EOV) {
         this.Y_EOV = Y_EOV;
         this.X_EOV = X_EOV;
         this.Z_EOV = Z_EOV;
-        List<Double> geoIUGG67 = getGeographicalCoordinatesForIUGG67();
+        List<Double> WGS84 = getWGSCoordinatesByEOV();
+        this.fi_WGS = WGS84.get(0);
+        this.lambda_WGS = WGS84.get(1);
+        this.h_WGS = WGS84.get(2);
     }
-    private List<Double> getGeographicalCoordinatesForIUGG67(){
+
+    private List<Double> getWGSCoordinatesByEOV(){
+        List<Double> xyzIUGG67 = getXYZCoordinatesForIUGG67();
+        ToWGS toWGS = new ToWGS(xyzIUGG67.get(0), xyzIUGG67.get(1), xyzIUGG67.get(2));
+        return Arrays.asList(ToWGS.FI_WGS84, ToWGS.LAMBDA_WGS84, ToWGS.H_WGS84);
+    }
+
+    private List<Double> getXYZCoordinatesForIUGG67(){
         double sphereFi_ = 2 * Math.atan( Math.pow(Math.E, (X_EOV - 200000) / (EOV.R * EOV.m0))) - Math.PI / 2;
         double sphereLambda_ = (Y_EOV - 650000) / (EOV.R * EOV.m0);
         double sphereFi = Math.asin(Math.sin(sphereFi_) * Math.cos(Math.toRadians(EOV.fi_0)) +
@@ -37,23 +54,25 @@ public class WGS84 {
         double sphereLambda = Math.asin(Math.cos(sphereFi_) * Math.sin(sphereLambda_) / Math.cos(sphereFi));
         double FI = iterateFi(sphereFi);
         double LAMBDA = Math.toRadians(EOV.lambda_0) + sphereLambda / EOV.n;
-        return Arrays.asList(FI, LAMBDA, 0.0);
+        double N = EOV.a / Math.sqrt(1 - Math.pow(EOV.e, 2) * Math.pow(Math.sin(FI), 2));
+        double X = (N + Z_EOV) * Math.cos(FI) * Math.cos(LAMBDA);
+        double Y = (N + Z_EOV) * Math.cos(FI) * Math.sin(LAMBDA);
+        double Z = ((1 - Math.pow(EOV.e, 2)) * N + Z_EOV) * Math.sin(FI);
+        return Arrays.asList(X, Y, Z);
     }
+
     private double iterateFi(double preFi){
         double sphereFi = preFi;
         double Fi = preFi;
         for (int i = 0; i < 4; i++) {
             preFi =  2 * Math.atan(Math.pow(
                     Math.tan(Math.PI / 4 + sphereFi / 2) /
-                            (EOV.k * Math.pow((1 - EOV.epszilon * Math.sin(Fi)) /
-                                    (1 + EOV.epszilon * Math.sin(Fi)), EOV.n * EOV.epszilon / 2)),
+                            (EOV.k * Math.pow((1 - EOV.e * Math.sin(Fi)) /
+                                    (1 + EOV.e * Math.sin(Fi)), EOV.n * EOV.e / 2)),
                     1 / EOV.n) ) - Math.PI / 2;
             Fi = preFi;
         }
         return Fi;
-    }
-    public static void main(String[] args) {
-        new WGS84().toWGS84(650684.464, 237444.185, 0.0);
     }
 
     public static String getX(double latitude, double longitude, double altitude){

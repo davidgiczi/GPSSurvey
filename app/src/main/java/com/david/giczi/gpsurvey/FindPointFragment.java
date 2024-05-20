@@ -17,10 +17,12 @@ import com.david.giczi.gpsurvey.databinding.FragmentFindPointBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.EOV;
+import com.david.giczi.gpsurvey.utils.WGS84;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
 
 
 public class FindPointFragment extends Fragment {
@@ -169,14 +171,26 @@ public class FindPointFragment extends Fragment {
             MainActivity.NEXT_POINT_NUMBER++;
             findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
             if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
+                double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString());
+                double lambda_WGS = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString());
                 EOV eov = new EOV();
-                eov.toEOV(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()),
-                          Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()), 0d);
+                eov.toEOV(fi_WGS, lambda_WGS, 0d);
                 findPoint.setY_EOV(eov.getY_EOV());
                 findPoint.setX_EOV(eov.getX_EOV());
+                findPoint.setFi_WGS(fi_WGS);
+                findPoint.setLambda_WGS(lambda_WGS);
             }
-            findPoint.setFi_WGS(Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()));
-            findPoint.setLambda_WGS(Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()));
+            else if(input1stData[0].length() > 2 && input2ndData[0].length() > 2){
+                double y_eov = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString());
+                double x_eov = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString());
+                WGS84 wgs = new WGS84();
+                wgs.toWGS84(y_eov, x_eov, 0d);
+                findPoint.setFi_WGS(wgs.getFi_WGS());
+                findPoint.setLambda_WGS(wgs.getLambda_WGS());
+                findPoint.setH_WGS(wgs.getH_WGS());
+                findPoint.setY_EOV(y_eov);
+                findPoint.setX_EOV(x_eov);
+            }
             MainActivity.MEAS_POINT_LIST.add(findPoint);
         }
         else {
