@@ -166,13 +166,17 @@ public class FindPointFragment extends Fragment {
 
     private void setFindPoint(String findPointId){
         if(  findPointId.equals(CHOOSE_POINT) ) {
-            String[] input1stData = binding.findPoint1stCoordinate.getText().toString().split("\\.");
-            String[] input2ndData = binding.findPoint2ndCoordinate.getText().toString().split("\\.");
+            String[] input1stData = binding.findPoint1stCoordinate.getText().toString()
+                    .replace(",", ".").split("\\.");
+            String[] input2ndData = binding.findPoint2ndCoordinate.getText().toString()
+                    .replace(",", ".").split("\\.");
             MainActivity.NEXT_POINT_NUMBER++;
             findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
             if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
-                double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString());
-                double lambda_WGS = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString());
+                double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
+                        .replace(",", "."));
+                double lambda_WGS = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()
+                        .replace(",", "."));
                 EOV eov = new EOV();
                 eov.toEOV(fi_WGS, lambda_WGS, 0d);
                 findPoint.setY_EOV(eov.getY_EOV());
@@ -181,8 +185,10 @@ public class FindPointFragment extends Fragment {
                 findPoint.setLambda_WGS(lambda_WGS);
             }
             else if(input1stData[0].length() > 2 && input2ndData[0].length() > 2){
-                double y_eov = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString());
-                double x_eov = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString());
+                double y_eov = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
+                        .replace(",", "."));
+                double x_eov = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()
+                        .replace(",", "."));
                 WGS84 wgs = new WGS84();
                 wgs.toWGS84(y_eov, x_eov, 0d);
                 findPoint.setFi_WGS(wgs.getFi_WGS());
