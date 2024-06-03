@@ -50,7 +50,7 @@ public class WGS84 {
         double sphereFi_ = 2 * Math.atan( Math.pow(Math.E, (X_EOV - 200000) / (EOV.R * EOV.m0))) - Math.PI / 2;
         double sphereLambda_ = (Y_EOV - 650000) / (EOV.R * EOV.m0);
         double sphereFi = Math.asin(Math.sin(sphereFi_) * Math.cos(Math.toRadians(EOV.fi_0)) +
-                Math.cos(sphereFi_) * Math.sin(Math.toRadians(EOV.fi_0) * Math.cos(sphereLambda_)));
+                Math.cos(sphereFi_) * Math.sin(Math.toRadians(EOV.fi_0)) * Math.cos(sphereLambda_));
         double sphereLambda = Math.asin(Math.cos(sphereFi_) * Math.sin(sphereLambda_) / Math.cos(sphereFi));
         double FI = iterateFi(sphereFi);
         double LAMBDA = Math.toRadians(EOV.lambda_0) + sphereLambda / EOV.n;
