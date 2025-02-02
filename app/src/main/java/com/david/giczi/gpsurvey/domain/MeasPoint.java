@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class MeasPoint {
 
-    private int pointID;
+    private String pointID;
     private final List<EOV> preMeasPointData = new ArrayList<>();
     private double Y_EOV;
     private double qY;
@@ -29,7 +29,7 @@ public class MeasPoint {
     public MeasPoint() {
     }
 
-    public MeasPoint(int pointID) {
+    public MeasPoint(String pointID) {
         this.pointID = pointID;
     }
     public void setMeasData(EOV measPointData) {
@@ -78,11 +78,8 @@ public class MeasPoint {
         return preMeasPointData.size() < 2;
     }
 
-    public int getPointID() {
+    public String getPointID() {
         return pointID;
-    }
-    public String getPointIDAsString() {
-        return String.valueOf(pointID);
     }
     public double getY_EOV() {return (int) (100 * Y_EOV) / 100.0;}
 
@@ -110,7 +107,7 @@ public class MeasPoint {
     public List<EOV> getPreMeasPointData() {
         return preMeasPointData;
     }
-    public void setPointID(int pointID) {
+    public void setPointID(String pointID) {
         this.pointID = pointID;
     }
     public void setY_EOV(double y) {
@@ -120,7 +117,9 @@ public class MeasPoint {
     public void setX_EOV(double x) {
         this.X_EOV = x;
     }
-
+    public void setZ_EOV(double z_EOV) {
+        Z_EOV = z_EOV;
+    }
     public void setFi_WGS(double fi_WGS) {
         this.fi_WGS = fi_WGS;
     }
@@ -131,6 +130,18 @@ public class MeasPoint {
 
     public void setH_WGS(double h_WGS) {
         this.h_WGS = h_WGS;
+    }
+
+    public double getFi_WGS() {
+        return fi_WGS;
+    }
+
+    public double getLambda_WGS() {
+        return lambda_WGS;
+    }
+
+    public double getH_WGS() {
+        return h_WGS;
     }
 
     public String getMeasPontData(){
@@ -165,7 +176,7 @@ public class MeasPoint {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MeasPoint measPoint = (MeasPoint) o;
-        return pointID == measPoint.pointID;
+        return pointID.equals(measPoint.pointID);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class MeasFragment extends Fragment {
             else {
                 MainActivity.NEXT_POINT_NUMBER++;
             }
-            MainActivity.MEAS_POINT = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
+            MainActivity.MEAS_POINT = new MeasPoint(String.valueOf(MainActivity.NEXT_POINT_NUMBER));
             popupMeasPointData();
         });
     }

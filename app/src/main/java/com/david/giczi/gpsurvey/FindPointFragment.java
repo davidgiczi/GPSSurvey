@@ -136,7 +136,7 @@ public class FindPointFragment extends Fragment {
         List<String> ITEMS = new ArrayList<>();
         ITEMS.add(0, CHOOSE_POINT);
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-            ITEMS.add(measPoint.getPointIDAsString());
+            ITEMS.add(measPoint.getPointID());
         }
         binding.pointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -171,7 +171,7 @@ public class FindPointFragment extends Fragment {
             String[] input2ndData = binding.findPoint2ndCoordinate.getText().toString()
                     .replace(",", ".").split("\\.");
             MainActivity.NEXT_POINT_NUMBER++;
-            findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER);
+            findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER + "_kit");
             if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
                 double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
                         .replace(",", "."));
@@ -207,7 +207,7 @@ public class FindPointFragment extends Fragment {
     private MeasPoint getChosenPoint(String findPointId){
         MeasPoint chosenPoint = null;
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-            if( measPoint.getPointID() == Integer.parseInt(findPointId) ){
+            if( measPoint.getPointID().equals(findPointId) ){
                chosenPoint = measPoint;
             }
         }

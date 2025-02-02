@@ -40,6 +40,11 @@
     </group>
     <group android:id="@+id/calc_options">
         <item
+            android:id="@+id/input_points_option"
+            android:orderInCategory="100"
+            android:title="@string/input_points_option"
+            app:showAsAction="never" />
+        <item
             android:id="@+id/calc_option"
             android:orderInCategory="100"
             android:title="@string/calc_option"

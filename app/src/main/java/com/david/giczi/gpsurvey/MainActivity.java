@@ -1,6 +1,7 @@
 package com.david.giczi.gpsurvey;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -12,11 +13,12 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuCompat;
@@ -36,6 +38,10 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public LocationListener locationListener;
     private SensorManager sensorManager;
     private Sensor sensor;
-    private  ViewGroup compassContainer;
+    private ViewGroup compassContainer;
     public ViewGroup measuredDataContainer;
     public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
+    private int validInputPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +82,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if( locationListener == null ){
+        if (locationListener == null) {
             startMeasureDialog();
-        }
-        else if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null  ){
+        } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null) {
             Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
         }
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -86,16 +92,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         MEAS_POINT_LIST = new ArrayList<>();
     }
 
-    private void popupCompassWindow(){
-        compassContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_compass, null);
-        PopupWindow compassWindow = new PopupWindow(compassContainer, 600,600, true);
-        compassWindow.showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 0);
+    private void popupCompassWindow() {
+        compassContainer = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_compass, null);
+        PopupWindow compassWindow = new PopupWindow(compassContainer, 600, 600, true);
+        compassWindow.showAtLocation(binding.getRoot(), Gravity.CENTER, 0, 0);
         ImageView compassView = compassContainer.findViewById(R.id.compass);
         compassView.setImageResource(R.drawable.compass);
     }
 
-    private void rotateCompass(float rotateAngle){
-        if( compassContainer == null ){
+    private void rotateCompass(float rotateAngle) {
+        if (compassContainer == null) {
             return;
         }
         ImageView compassView = compassContainer.findViewById(R.id.compass);
@@ -111,51 +117,44 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
         if (id == R.id.exit_option) {
             exitDialog();
-        }
-        else if( id == R.id.point_measure_option ){
+        } else if (id == R.id.point_measure_option) {
 
-         if( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null){
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null) {
                 Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
+            } else {
+                startMeasure();
             }
-         else {
-             startMeasure();
-         }
-          navigateToMeasFragment();
-        }
-        else if( id == R.id.decimal_format ){
+            navigateToMeasFragment();
+        } else if (id == R.id.decimal_format) {
             decimalFormat = true;
             angleMinSecFormat = false;
             xyzFormat = false;
-        }
-        else if( id == R.id.xyz_format ){
+        } else if (id == R.id.xyz_format) {
             xyzFormat = true;
             decimalFormat = false;
             angleMinSecFormat = false;
-        }
-        else if( id == R.id.angle_min_sec_format ){
+        } else if (id == R.id.angle_min_sec_format) {
             angleMinSecFormat = true;
             decimalFormat = false;
             xyzFormat = false;
-        }
-        else if( id == R.id.compass_option ){
+        } else if (id == R.id.compass_option) {
             popupCompassWindow();
         }
-        else if( id == R.id.calc_option ){
+        else if( id == R.id.input_points_option ){
+            inputPointDataDialog();
+        } else if (id == R.id.calc_option) {
             navigateToCalcFragment();
-        }
-        else if( id == R.id.finding_point_option ){
+        } else if (id == R.id.finding_point_option) {
             navigateToFindPointFragment();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    private void navigateToFindPointFragment(){
-        switch (PAGE_NUMBER_VALUE){
+    private void navigateToFindPointFragment() {
+        switch (PAGE_NUMBER_VALUE) {
             case 0:
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_StartFragment_to_FindPointFragment);
@@ -172,8 +171,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private void navigateToMeasFragment(){
-        switch (PAGE_NUMBER_VALUE){
+    private void navigateToMeasFragment() {
+        switch (PAGE_NUMBER_VALUE) {
             case 0:
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_StartFragment_to_MeasFragment);
@@ -189,13 +188,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private void navigateToCalcFragment(){
-        switch (PAGE_NUMBER_VALUE){
+    private void navigateToCalcFragment() {
+        switch (PAGE_NUMBER_VALUE) {
             case 0:
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_StartFragment_to_CalcFragment);
                 break;
-            case 1 :
+            case 1:
                 Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
                         .navigate(R.id.action_MeasFragment_to_CalcFragment);
                 break;
@@ -212,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-    public static String convertAngleMinSecFormat(double data){
+
+    public static String convertAngleMinSecFormat(double data) {
 
         int angle = (int) data;
         int min = (int) ((data - angle) * 60);
@@ -220,12 +220,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return angle + "°" + (9 < min ? min : "0" + min) + "'" + (9 < sec ? sec : "0" + sec) + "\"";
     }
 
-    public void startMeasure(){
+    public void startMeasure() {
 
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                if( angleMinSecFormat ){
+                if (angleMinSecFormat) {
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
                     binding.altitudeText.setText(R.string.altitude);
@@ -233,25 +233,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.longitudeData.setText(convertAngleMinSecFormat(location.getLongitude()));
                     String altitude = location.getAltitude() + "m";
                     binding.altitudeData.setText(altitude);
-                }
-                else if( decimalFormat ){
+                } else if (decimalFormat) {
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
                     binding.altitudeText.setText(R.string.altitude);
-                    String latitude = String.format(Locale.getDefault(),"%.6f°", location.getLatitude());
+                    String latitude = String.format(Locale.getDefault(), "%.6f°", location.getLatitude());
                     String longitude = String.format(Locale.getDefault(), "%.6f°", location.getLongitude());
                     binding.latitudeData.setText(latitude);
                     binding.longitudeData.setText(longitude);
                     String altitude = location.getAltitude() + "m";
                     binding.altitudeData.setText(altitude);
-                }
-                else if( xyzFormat ){
+                } else if (xyzFormat) {
                     binding.latitudeText.setText(R.string.X);
                     binding.longitudeText.setText(R.string.Y);
                     binding.altitudeText.setText(R.string.Z);
                     binding.latitudeData.setText(WGS84.getX(location.getLatitude(),
-                                                            location.getLongitude(),
-                                                            location.getAltitude()));
+                            location.getLongitude(),
+                            location.getAltitude()));
                     binding.longitudeData.setText(WGS84.getY(location.getLatitude(),
                             location.getLongitude(),
                             location.getAltitude()));
@@ -284,22 +282,42 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 500, 0, locationListener);
-        MEAS_POINT_LIST = new ArrayList<>();
     }
 
-    private void measurePoint(EOV eov){
-      if( !MeasFragment.IS_RUN_MEAS_PROCESS){
-          return;
-      }
-       MEAS_POINT.setMeasData(eov);
-       TextView measDataView = measuredDataContainer.findViewById(R.id.measured_position);
-       measDataView.setText(MEAS_POINT.toString());
+    private void measurePoint(EOV eov) {
+        if (!MeasFragment.IS_RUN_MEAS_PROCESS) {
+            return;
+        }
+        MEAS_POINT.setMeasData(eov);
+        TextView measDataView = measuredDataContainer.findViewById(R.id.measured_position);
+        measDataView.setText(MEAS_POINT.toString());
     }
 
-    private void requestPermissions(){
+    private void requestPermissions() {
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+    }
+
+    private void inputPointDataDialog(){
+        if( MEAS_POINT_LIST.isEmpty() ){
+            openInputPointDataFile();
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pontok beolvasása");
+        builder.setMessage("Törli a korábbi pontokat?");
+
+        builder.setPositiveButton("Igen", (dialog, which) -> {
+           MEAS_POINT_LIST.clear();
+           openInputPointDataFile();
+        });
+        builder.setNegativeButton("Nem", (dialog, which) -> {
+            openInputPointDataFile();
+            dialog.dismiss();
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void startMeasureDialog() {
@@ -344,12 +362,149 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        rotateCompass( - event.values[0] );
+        rotateCompass(-event.values[0]);
         AZIMUTH = event.values[0];
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    private void openInputPointDataFile() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        startActivityForResult(
+                Intent.createChooser(intent, "Choose a file"), 101);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 101 && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData();
+                readInputPointData(uri);
+            }
+        }
+    }
+
+    private void readInputPointData(Uri uri) {
+        validInputPoints = 0;
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            int row = 1;
+            while ((line = br.readLine()) != null) {
+              parseInputData(line, row);
+              row++;
+            }
+            br.close();
+            Toast.makeText(this, validInputPoints + ". db pont beolvasva", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+        private void parseInputData(String dataLine, int row){
+        String[] inputData = dataLine.split(";");
+        switch ( inputData.length ){
+            case 2:
+                validateInputData(null, inputData[0], inputData[1], null);
+                break;
+            case 3:
+                validateInputData(inputData[0], inputData[1], inputData[2], null);
+                break;
+            case 4:
+                validateInputData(inputData[0], inputData[1], inputData[2], inputData[3]);
+                break;
+            default:
+                Toast.makeText(this, row + ". sor beolvasása sikertelen", Toast.LENGTH_SHORT).show();
+        }
+   }
+        private void validateInputData(String id, String data1, String data2, String h){
+        String[] data1Value = data1.replace(",", ".").split("\\.");
+        String[] data2Value = data2.replace(",", ".").split("\\.");
+
+        if( data1Value[0].length() == 2 && data2Value[0].length() == 2 ){
+            try {
+                    double input1stData = Double.parseDouble(data1.replace(",", "."));
+                    double input2ndData = Double.parseDouble(data2.replace(",", "."));
+        MeasPoint inputPoint = new MeasPoint(id == null ? (NEXT_POINT_NUMBER++) + "_kit" : id + "_kit");
+              if( input1stData > 44.9 && input1stData < 49 && input2ndData > 14.9 && input2ndData < 23 ){
+                  inputPoint.setFi_WGS(input1stData);
+                  inputPoint.setLambda_WGS(input2ndData);
+              }
+               else if( input2ndData > 44.9 && input2ndData < 49 && input1stData > 14.9 && input1stData < 23 ){
+                  inputPoint.setFi_WGS(input2ndData);
+                  inputPoint.setLambda_WGS(input1stData);
+              }
+                double elevation = 0.0;
+                try {
+                    if( h != null ) {
+                        elevation = Double.parseDouble(h);
+                        inputPoint.setH_WGS(elevation);
+                    }
+                }
+                catch (NumberFormatException e){
+                    e.printStackTrace();
+                }
+                finally {
+                    EOV eov = new EOV();
+                    eov.toEOV(inputPoint.getFi_WGS(), inputPoint.getLambda_WGS(), elevation);
+                    inputPoint.setY_EOV(eov.getY_EOV());
+                    inputPoint.setX_EOV(eov.getX_EOV());
+                    inputPoint.setZ_EOV(eov.getZ_EOV());
+                    MEAS_POINT_LIST.add(inputPoint);
+                    validInputPoints++;
+                }
+            }
+            catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+
+        }
+        else if((data1Value[0].length() == 5 || data1Value[0].length() == 6) &&
+                (data2Value[0].length() == 5 || data2Value[0].length() == 6) ){
+            try {
+                double input1stData = Double.parseDouble(data1.replace(",", "."));
+                double input2ndData = Double.parseDouble(data2.replace(",", "."));
+                MeasPoint inputPoint = new MeasPoint(id == null ? (NEXT_POINT_NUMBER++) + "_kit" : id + "_kit");
+                if( input1stData > 400000 && input1stData < 960000 && input2ndData > 32000 && input2ndData <  384000){
+                   inputPoint.setY_EOV(input1stData);
+                   inputPoint.setX_EOV(input2ndData);
+                }
+                else if( input2ndData > 400000 && input2ndData < 960000 && input1stData > 32000 && input1stData < 384000){
+                    inputPoint.setY_EOV(input2ndData);
+                    inputPoint.setX_EOV(input1stData);
+                }
+
+                double elevation = 0.0;
+                try {
+                    if( h != null ) {
+                        elevation = Double.parseDouble(h);
+                        inputPoint.setH_WGS(elevation);
+                    }
+                }
+                catch (NumberFormatException e){
+                    e.printStackTrace();
+                }
+                finally {
+                  WGS84 wgs = new WGS84();
+                  wgs.toWGS84(inputPoint.getY_EOV(), inputPoint.getX_EOV(), inputPoint.getZ_EOV());
+                  inputPoint.setFi_WGS(wgs.getFi_WGS());
+                  inputPoint.setLambda_WGS(wgs.getLambda_WGS());
+                  inputPoint.setH_WGS(elevation);
+                  MEAS_POINT_LIST.add(inputPoint);
+                  validInputPoints++;
+                }
+
+            }
+            catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+        }
+}
 
     }
-}
+

@@ -81,7 +81,7 @@ public class CalcFragment extends Fragment {
             displayedMeasuredPointLinearLayoutStore.add(measPointIDLayout);
             binding.calcLinearlayout.addView(measPointIDLayout);
             TextView measPointData = new TextView(getContext());
-            if( measPoint.getZ_EOV() == 0.0 ){
+            if( measPoint.getPointID().endsWith("_kit") ){
                 measPointData.setTextColor(Color.parseColor("#6750a4"));
             }
             measPointData.setTextIsSelectable(true);
@@ -102,9 +102,8 @@ public class CalcFragment extends Fragment {
         builder.setTitle(pointNumber + ". pont törlése");
         builder.setMessage("Biztos, hogy törli a pontot?");
         builder.setPositiveButton("Igen", (dialog, which) -> {
-            int pointId = Integer.parseInt(pointNumber);
             for (int i = MainActivity.MEAS_POINT_LIST.size() - 1; i >= 0; i--) {
-                if ( pointId == MainActivity.MEAS_POINT_LIST.get(i).getPointID() ) {
+                if ( pointNumber.equals(MainActivity.MEAS_POINT_LIST.get(i).getPointID()) ) {
                   MeasPoint deletedPoint = MainActivity.MEAS_POINT_LIST.remove(i);
                   chosenMeasPointList.remove(deletedPoint);
                 }
@@ -322,17 +321,17 @@ public class CalcFragment extends Fragment {
         List<String> ITEMS = new ArrayList<>();
         ITEMS.add(0, "Válassz pontokat");
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-            ITEMS.add(measPoint.getPointIDAsString());
+            ITEMS.add(measPoint.getPointID());
         }
         binding.pointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if( !parent.getItemAtPosition(position).equals("Válassz pontokat") ){
-                    int pointId = Integer.parseInt((String) parent.getItemAtPosition(position));
+                    String pointId = (String) parent.getItemAtPosition(position);
                     MeasPoint chosenPoint = null;
                     for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-                        if( pointId == measPoint.getPointID() ){
+                        if( pointId.equals(measPoint.getPointID()) ){
                             chosenPoint = measPoint;
                         }
                     }
