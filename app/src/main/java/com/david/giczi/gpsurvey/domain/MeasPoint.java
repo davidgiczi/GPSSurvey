@@ -144,23 +144,30 @@ public class MeasPoint {
         return h_WGS;
     }
 
-    public String getMeasPontData(){
+    public String getEOVPontData(){
         return "Y=" + getY_EOV() + "m ±" + getqY() +
                 "m\tX=" + getX_EOV() + "m ±" + getqX() +
                 "m\nh=" + getZ_EOV() + "m ±" + getqZ() + "m";
     }
 
+    public String getEOVPont(){
+        return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID) +
+                ";" + getY_EOV() + ";" + getX_EOV() + ";" + getZ_EOV();
+    }
+
     public String getEOVMeasPontData(){
-        return pointID +  "," + getY_EOV() + "," + getX_EOV() + "," + getZ_EOV()
-                + "," + getQ() + "," + getqY() + "," + getqX() + "," + getqZ();
+        return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID)
+                +  ";" + getY_EOV() + ";" + getX_EOV() + ";" + getZ_EOV()
+                + ";" + getQ() + ";" + getqY() + ";" + getqX() + ";" + getqZ();
     }
     public String getWGSMeasPointDataInDecimalFormat(){
-        return  String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
-                String.format(Locale.getDefault(), "%.6f", fi_WGS) + "," +
+        return  String.format(Locale.getDefault(), "%.6f", lambda_WGS) + ";" +
+                String.format(Locale.getDefault(), "%.6f", fi_WGS) + ";" +
                 String.format(Locale.getDefault(), "%.2f", h_WGS);
     }
     public String getWGSMeasPointDataInAngelMinSecFormat(){
-        return pointID + "," + MainActivity.convertAngleMinSecFormat(lambda_WGS) + "," +
+        return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID)
+                + ";" + MainActivity.convertAngleMinSecFormat(lambda_WGS) + ";" +
                 MainActivity.convertAngleMinSecFormat(fi_WGS) + "," + ((int) (100 * h_WGS) / 100.0);
     }
 
@@ -168,7 +175,8 @@ public class MeasPoint {
         double X = WGS84.getDoubleX(lambda_WGS, fi_WGS, h_WGS);
         double Y = WGS84.getDoubleY(lambda_WGS, fi_WGS, h_WGS);
         double Z = WGS84.getDoubleZ(lambda_WGS,h_WGS);
-        return pointID + "," + X + "," + Y + "," + Z;
+        return(pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID)
+                + ";" + X + ";" + Y + ";" + Z;
     }
 
     @Override

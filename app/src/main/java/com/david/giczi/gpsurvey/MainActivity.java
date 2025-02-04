@@ -171,6 +171,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    private void navigateToStartFragment() {
+        switch (PAGE_NUMBER_VALUE) {
+            case 1:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_MeasFragment_to_StartFragment);
+                break;
+            case 2:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_CalcFragment_to_StartFragment);
+                break;
+            case 3:
+                Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
+                        .navigate(R.id.action_FindPointFragment_to_StartFragment);
+                break;
+        }
+    }
+
     private void navigateToMeasFragment() {
         switch (PAGE_NUMBER_VALUE) {
             case 0:
@@ -311,9 +328,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         builder.setPositiveButton("Igen", (dialog, which) -> {
            MEAS_POINT_LIST.clear();
            openInputPointDataFile();
+           navigateToStartFragment();
         });
         builder.setNegativeButton("Nem", (dialog, which) -> {
             openInputPointDataFile();
+            navigateToStartFragment();
             dialog.dismiss();
         });
         AlertDialog alert = builder.create();
@@ -401,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
               row++;
             }
             br.close();
-            Toast.makeText(this, validInputPoints + ". db pont beolvasva", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, validInputPoints + " db pont beolvasva", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
         }

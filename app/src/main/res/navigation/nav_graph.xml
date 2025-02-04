@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_MeasFragment_to_FindPointFragment"
             app:destination="@id/FindPointFragment" />
+        <action
+            android:id="@+id/action_MeasFragment_to_StartFragment"
+            app:destination="@id/StartFragment" />
     </fragment>
     <fragment
         android:id="@+id/CalcFragment"
@@ -40,6 +43,9 @@
         <action
             android:id="@+id/action_CalcFragment_to_FindPointFragment"
             app:destination="@id/FindPointFragment" />
+        <action
+            android:id="@+id/action_CalcFragment_to_StartFragment"
+            app:destination="@id/StartFragment" />
     </fragment>
 
     <fragment
@@ -52,6 +58,9 @@
         <action
             android:id="@+id/action_FindPointFragment_to_CalcFragment"
             app:destination="@id/CalcFragment" />
+        <action
+            android:id="@+id/action_FindPointFragment_to_StartFragment"
+            app:destination="@id/StartFragment" />
     </fragment>
 
 </navigation>

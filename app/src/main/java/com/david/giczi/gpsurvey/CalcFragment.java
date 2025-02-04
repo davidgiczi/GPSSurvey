@@ -46,7 +46,7 @@ public class CalcFragment extends Fragment {
     private  ViewGroup saveDataContainer;
     private static final List<String> ITEMS_FOR_KML = Arrays.asList("Pontok", "Vonal", "Kerület");
     private static final List<String> ITEMS_FOR_TXT =
-            Arrays.asList("EOV koordináták és számítások", "WGS - decimális",
+            Arrays.asList("EOV koordináták","EOV koordináták és számítások", "WGS - decimális",
                     "WGS - fok-perc-mperc", "WGS - XYZ");
 
     @Nullable
@@ -85,7 +85,7 @@ public class CalcFragment extends Fragment {
                 measPointData.setTextColor(Color.parseColor("#6750a4"));
             }
             measPointData.setTextIsSelectable(true);
-            measPointData.setText(measPoint.getMeasPontData());
+            measPointData.setText(measPoint.getEOVPontData());
             measPointData.setTextSize(16f);
             LinearLayout measPointDataLayout = new LinearLayout(getContext());
             measPointDataLayout.setGravity(Gravity.CENTER);
@@ -199,31 +199,31 @@ public class CalcFragment extends Fragment {
             fileName = "_" + points.get(0).getPointID() + "-"
                             + points.get(points.size() - 1).getPointID() + "_kerulet.kml";
         }
-        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(0))){
+        else if( points.size() == 1 && (dataType.equals(ITEMS_FOR_TXT.get(0)) || dataType.equals(ITEMS_FOR_TXT.get(1))) ){
             fileName = "_" + points.get(0).getPointID() + "_pont_EOV.txt";
         }
-        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(0))){
+        else if( points.size() > 1 && (dataType.equals(ITEMS_FOR_TXT.get(0)) || dataType.equals(ITEMS_FOR_TXT.get(1))) ){
             fileName = "_" + points.get(0).getPointID() + "-"
                     + points.get(points.size() - 1).getPointID() + "_pontok_EOV.txt";
         }
-        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(1))){
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(2))){
             fileName = "_" + points.get(0).getPointID() + "_pont_WGS.txt";
         }
-        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(1))){
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(2))){
             fileName = "_" + points.get(0).getPointID() + "-"
                     + points.get(points.size() - 1).getPointID() + "_pontok_WGS.txt";
         }
-        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(2))){
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(3))){
             fileName = "_" + points.get(0).getPointID() + "_pont_WGS-fpmp.txt";
         }
-        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(2))){
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(3))){
             fileName = "_" + points.get(0).getPointID() + "-" + points.get(points.size() - 1).getPointID()
                     + "_pontok_WGS-fpmp.txt";
         }
-        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(3))){
+        else if( points.size() == 1 && dataType.equals(ITEMS_FOR_TXT.get(4))){
             fileName = "_" + points.get(0).getPointID() + "_pont_WGS-XYZ.txt";
         }
-        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(3))){
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_TXT.get(4))){
             fileName = "_" + points.get(0).getPointID() + "-" + points.get(points.size() - 1).getPointID()
                     + "_pontok_WGS-XYZ.txt";
         }
@@ -407,17 +407,19 @@ public class CalcFragment extends Fragment {
        String dataType = (String) ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).getSelectedItem();
 
        if( isTXTFormat ){
-
            if( dataType.equals(ITEMS_FOR_TXT.get(0)) ){
+               saveMeasPointDataInEOVFormat(fileName, saveAllPoints);
+           }
+          else if( dataType.equals(ITEMS_FOR_TXT.get(1)) ){
                saveMeasPointAndCalculatedDataInEOVFormat(fileName, saveAllPoints);
            }
-           else if( dataType.equals(ITEMS_FOR_TXT.get(1)) ){
+           else if( dataType.equals(ITEMS_FOR_TXT.get(2)) ){
                saveMeasPointDataInWGSDecimalFormat(fileName, saveAllPoints);
            }
-           else if( dataType.equals(ITEMS_FOR_TXT.get(2)) ){
+           else if( dataType.equals(ITEMS_FOR_TXT.get(3)) ){
                 saveMeasPointDataInWGSAngleMinSecFormat(fileName, saveAllPoints);
            }
-           else if( dataType.equals(ITEMS_FOR_TXT.get(3)) ){
+           else if( dataType.equals(ITEMS_FOR_TXT.get(4)) ){
                 saveMeasPointDataInWGSXYZFormat(fileName, saveAllPoints);
            }
 
@@ -453,6 +455,35 @@ public class CalcFragment extends Fragment {
 
             for (String dataForKML : wrapDataInKML.getKmlDataList()) {
                 bw.write(dataForKML);
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_SHORT).show();
+    }
+
+    private void saveMeasPointDataInEOVFormat(String fileName, boolean saveAllPoints) {
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + fileName);
+
+        if( projectFile.exists() ){
+            Toast.makeText(getContext(), projectFile.getName() +
+                    "\nlétező projekt fájl, mentés sikertelen.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
+                bw.write(measPoint.getEOVPont());
                 bw.newLine();
             }
             bw.close();
@@ -511,7 +542,9 @@ public class CalcFragment extends Fragment {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
             for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
-                bw.write(measPoint.getPointID() + "," + measPoint.getWGSMeasPointDataInDecimalFormat());
+                bw.write((measPoint.getPointID().endsWith("_kit") ?
+                        measPoint.getPointID().substring(0, measPoint.getPointID().indexOf("_")) : measPoint.getPointID())
+                        + ";" + measPoint.getWGSMeasPointDataInDecimalFormat());
                 bw.newLine();
             }
             bw.close();
