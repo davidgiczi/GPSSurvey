@@ -15,6 +15,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
     private int validInputPoints;
+    private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locationListener == null) {
             startMeasureDialog();
@@ -90,6 +93,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         MEAS_POINT_LIST = new ArrayList<>();
+        activityResultLauncher =  registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if( result.getResultCode() == Activity.RESULT_OK ) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            Uri uri = data.getData();
+                            readInputPointData(uri);
+                        }
+                    }
+                });
     }
 
     private void popupCompassWindow() {
@@ -393,19 +407,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/plain");
-        startActivityForResult(
-                Intent.createChooser(intent, "Choose a file"), 101);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 101 && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                Uri uri = data.getData();
-                readInputPointData(uri);
-            }
-        }
+        activityResultLauncher.launch(intent);
     }
 
     private void readInputPointData(Uri uri) {
