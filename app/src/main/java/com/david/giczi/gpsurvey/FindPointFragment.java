@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentFindPointBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
-import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
 import java.util.ArrayList;
@@ -110,21 +109,23 @@ public class FindPointFragment extends Fragment {
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input1stData[0].length() >= 6 &&  Double.parseDouble(input1stData[0]) < 400000 ){
+        else if( input1stData[0].length() >= 6 &&  (Double.parseDouble(input1stData[0]) < 400000 ||
+                Double.parseDouble(input1stData[0]) > 960000 )){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input2ndData[0].length() >= 6 &&  Double.parseDouble(input2ndData[0]) > 400000 ){
+        else if( input2ndData[0].length() >= 6 &&  (Double.parseDouble(input2ndData[0]) > 384000 ||
+                Double.parseDouble(input2ndData[0]) < 32000) ){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input1stData[0].length() == 2 &&  (Double.parseDouble(input1stData[0]) < 45 ||
-                Double.parseDouble(input1stData[0]) > 48) ){
+        else if( input1stData[0].length() == 2 &&  (Double.parseDouble(input1stData[0]) < 45.74 ||
+                Double.parseDouble(input1stData[0]) > 48.58) ){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input2ndData[0].length() == 2 &&  (Double.parseDouble(input2ndData[0]) < 16  ||
-                Double.parseDouble(input2ndData[0]) > 22)){
+        else if( input2ndData[0].length() == 2 &&  (Double.parseDouble(input2ndData[0]) < 16.11  ||
+                Double.parseDouble(input2ndData[0]) > 22.9)){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -177,10 +178,6 @@ public class FindPointFragment extends Fragment {
                         .replace(",", "."));
                 double lambda_WGS = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()
                         .replace(",", "."));
-                EOV eov = new EOV();
-                eov.toEOV(fi_WGS, lambda_WGS, 0d);
-                findPoint.setY_EOV(eov.getY_EOV());
-                findPoint.setX_EOV(eov.getX_EOV());
                 findPoint.setFi_WGS(fi_WGS);
                 findPoint.setLambda_WGS(lambda_WGS);
             }
@@ -218,12 +215,12 @@ public class FindPointFragment extends Fragment {
         handler = new Handler();
         findPointProcess = () -> {
             handler.postDelayed(findPointProcess, 1000);
-            if( MainActivity.ACTUAL_POSITION == null ){
+            if( MainActivity.EOV_POSITION == null ){
                 return;
             }
             MeasPoint actualPosition = new MeasPoint();
-            actualPosition.setY_EOV(MainActivity.ACTUAL_POSITION.getY_EOV());
-            actualPosition.setX_EOV(MainActivity.ACTUAL_POSITION.getX_EOV());
+            actualPosition.setY_EOV(MainActivity.EOV_POSITION.getY_EOV());
+            actualPosition.setX_EOV(MainActivity.EOV_POSITION.getX_EOV());
             AzimuthAndDistance findPointData = new AzimuthAndDistance(actualPosition, findPoint);
             double direction = 0 > Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH ?
                     Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH + 360 :

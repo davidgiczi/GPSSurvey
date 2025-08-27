@@ -1,22 +1,32 @@
 package com.david.giczi.gpsurvey.domain;
 
+import android.util.Log;
+
 public class TopoCentricPoint {
 
-    private final double X;
-    private final double Y;
-    private final double Z;
+    private double X;
+    private double Y;
+    private double Z;
+    public final double fi;
+    public final double lambda;
+    public final double h;
     public static double FI_0;
     public static double LAMBDA_0;
     public static double H_0;
-    public static double EAST;
-    public static double NORTH;
-    public static double UP;
+    public double EAST;
+    public double NORTH;
+    public double UP;
     private static final double a = 6378137d;
     private static final double e2 = 6.69437999014 / 1000;
 
     public TopoCentricPoint(double fi, double lambda, double h) {
-        fi = Math.toRadians(fi);
-        lambda = Math.toRadians(lambda);
+        this.fi = Math.toRadians(fi);
+        this.lambda = Math.toRadians(lambda);
+        this.h = h;
+        calculateNorthEastUpData();
+    }
+
+    public void calculateNorthEastUpData(){
         X = getX(fi, lambda, h);
         Y = getY(fi, lambda, h);
         Z = getZ(fi, h);
@@ -26,32 +36,38 @@ public class TopoCentricPoint {
     }
 
     public static void setCentricFi(double fi_centric) {
-        FI_0 = Math.toRadians(fi_centric);
+        TopoCentricPoint.FI_0 = Math.toRadians(fi_centric);
     }
 
     public static void setCentricLambda(double lambda_centric) {
-        LAMBDA_0 = Math.toRadians(lambda_centric);
+        TopoCentricPoint.LAMBDA_0 = Math.toRadians(lambda_centric);
     }
 
     public static void setCentricH(double h_centric) {
-        H_0 = h_centric;
+        TopoCentricPoint.H_0 = h_centric;
     }
 
     private double getEAST(){
-        return (int) (1000 * (- Math.sin(LAMBDA_0) * (X - getX(FI_0, LAMBDA_0, H_0)) +
-                Math.cos(LAMBDA_0) * (Y - getY(FI_0, LAMBDA_0, H_0)))) / 1000d;
+        return (int) (1000 * (- Math.sin(LAMBDA_0) *
+                (this.X - getX(TopoCentricPoint.FI_0, TopoCentricPoint.LAMBDA_0, TopoCentricPoint.H_0)) +
+                Math.cos(TopoCentricPoint.LAMBDA_0) *
+                        (this.Y - getY(TopoCentricPoint.FI_0, TopoCentricPoint.LAMBDA_0, TopoCentricPoint.H_0)))) / 1000d;
     }
 
     private double getNORTH(){
-        return (int) (1000 * (- Math.sin(FI_0) * Math.cos(LAMBDA_0) * (X - getX(FI_0, LAMBDA_0, H_0)) -
-                Math.sin(FI_0) * Math.sin(LAMBDA_0) * (Y - getY(FI_0, LAMBDA_0, H_0)) +
-                        Math.cos(FI_0) * (Z - getZ(FI_0, H_0)))) / 1000d;
+        return (int) (1000 * (- Math.sin(TopoCentricPoint.FI_0) * Math.cos(TopoCentricPoint.LAMBDA_0) *
+                (this.X - getX(TopoCentricPoint.FI_0, TopoCentricPoint.LAMBDA_0, TopoCentricPoint.H_0)) -
+                Math.sin(TopoCentricPoint.FI_0) * Math.sin(TopoCentricPoint.LAMBDA_0) *
+                        (this.Y - getY(TopoCentricPoint.FI_0, TopoCentricPoint.LAMBDA_0, TopoCentricPoint.H_0)) +
+                        Math.cos(TopoCentricPoint.FI_0) * (this.Z - getZ(TopoCentricPoint.FI_0, TopoCentricPoint.H_0)))) / 1000d;
     }
 
     private double getUP(){
-        return (int) (1000 * (Math.cos(FI_0) * Math.cos(LAMBDA_0) * (X - getX(FI_0, LAMBDA_0, H_0)) +
-                Math.cos(FI_0) * Math.sin(LAMBDA_0) * (Y - getY(FI_0, LAMBDA_0, H_0)) +
-                Math.sin(FI_0) * (Z - getZ(FI_0, H_0)))) / 1000d;
+        return (int) (1000 * (Math.cos(TopoCentricPoint.FI_0) * Math.cos(TopoCentricPoint.LAMBDA_0) *
+                (this.X - getX(TopoCentricPoint.FI_0, TopoCentricPoint.LAMBDA_0, TopoCentricPoint.H_0)) +
+                Math.cos(TopoCentricPoint.FI_0) * Math.sin(TopoCentricPoint.LAMBDA_0) *
+                        (this.Y - getY(TopoCentricPoint.FI_0, TopoCentricPoint.LAMBDA_0, TopoCentricPoint.H_0)) +
+                Math.sin(TopoCentricPoint.FI_0) * (this.Z - getZ(TopoCentricPoint.FI_0, TopoCentricPoint.H_0)))) / 1000d;
     }
 
     private double getX(double fi, double lambda, double h){

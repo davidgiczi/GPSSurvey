@@ -42,8 +42,8 @@ public class AzimuthAndDistance {
 	}
 	 
 	public double calcDistance() {
-		return Math.sqrt(Math.pow(pointA.getX_EOV() - pointB.getX_EOV(), 2)
-				+ Math.pow(pointA.getY_EOV() - pointB.getY_EOV(), 2));
+		return Math.sqrt(Math.pow(pointA.getEAST() - pointB.getEAST(), 2)
+				+ Math.pow(pointA.getNORTH() - pointB.getNORTH(), 2));
 	}
 
 

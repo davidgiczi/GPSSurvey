@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentCalcBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
+import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.CalcData;
 import com.david.giczi.gpsurvey.utils.WrapDataInKML;
 
@@ -80,18 +81,46 @@ public class CalcFragment extends Fragment {
             measPointIDLayout.addView(measPointId);
             displayedMeasuredPointLinearLayoutStore.add(measPointIDLayout);
             binding.calcLinearlayout.addView(measPointIDLayout);
-            TextView measPointData = new TextView(getContext());
+
+            TextView measPointEOVData = new TextView(getContext());
             if( measPoint.getPointID().endsWith("_kit") ){
-                measPointData.setTextColor(Color.parseColor("#6750a4"));
+                measPointEOVData.setTextColor(Color.parseColor("#6750a4"));
             }
-            measPointData.setTextIsSelectable(true);
-            measPointData.setText(measPoint.getEOVPontData());
-            measPointData.setTextSize(16f);
-            LinearLayout measPointDataLayout = new LinearLayout(getContext());
-            measPointDataLayout.setGravity(Gravity.CENTER);
-            measPointDataLayout.addView(measPointData);
-            displayedMeasuredPointLinearLayoutStore.add(measPointDataLayout);
-            binding.calcLinearlayout.addView(measPointDataLayout);
+            measPointEOVData.setTextIsSelectable(true);
+            measPointEOVData.setText(measPoint.getEOVPointData());
+            measPointEOVData.setTextSize(16f);
+            LinearLayout measPointEOVDataLayout = new LinearLayout(getContext());
+            measPointEOVDataLayout.setGravity(Gravity.CENTER);
+            measPointEOVDataLayout.addView(measPointEOVData);
+            displayedMeasuredPointLinearLayoutStore.add(measPointEOVDataLayout);
+            binding.calcLinearlayout.addView(measPointEOVDataLayout);
+
+            TextView measPointEastNorthUpData = new TextView(getContext());
+            measPointEastNorthUpData.setTextIsSelectable(true);
+            measPointEastNorthUpData.setText(measPoint.getEastNorthUpPointData());
+            measPointEastNorthUpData.setTextSize(16f);
+            LinearLayout measPointEastNorthUpDataLayout = new LinearLayout(getContext());
+            int enuLayoutId = 0;
+            measPointEastNorthUpDataLayout.setId(enuLayoutId);
+            measPointEastNorthUpDataLayout.setGravity(Gravity.CENTER);
+            measPointEastNorthUpDataLayout.addView(measPointEastNorthUpData);
+            measPointEastNorthUpData.setOnClickListener(enu -> {
+
+                for (int i = 0; i < binding.calcLinearlayout.getChildCount(); i++) {
+                    if( binding.calcLinearlayout.getChildAt(i).getId() == 0 ){
+                        ((TextView) ((LinearLayout) binding.calcLinearlayout.getChildAt(i))
+                                .getChildAt(0)).setTextColor(Color.BLACK);
+                    }
+                }
+                ((TextView) enu).setTextColor(Color.RED);
+                recalculateTopoPoints((TextView) enu);
+
+            });
+            if( measPoint.isTopoCenter() ){
+                measPointEastNorthUpData.setTextColor(Color.RED);
+            }
+            displayedMeasuredPointLinearLayoutStore.add(measPointEastNorthUpDataLayout);
+            binding.calcLinearlayout.addView(measPointEastNorthUpDataLayout);
         }
     }
 
@@ -125,6 +154,28 @@ public class CalcFragment extends Fragment {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void recalculateTopoPoints(TextView pointTextView){
+        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            if( measPoint.getEastNorthUpPointData().equals(pointTextView.getText().toString())){
+                measPoint.setTopoCenter(true);
+            }
+        }
+    }
+
+    private void reCalculateNorthEastUpData(){
+        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST){
+            TopoCentricPoint topo = new TopoCentricPoint(measPoint.getEAST(),
+                    measPoint.getNORTH(), measPoint.getUP());
+            measPoint.setEAST(topo.EAST);
+            measPoint.setNORTH(topo.NORTH);
+            measPoint.setUP(topo.UP);
+        }
+    }
+    private void refreshDisplayedData(){
+
+
     }
 
     private void savePointDialog(boolean saveAllPoints) {
@@ -483,7 +534,7 @@ public class CalcFragment extends Fragment {
                     new FileWriter(projectFile));
 
             for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
-                bw.write(measPoint.getEOVPont());
+                bw.write(measPoint.getEOVPointSeparatedBySemicolon());
                 bw.newLine();
             }
             bw.close();
@@ -512,7 +563,7 @@ public class CalcFragment extends Fragment {
                     new FileWriter(projectFile));
 
             for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
-                bw.write(measPoint.getEOVMeasPontData());
+                bw.write(measPoint.getEOVPointSeparatedBySemicolon());
                 bw.newLine();
             }
             bw.write(new CalcData(MainActivity.MEAS_POINT_LIST).getCalculatedData());
@@ -544,7 +595,7 @@ public class CalcFragment extends Fragment {
             for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
                 bw.write((measPoint.getPointID().endsWith("_kit") ?
                         measPoint.getPointID().substring(0, measPoint.getPointID().indexOf("_")) : measPoint.getPointID())
-                        + ";" + measPoint.getWGSMeasPointDataInDecimalFormat());
+                        + ";" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedBySemiColon());
                 bw.newLine();
             }
             bw.close();

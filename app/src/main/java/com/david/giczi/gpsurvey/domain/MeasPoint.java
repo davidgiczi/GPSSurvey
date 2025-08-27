@@ -14,64 +14,97 @@ import java.util.Objects;
 public class MeasPoint {
 
     private String pointID;
-    private final List<EOV> preMeasPointData = new ArrayList<>();
+    private final List<TopoCentricPoint> preMeasPointData;
     private double Y_EOV;
-    private double qY;
     private double X_EOV;
-    private double qX;
     private double Z_EOV;
-    private double qZ;
     private double Q;
     private double fi_WGS;
     private double lambda_WGS;
     private double h_WGS;
+    private double EAST;
+    private double NORTH;
+    private double UP;
+    private double qEAST;
+    private double qNORTH;
+    private double qUP;
+    private boolean isTopoCenter;
 
     public MeasPoint() {
+        this.preMeasPointData = new ArrayList<>();
     }
 
     public MeasPoint(String pointID) {
+        this.preMeasPointData = new ArrayList<>();
         this.pointID = pointID;
     }
-    public void setMeasData(EOV measPointData) {
-       preMeasPointData.add(measPointData);
-       this.Y_EOV = 0.0;
-       this.X_EOV = 0.0;
-       this.Z_EOV = 0.0;
-       this.fi_WGS = 0.0;
-       this.lambda_WGS = 0.0;
-       this.h_WGS = 0.0;
+
+    public void setTopoCenter(boolean topoCenter) {
+
+        if( topoCenter ){
+            this.EAST = 0d;
+            this.NORTH = 0d;
+            this.UP = 0d;
+            TopoCentricPoint.setCentricFi(this.fi_WGS);
+            TopoCentricPoint.setCentricLambda(this.lambda_WGS);
+            TopoCentricPoint.setCentricH(this.h_WGS);
+        }
+
+        isTopoCenter = topoCenter;
+    }
+    public void setMeasData(double fi, double lambda, double h) {
+        if( preMeasPointData.isEmpty() && MainActivity.MEAS_POINT_LIST.isEmpty()){
+            TopoCentricPoint.setCentricFi(fi);
+            TopoCentricPoint.setCentricLambda(lambda);
+            TopoCentricPoint.setCentricH(h);
+        }
+        this.fi_WGS = 0.0;
+        this.lambda_WGS = 0.0;
+        this.h_WGS = 0.0;
+        this.EAST = 0.0;
+        this.NORTH = 0.0;
+        this.UP = 0.0;
+       preMeasPointData.add(new TopoCentricPoint(fi, lambda, h));
        setCoordinates();
        setReliability();
     }
     private void setCoordinates(){
-        for (EOV measData : preMeasPointData) {
-            this.Y_EOV += measData.getY_EOV();
-            this.X_EOV += measData.getX_EOV();
-            this.Z_EOV += measData.getZ_EOV();
-            this.fi_WGS += measData.getFi_WGS();
-            this.lambda_WGS += measData.getLambda_WGS();
-            this.h_WGS += measData.getH_WGS();
+        for (TopoCentricPoint measData : preMeasPointData) {
+            this.fi_WGS += Math.toDegrees(measData.fi);
+            this.lambda_WGS += Math.toDegrees(measData.lambda);
+            this.h_WGS += measData.h;
+            this.EAST += measData.EAST;
+            this.NORTH += measData.NORTH;
+            this.UP += measData.UP;
         }
-        this.Y_EOV /= preMeasPointData.size();
-        this.X_EOV /= preMeasPointData.size();
-        this.Z_EOV /=  preMeasPointData.size();
+        this.EAST /= preMeasPointData.size();
+        this.NORTH /= preMeasPointData.size();
+        this.UP /=  preMeasPointData.size();
         this.fi_WGS /= preMeasPointData.size();
         this.lambda_WGS /= preMeasPointData.size();
         this.h_WGS /=  preMeasPointData.size();
     }
     private void setReliability(){
-        double vY = 0.0;
-        double vX = 0.0;
-        double vZ = 0.0;
-        for (EOV measData : preMeasPointData) {
-            vY += Math.pow(Y_EOV - measData.getY_EOV(), 2);
-            vX += Math.pow(X_EOV - measData.getX_EOV(), 2);
-            vZ += Math.pow(Z_EOV - measData.getZ_EOV(), 2);
+        double vEAST = 0.0;
+        double vNORTH = 0.0;
+        double vUP = 0.0;
+        for (TopoCentricPoint measData : preMeasPointData) {
+            vEAST += Math.pow(this.EAST - measData.EAST, 2);
+            vNORTH += Math.pow(this.NORTH - measData.NORTH, 2);
+            vUP += Math.pow(this.UP - measData.UP, 2);
         }
-        this.qY = Math.sqrt(vY / (preMeasPointData.size() - 1));
-        this.qX = Math.sqrt(vX / (preMeasPointData.size() - 1));
-        this.qZ = Math.sqrt(vZ / (preMeasPointData.size() - 1));
-        this.Q = Math.sqrt(Math.pow(qY, 2) + Math.pow(qX, 2));
+        this.qEAST = Math.sqrt(vEAST / (preMeasPointData.size() - 1));
+        this.qNORTH = Math.sqrt(vNORTH / (preMeasPointData.size() - 1));
+        this.qUP = Math.sqrt(vUP / (preMeasPointData.size() - 1));
+        this.Q = Math.sqrt(Math.pow(qEAST, 2) + Math.pow(qNORTH, 2));
+    }
+
+    public void calculateEOVData(){
+        EOV EOV = new EOV();
+        EOV.toEOV(this.fi_WGS, this.lambda_WGS, this.h_WGS);
+        this.Y_EOV = EOV.getY_EOV();
+        this.X_EOV = EOV.getX_EOV();
+        this.Z_EOV = EOV.getZ_EOV();
     }
 
     public boolean isNotMeasured(){
@@ -87,39 +120,63 @@ public class MeasPoint {
 
     public double getZ_EOV() {return (int) (100 * Z_EOV) / 100.0;
     }
-
+    public void setY_EOV(double y_EOV) {
+        Y_EOV = y_EOV;
+    }
+    public void setX_EOV(double x_EOV) {
+        X_EOV = x_EOV;
+    }
+    public void setZ_EOV(double z_EOV) {
+        Z_EOV = z_EOV;
+    }
     public double getQ() {
         return (int) (100 * Q) / 100.0;
     }
 
-    public double getqY() {
-        return (int) (100 * qY) / 100.0;
+    public double getqEAST() {
+        return (int) (100 * qEAST) / 100.0;
     }
 
-    public double getqX() {
-        return (int) (100 * qX) / 100.0;
+    public double getqNORTH() {
+        return (int) (100 * qNORTH) / 100.0;
     }
 
-    public double getqZ() {
-        return (int) (100 * qZ) / 100.0;
+    public double getqUP() {
+        return (int) (100 * qUP) / 100.0;
     }
 
-    public List<EOV> getPreMeasPointData() {
+    public double getEAST() {
+        return (int) (100 * EAST) / 100.0;
+    }
+    public double getNORTH() {
+        return (int) (100 * NORTH) / 100.0;
+    }
+    public double getUP() {
+        return (int) (100 * UP) / 100.0;
+    }
+
+    public boolean isTopoCenter() {
+        return isTopoCenter;
+    }
+
+    public void setEAST(double EAST) {
+        this.EAST = EAST;
+    }
+
+    public void setNORTH(double NORTH) {
+        this.NORTH = NORTH;
+    }
+
+    public void setUP(double UP) {
+        this.UP = UP;
+    }
+    public List<TopoCentricPoint> getPreMeasPointData() {
         return preMeasPointData;
     }
     public void setPointID(String pointID) {
         this.pointID = pointID;
     }
-    public void setY_EOV(double y) {
-        this.Y_EOV = y;
-    }
 
-    public void setX_EOV(double x) {
-        this.X_EOV = x;
-    }
-    public void setZ_EOV(double z_EOV) {
-        Z_EOV = z_EOV;
-    }
     public void setFi_WGS(double fi_WGS) {
         this.fi_WGS = fi_WGS;
     }
@@ -144,31 +201,37 @@ public class MeasPoint {
         return h_WGS;
     }
 
-    public String getEOVPontData(){
-        return "Y=" + getY_EOV() + "m ±" + getqY() +
-                "m\tX=" + getX_EOV() + "m ±" + getqX() +
-                "m\nh=" + getZ_EOV() + "m ±" + getqZ() + "m";
+    public String getEOVPointData(){
+        return  "Y=" + getY_EOV() + "m" +
+                "\tX=" + getX_EOV() + "m" +
+                "\tH=" + getZ_EOV() + "m";
     }
 
-    public String getEOVPont(){
+    public String getEOVPointSeparatedBySemicolon(){
         return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID) +
                 ";" + getY_EOV() + ";" + getX_EOV() + ";" + getZ_EOV();
     }
 
-    public String getEOVMeasPontData(){
-        return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID)
-                +  ";" + getY_EOV() + ";" + getX_EOV() + ";" + getZ_EOV()
-                + ";" + getQ() + ";" + getqY() + ";" + getqX() + ";" + getqZ();
+    public String getEastNorthUpPointData(){
+      return  "East=" + getEAST() + "m" +
+                "\tNorth=" + getNORTH() + "m" +
+                "\tUp=" + getUP() + "m";
     }
-    public String getWGSMeasPointDataInDecimalFormat(){
+
+    public String getWGSMeasPointDataInDecimalFormatSeparatedByComma(){
+        return  String.format(Locale.getDefault(), "%.6f", lambda_WGS) + "," +
+                String.format(Locale.getDefault(), "%.6f", fi_WGS) + "," +
+                String.format(Locale.getDefault(), "%.2f", h_WGS);
+    }
+    public String getWGSMeasPointDataInDecimalFormatSeparatedBySemiColon(){
         return  String.format(Locale.getDefault(), "%.6f", lambda_WGS) + ";" +
                 String.format(Locale.getDefault(), "%.6f", fi_WGS) + ";" +
                 String.format(Locale.getDefault(), "%.2f", h_WGS);
     }
     public String getWGSMeasPointDataInAngelMinSecFormat(){
         return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID)
-                + ";" + MainActivity.convertAngleMinSecFormat(lambda_WGS) + ";" +
-                MainActivity.convertAngleMinSecFormat(fi_WGS) + "," + ((int) (100 * h_WGS) / 100.0);
+                + "," + MainActivity.convertAngleMinSecFormat(lambda_WGS) + ";" +
+                MainActivity.convertAngleMinSecFormat(fi_WGS) + ";" + ((int) (100 * h_WGS) / 100.0);
     }
 
     public String getWGSMeasPointDataInXYZFormat(){
@@ -196,11 +259,11 @@ public class MeasPoint {
     @Override
     public String toString() {
         return  pointID +". pont\t\t±Qyx=" + getQ() + "m" +
-                "\n\nY=" + getY_EOV() +
-                "m\t±" + getqY() +
-                "m\n\nX=" + getX_EOV() +
-                "m\t±" + getqX() +
-                "m\n\nh=" + getZ_EOV() +
-                "m\t±" + getqZ() + "m";
+                "\n\nEast=" + getEAST() +
+                "m\t±" + getqEAST() +
+                "m\n\nNorth=" + getNORTH() +
+                "m\t±" + getqNORTH() +
+                "m\n\nUp=" + getUP() +
+                "m\t±" + getqUP() + "m";
     }
 }

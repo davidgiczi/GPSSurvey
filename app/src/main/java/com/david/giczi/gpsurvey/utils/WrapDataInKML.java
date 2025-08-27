@@ -4,7 +4,6 @@ import android.content.Context;
 
 import androidx.fragment.app.Fragment;
 
-import com.david.giczi.gpsurvey.MainActivity;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -79,7 +78,7 @@ public class WrapDataInKML extends Fragment {
               kmlDataList.add("<description><![CDATA[Name=" + measPoint.getPointID() + "]]></description>");
               kmlDataList.add("<styleUrl>#placemark</styleUrl>");
               kmlDataList.add("<Point>");
-              kmlDataList.add("<coordinates>" + measPoint.getWGSMeasPointDataInDecimalFormat() + "</coordinates>");
+              kmlDataList.add("<coordinates>" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedByComma() + "</coordinates>");
               kmlDataList.add("</Point>");
               kmlDataList.add("</Placemark>");
     }
@@ -96,7 +95,7 @@ public class WrapDataInKML extends Fragment {
         kmlDataList.add("<tessellate>1</tessellate>");
         kmlDataList.add("<coordinates>");
         for (MeasPoint measPoint : measPointList) {
-            kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormat());
+            kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormatSeparatedByComma());
         }
         kmlDataList.add("</coordinates>");
         kmlDataList.add("</LineString>");
@@ -118,9 +117,9 @@ public class WrapDataInKML extends Fragment {
         kmlDataList.add("<tessellate>1</tessellate>");
         kmlDataList.add("<coordinates>");
         for (MeasPoint measPoint : measPointList) {
-            kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormat());
+            kmlDataList.add(measPoint.getWGSMeasPointDataInDecimalFormatSeparatedByComma());
         }
-        kmlDataList.add(measPointList.get(0).getWGSMeasPointDataInDecimalFormat());
+        kmlDataList.add(measPointList.get(0).getWGSMeasPointDataInDecimalFormatSeparatedByComma());
         kmlDataList.add("</coordinates>");
         kmlDataList.add("</LineString>");
         kmlDataList.add("</Placemark>");

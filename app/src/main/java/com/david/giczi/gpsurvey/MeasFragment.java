@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentMeasBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
+import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +90,13 @@ public class MeasFragment extends Fragment {
                return;
            }
            MainActivity.MEAS_POINT.getPreMeasPointData().clear();
+           if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
+            MainActivity.MEAS_POINT.setTopoCenter(true);
+            TopoCentricPoint.setCentricFi(MainActivity.MEAS_POINT.getFi_WGS());
+            TopoCentricPoint.setCentricLambda(MainActivity.MEAS_POINT.getLambda_WGS());
+            TopoCentricPoint.setCentricH(MainActivity.MEAS_POINT.getH_WGS());
+           }
+           MainActivity.MEAS_POINT.calculateEOVData();
            MainActivity.MEAS_POINT_LIST.add(MainActivity.MEAS_POINT);
            displayMeasuredPoint();
        });
@@ -100,9 +109,15 @@ public class MeasFragment extends Fragment {
         canvas.drawText("M = 1:" + (int) SCALE, 3 * MM, 87 * MM, paint);
         paint.setTypeface(Typeface.DEFAULT);
         for (MeasPoint measPoint : transformedMeasPointStore) {
-            canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getY_EOV(), (float) measPoint.getX_EOV(), paint);
+            canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getEAST(), (float) measPoint.getNORTH(), paint);
+            if( measPoint.isTopoCenter() ){
+                paint.setColor(Color.RED);
+            }
+            else{
+                paint.setColor(Color.BLACK);
+            }
             canvas.drawText(String.valueOf(measPoint.getPointID()),
-                    (float) measPoint.getY_EOV(), (float) (measPoint.getX_EOV() - 2 * MM), paint);
+                    (float) measPoint.getEAST(), (float) (measPoint.getNORTH() - 2 * MM), paint);
         }
     }
     private void init(){
@@ -118,22 +133,25 @@ public class MeasFragment extends Fragment {
     }
     private void transformMeasPoints(){
         transformedMeasPointStore = new ArrayList<>();
-        double Y = getMediumY();
-        double X = getMediumX();
+        double east = getMediumEAST();
+        double north = getMediumNORTH();
         for (MeasPoint measuredPoint : MainActivity.MEAS_POINT_LIST) {
             MeasPoint transformedPoint = new MeasPoint();
             transformedPoint.setPointID(measuredPoint.getPointID());
-            transformedPoint.setY_EOV(X_CENTER + ((measuredPoint.getY_EOV() - Y) * 1000.0 * MM) / SCALE);
-            transformedPoint.setX_EOV(Y_CENTER - ((measuredPoint.getX_EOV() - X) * 1000.0 * MM)  / SCALE);
+            if( measuredPoint.isTopoCenter() ){
+                transformedPoint.setTopoCenter(true);
+            }
+            transformedPoint.setEAST(X_CENTER + ((measuredPoint.getEAST() - east) * 1000.0 * MM) / SCALE);
+            transformedPoint.setNORTH(Y_CENTER - ((measuredPoint.getNORTH() - north) * 1000.0 * MM)  / SCALE);
             transformedMeasPointStore.add(transformedPoint);
         }
     }
 
-    private double getMediumY(){
-        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getY_EOV).summaryStatistics().getAverage();
+    private double getMediumEAST(){
+        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getEAST).summaryStatistics().getAverage();
     }
-    private double getMediumX(){
-        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getX_EOV).summaryStatistics().getAverage();
+    private double getMediumNORTH(){
+        return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getNORTH).summaryStatistics().getAverage();
     }
 
     private void setScaleValue(){

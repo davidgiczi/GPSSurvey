@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,26 +14,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.provider.Settings;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.MenuCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
-import com.david.giczi.gpsurvey.domain.MeasPoint;
-import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
-import com.david.giczi.gpsurvey.utils.EOV;
-import com.david.giczi.gpsurvey.utils.WGS84;
-
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -44,6 +24,25 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.MenuCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
+import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
+import com.david.giczi.gpsurvey.domain.MeasPoint;
+import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
+import com.david.giczi.gpsurvey.utils.EOV;
+import com.david.giczi.gpsurvey.utils.WGS84;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
-    public static EOV ACTUAL_POSITION;
+    public static EOV EOV_POSITION;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -290,11 +289,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.altitudeData.setText(WGS84.getZ(location.getLatitude(),
                             location.getAltitude()));
                 }
-                ACTUAL_POSITION = new EOV();
-                ACTUAL_POSITION.toEOV(location.getLatitude(), location.getLongitude(), location.getAltitude());
+                EOV_POSITION = new EOV();
+                EOV_POSITION.toEOV(location.getLatitude(), location.getLongitude(), location.getAltitude());
                 binding.eovText.setText(R.string.eov);
-                binding.eovData.setText(ACTUAL_POSITION.toString());
-                measurePoint(ACTUAL_POSITION);
+                binding.eovData.setText(EOV_POSITION.toString());
+                measurePoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
             }
 
             @Override
@@ -318,11 +317,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 500, 0, locationListener);
     }
 
-    private void measurePoint(EOV eov) {
+    private void measurePoint(double fi, double lambda, double h) {
         if (!MeasFragment.IS_RUN_MEAS_PROCESS) {
             return;
         }
-        MEAS_POINT.setMeasData(eov);
+        MEAS_POINT.setMeasData(fi, lambda, h);
         TextView measDataView = measuredDataContainer.findViewById(R.id.measured_position);
         measDataView.setText(MEAS_POINT.toString());
     }
@@ -455,11 +454,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     double input1stData = Double.parseDouble(data1.replace(",", "."));
                     double input2ndData = Double.parseDouble(data2.replace(",", "."));
         MeasPoint inputPoint = new MeasPoint(id == null ? (NEXT_POINT_NUMBER++) + "_kit" : id + "_kit");
-              if( input1stData > 44.9 && input1stData < 49 && input2ndData > 14.9 && input2ndData < 23 ){
+              if( input1stData > 45.74 && input1stData < 48.58 && input2ndData > 16.11 && input2ndData < 22.9 ){
                   inputPoint.setFi_WGS(input1stData);
                   inputPoint.setLambda_WGS(input2ndData);
               }
-               else if( input2ndData > 44.9 && input2ndData < 49 && input1stData > 14.9 && input1stData < 23 ){
+               else if( input2ndData > 45.74 && input2ndData < 48.58 && input1stData > 16.11 && input1stData < 22.9 ){
                   inputPoint.setFi_WGS(input2ndData);
                   inputPoint.setLambda_WGS(input1stData);
               }
@@ -475,10 +474,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 finally {
                     EOV eov = new EOV();
-                    eov.toEOV(inputPoint.getFi_WGS(), inputPoint.getLambda_WGS(), elevation);
+                    eov.toEOV(inputPoint.getFi_WGS(), inputPoint.getLambda_WGS(), inputPoint.getH_WGS());
                     inputPoint.setY_EOV(eov.getY_EOV());
                     inputPoint.setX_EOV(eov.getX_EOV());
                     inputPoint.setZ_EOV(eov.getZ_EOV());
+                    TopoCentricPoint topo;
+                    if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d &&
+                        TopoCentricPoint.H_0 == 0d ){
+                        TopoCentricPoint.setCentricFi(inputPoint.getFi_WGS());
+                        TopoCentricPoint.setCentricLambda(inputPoint.getLambda_WGS());
+                        TopoCentricPoint.setCentricH(inputPoint.getH_WGS());
+                        inputPoint.setTopoCenter(true);
+                    }
+                    topo = new TopoCentricPoint(inputPoint.getFi_WGS(), inputPoint.getLambda_WGS(),
+                            inputPoint.getH_WGS());
+                    inputPoint.setEAST(topo.EAST);
+                    inputPoint.setNORTH(topo.NORTH);
+                    inputPoint.setUP(topo.UP);
                     MEAS_POINT_LIST.add(inputPoint);
                     validInputPoints++;
                 }
@@ -507,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 try {
                     if( h != null ) {
                         elevation = Double.parseDouble(h);
-                        inputPoint.setH_WGS(elevation);
+                        inputPoint.setZ_EOV(elevation);
                     }
                 }
                 catch (NumberFormatException e){
@@ -518,7 +530,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                   wgs.toWGS84(inputPoint.getY_EOV(), inputPoint.getX_EOV(), inputPoint.getZ_EOV());
                   inputPoint.setFi_WGS(wgs.getFi_WGS());
                   inputPoint.setLambda_WGS(wgs.getLambda_WGS());
-                  inputPoint.setH_WGS(elevation);
+                  inputPoint.setH_WGS(wgs.getH_WGS());
+                  TopoCentricPoint topo;
+                    if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d &&
+                            TopoCentricPoint.H_0 == 0d ){
+                        TopoCentricPoint.setCentricFi(wgs.getFi_WGS());
+                        TopoCentricPoint.setCentricLambda(wgs.getLambda_WGS());
+                        TopoCentricPoint.setCentricH(wgs.getH_WGS());
+                        inputPoint.setTopoCenter(true);
+                    }
+                    topo = new TopoCentricPoint(wgs.getFi_WGS(), wgs.getLambda_WGS(),
+                            wgs.getH_WGS());
+                    inputPoint.setEAST(topo.EAST);
+                    inputPoint.setNORTH(topo.NORTH);
+                    inputPoint.setUP(topo.UP);
                   MEAS_POINT_LIST.add(inputPoint);
                   validInputPoints++;
                 }

@@ -47,6 +47,10 @@ public class EOV {
      this.lambda_WGS = lambda_WGS;
      this.h_WGS = h_WGS;
      List<Double> EOV = getEOVCoordinatesByWGS();
+     if( 400000 > EOV.get(0) || 960000 < EOV.get(0) ||
+                32000 > EOV.get(1) || 384000 < EOV.get(1) ){
+    return;
+        }
      this.Y_EOV = EOV.get(0);
      this.X_EOV = EOV.get(1);
      this.Z_EOV = EOV.get(2);
