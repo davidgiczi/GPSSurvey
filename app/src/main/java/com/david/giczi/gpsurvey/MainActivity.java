@@ -15,7 +15,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -343,6 +342,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         builder.setPositiveButton("Igen", (dialog, which) -> {
            MEAS_POINT_LIST.clear();
+           TopoCentricPoint.setCentricFi(0d);
+           TopoCentricPoint.setCentricLambda(0d);
+           TopoCentricPoint.setCentricH(0d);
            openInputPointDataFile();
            navigateToStartFragment();
         });
@@ -462,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                   inputPoint.setFi_WGS(input2ndData);
                   inputPoint.setLambda_WGS(input1stData);
               }
-                double elevation = 0.0;
+                double elevation;
                 try {
                     if( h != null ) {
                         elevation = Double.parseDouble(h);
@@ -515,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     inputPoint.setX_EOV(input1stData);
                 }
 
-                double elevation = 0.0;
+                double elevation;
                 try {
                     if( h != null ) {
                         elevation = Double.parseDouble(h);

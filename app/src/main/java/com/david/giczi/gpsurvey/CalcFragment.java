@@ -18,13 +18,14 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
 import com.david.giczi.gpsurvey.databinding.FragmentCalcBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
-import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.CalcData;
 import com.david.giczi.gpsurvey.utils.WrapDataInKML;
 
@@ -158,24 +159,8 @@ public class CalcFragment extends Fragment {
 
     private void recalculateTopoPoints(TextView pointTextView){
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-            if( measPoint.getEastNorthUpPointData().equals(pointTextView.getText().toString())){
-                measPoint.setTopoCenter(true);
-            }
+            measPoint.setTopoCenter(measPoint.getEastNorthUpPointData().equals(pointTextView.getText().toString()));
         }
-    }
-
-    private void reCalculateNorthEastUpData(){
-        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST){
-            TopoCentricPoint topo = new TopoCentricPoint(measPoint.getEAST(),
-                    measPoint.getNORTH(), measPoint.getUP());
-            measPoint.setEAST(topo.EAST);
-            measPoint.setNORTH(topo.NORTH);
-            measPoint.setUP(topo.UP);
-        }
-    }
-    private void refreshDisplayedData(){
-
-
     }
 
     private void savePointDialog(boolean saveAllPoints) {

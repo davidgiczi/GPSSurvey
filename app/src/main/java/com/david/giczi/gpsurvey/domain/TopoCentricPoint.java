@@ -1,7 +1,5 @@
 package com.david.giczi.gpsurvey.domain;
 
-import android.util.Log;
-
 public class TopoCentricPoint {
 
     private double X;

@@ -41,6 +41,8 @@ public class MeasPoint {
 
     public void setTopoCenter(boolean topoCenter) {
 
+        isTopoCenter = topoCenter;
+
         if( topoCenter ){
             this.EAST = 0d;
             this.NORTH = 0d;
@@ -49,8 +51,13 @@ public class MeasPoint {
             TopoCentricPoint.setCentricLambda(this.lambda_WGS);
             TopoCentricPoint.setCentricH(this.h_WGS);
         }
+        else {
+            TopoCentricPoint topo = new TopoCentricPoint(this.fi_WGS, this.lambda_WGS, this.h_WGS);
+            this.EAST = topo.EAST;
+            this.NORTH = topo.NORTH;
+            this.UP = topo.UP;
+        }
 
-        isTopoCenter = topoCenter;
     }
     public void setMeasData(double fi, double lambda, double h) {
         if( preMeasPointData.isEmpty() && MainActivity.MEAS_POINT_LIST.isEmpty()){
