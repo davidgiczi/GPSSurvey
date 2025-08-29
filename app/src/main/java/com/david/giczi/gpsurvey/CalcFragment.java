@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 
 import com.david.giczi.gpsurvey.databinding.FragmentCalcBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
+import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.CalcData;
 import com.david.giczi.gpsurvey.utils.WrapDataInKML;
 
@@ -115,7 +116,15 @@ public class CalcFragment extends Fragment {
                 }
                 ((TextView) enu).setTextColor(Color.RED);
                 recalculateTopoPoints((TextView) enu);
-
+                int pointIndex = 0;
+                for (int i = 0; i < binding.calcLinearlayout.getChildCount(); i++) {
+                    if( binding.calcLinearlayout.getChildAt(i).getId() == 0 ) {
+                        ((TextView) ((LinearLayout) binding.calcLinearlayout.getChildAt(i))
+                                .getChildAt(0)).setText(MainActivity.MEAS_POINT_LIST.get(pointIndex).getEastNorthUpPointData());
+                        pointIndex++;
+                    }
+                }
+                displayCalculatedData(MainActivity.MEAS_POINT_LIST);
             });
             if( measPoint.isTopoCenter() ){
                 measPointEastNorthUpData.setTextColor(Color.RED);
@@ -158,8 +167,26 @@ public class CalcFragment extends Fragment {
     }
 
     private void recalculateTopoPoints(TextView pointTextView){
+
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-            measPoint.setTopoCenter(measPoint.getEastNorthUpPointData().equals(pointTextView.getText().toString()));
+            if( measPoint.getEastNorthUpPointData().equals(pointTextView.getText().toString()) ){
+                TopoCentricPoint.setCentricFi(measPoint.getFi_WGS());
+                TopoCentricPoint.setCentricLambda(measPoint.getLambda_WGS());
+                TopoCentricPoint.setCentricH(measPoint.getH_WGS());
+                measPoint.setTopoCenter(true);
+            }
+            else {
+                measPoint.setTopoCenter(false);
+            }
+        }
+        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            if( !measPoint.isTopoCenter() ){
+                TopoCentricPoint topo = new TopoCentricPoint(measPoint.getFi_WGS(),
+                        measPoint.getLambda_WGS(), measPoint.getH_WGS());
+                measPoint.setEAST(topo.EAST);
+                measPoint.setNORTH(topo.NORTH);
+                measPoint.setUP(topo.UP);
+            }
         }
     }
 

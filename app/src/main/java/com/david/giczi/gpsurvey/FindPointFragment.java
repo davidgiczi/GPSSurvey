@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.david.giczi.gpsurvey.databinding.FragmentFindPointBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
+import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
@@ -173,6 +174,7 @@ public class FindPointFragment extends Fragment {
                     .replace(",", ".").split("\\.");
             MainActivity.NEXT_POINT_NUMBER++;
             findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER + "_kit");
+            TopoCentricPoint topo = null;
             if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
                 double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
                         .replace(",", "."));
@@ -180,6 +182,7 @@ public class FindPointFragment extends Fragment {
                         .replace(",", "."));
                 findPoint.setFi_WGS(fi_WGS);
                 findPoint.setLambda_WGS(lambda_WGS);
+                topo = new TopoCentricPoint(fi_WGS, lambda_WGS, 0);
             }
             else if(input1stData[0].length() > 2 && input2ndData[0].length() > 2){
                 double y_eov = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
@@ -193,6 +196,17 @@ public class FindPointFragment extends Fragment {
                 findPoint.setH_WGS(wgs.getH_WGS());
                 findPoint.setY_EOV(y_eov);
                 findPoint.setX_EOV(x_eov);
+                topo = new TopoCentricPoint(wgs.getFi_WGS(), wgs.getLambda_WGS(), wgs.getH_WGS());
+            }
+            if( topo != null ){
+                findPoint.setEAST(topo.EAST);
+                findPoint.setNORTH(topo.NORTH);
+                findPoint.setUP(topo.UP);
+            }
+            if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d && TopoCentricPoint.H_0 == 0d ){
+                TopoCentricPoint.setCentricFi(findPoint.getFi_WGS());
+                TopoCentricPoint.setCentricLambda(findPoint.getLambda_WGS());
+                TopoCentricPoint.setCentricH(findPoint.getH_WGS());
             }
             MainActivity.MEAS_POINT_LIST.add(findPoint);
         }
@@ -215,12 +229,12 @@ public class FindPointFragment extends Fragment {
         handler = new Handler();
         findPointProcess = () -> {
             handler.postDelayed(findPointProcess, 1000);
-            if( MainActivity.EOV_POSITION == null ){
+            if( MainActivity.ACTUAL_POSITION == null ){
                 return;
             }
             MeasPoint actualPosition = new MeasPoint();
-            actualPosition.setY_EOV(MainActivity.EOV_POSITION.getY_EOV());
-            actualPosition.setX_EOV(MainActivity.EOV_POSITION.getX_EOV());
+            actualPosition.setEAST(MainActivity.ACTUAL_POSITION.EAST);
+            actualPosition.setNORTH(MainActivity.ACTUAL_POSITION.NORTH);
             AzimuthAndDistance findPointData = new AzimuthAndDistance(actualPosition, findPoint);
             double direction = 0 > Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH ?
                     Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH + 360 :

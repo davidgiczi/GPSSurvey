@@ -65,10 +65,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
+    public static TopoCentricPoint ACTUAL_POSITION;
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
-    public static EOV EOV_POSITION;
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
@@ -288,10 +288,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     binding.altitudeData.setText(WGS84.getZ(location.getLatitude(),
                             location.getAltitude()));
                 }
-                EOV_POSITION = new EOV();
-                EOV_POSITION.toEOV(location.getLatitude(), location.getLongitude(), location.getAltitude());
+                EOV eovPosition = new EOV();
+                eovPosition.toEOV(location.getLatitude(), location.getLongitude(), location.getAltitude());
                 binding.eovText.setText(R.string.eov);
-                binding.eovData.setText(EOV_POSITION.toString());
+                binding.eovData.setText(eovPosition.toString());
+                ACTUAL_POSITION = new TopoCentricPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
                 measurePoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
             }
 
@@ -320,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (!MeasFragment.IS_RUN_MEAS_PROCESS) {
             return;
         }
-        MEAS_POINT.setMeasData(fi, lambda, h);
+        MEAS_POINT.addMeasData(fi, lambda, h);
         TextView measDataView = measuredDataContainer.findViewById(R.id.measured_position);
         measDataView.setText(MEAS_POINT.toString());
     }

@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment;
 
 import com.david.giczi.gpsurvey.databinding.FragmentMeasBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
-import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 
 import java.util.ArrayList;
@@ -94,9 +93,6 @@ public class MeasFragment extends Fragment {
            MainActivity.MEAS_POINT.getPreMeasPointData().clear();
            if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
             MainActivity.MEAS_POINT.setTopoCenter(true);
-            TopoCentricPoint.setCentricFi(MainActivity.MEAS_POINT.getFi_WGS());
-            TopoCentricPoint.setCentricLambda(MainActivity.MEAS_POINT.getLambda_WGS());
-            TopoCentricPoint.setCentricH(MainActivity.MEAS_POINT.getH_WGS());
            }
            MainActivity.MEAS_POINT.calculateEOVData();
            MainActivity.MEAS_POINT_LIST.add(MainActivity.MEAS_POINT);

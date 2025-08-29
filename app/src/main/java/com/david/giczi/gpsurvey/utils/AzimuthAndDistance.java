@@ -16,8 +16,8 @@ public class AzimuthAndDistance {
 	
 	public double calcAzimuth() {
 		
-		double deltaX = pointB.getY_EOV() - pointA.getY_EOV();
-		double deltaY = pointB.getX_EOV() - pointA.getX_EOV();
+		double deltaX = pointB.getEAST() - pointA.getNORTH();
+		double deltaY = pointB.getEAST() - pointA.getNORTH();
 		
 		if( deltaX >= 0 && deltaY > 0 ) {
 			return Math.atan(deltaX / deltaY);
