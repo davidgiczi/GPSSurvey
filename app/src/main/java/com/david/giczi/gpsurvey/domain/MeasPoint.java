@@ -14,7 +14,7 @@ import java.util.Objects;
 public class MeasPoint {
 
     private String pointID;
-    private final List<TopoCentricPoint> preMeasPointData;
+    private List<TopoCentricPoint> preMeasPointData;
     private double Y_EOV;
     private double X_EOV;
     private double Z_EOV;
@@ -34,6 +34,12 @@ public class MeasPoint {
         this.preMeasPointData = new ArrayList<>();
     }
 
+    public MeasPoint(double fi_WGS, double lambda_WGS, double h_WGS) {
+        this.fi_WGS = fi_WGS;
+        this.lambda_WGS = lambda_WGS;
+        this.h_WGS = h_WGS;
+    }
+
     public MeasPoint(String pointID) {
         this.preMeasPointData = new ArrayList<>();
         this.pointID = pointID;
@@ -47,16 +53,22 @@ public class MeasPoint {
             this.EAST = 0d;
             this.NORTH = 0d;
             this.UP = 0d;
-            TopoCentricPoint.setCentricFi(this.fi_WGS);
-            TopoCentricPoint.setCentricLambda(this.lambda_WGS);
-            TopoCentricPoint.setCentricH(this.h_WGS);
+            if( this.fi_WGS == 0d && this.lambda_WGS == 0d && this.h_WGS == 0d ){
+                return;
+            }
+           TopoCentricPoint.initTopoCenter(this.fi_WGS, this.lambda_WGS, this.h_WGS, true);
         }
     }
+
+    public void calcEastNorthUpData(){
+        TopoCentricPoint topo = new TopoCentricPoint(this.fi_WGS, this.lambda_WGS, this.h_WGS);
+        this.EAST = topo.EAST;
+        this.NORTH = topo.NORTH;
+        this.UP = topo.UP;
+    }
     public void addMeasData(double fi, double lambda, double h) {
-        if( MainActivity.MEAS_POINT_LIST.isEmpty() && preMeasPointData.isEmpty() ){
-            TopoCentricPoint.setCentricFi(fi);
-            TopoCentricPoint.setCentricLambda(lambda);
-            TopoCentricPoint.setCentricH(h);
+        if( MainActivity.MEAS_POINT_LIST.isEmpty() && preMeasPointData.isEmpty() ) {
+            TopoCentricPoint.initTopoCenter(fi, lambda, h, false);
         }
         this.fi_WGS = 0.0;
         this.lambda_WGS = 0.0;
@@ -167,9 +179,6 @@ public class MeasPoint {
         this.NORTH = NORTH;
     }
 
-    public void setUP(double UP) {
-        this.UP = UP;
-    }
     public List<TopoCentricPoint> getPreMeasPointData() {
         return preMeasPointData;
     }

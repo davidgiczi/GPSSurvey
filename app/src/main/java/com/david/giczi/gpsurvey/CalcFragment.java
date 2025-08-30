@@ -170,9 +170,8 @@ public class CalcFragment extends Fragment {
 
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             if( measPoint.getEastNorthUpPointData().equals(pointTextView.getText().toString()) ){
-                TopoCentricPoint.setCentricFi(measPoint.getFi_WGS());
-                TopoCentricPoint.setCentricLambda(measPoint.getLambda_WGS());
-                TopoCentricPoint.setCentricH(measPoint.getH_WGS());
+                TopoCentricPoint.initTopoCenter(measPoint.getFi_WGS(), measPoint.getLambda_WGS(),
+                        measPoint.getH_WGS(), true);
                 measPoint.setTopoCenter(true);
             }
             else {
@@ -181,11 +180,7 @@ public class CalcFragment extends Fragment {
         }
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             if( !measPoint.isTopoCenter() ){
-                TopoCentricPoint topo = new TopoCentricPoint(measPoint.getFi_WGS(),
-                        measPoint.getLambda_WGS(), measPoint.getH_WGS());
-                measPoint.setEAST(topo.EAST);
-                measPoint.setNORTH(topo.NORTH);
-                measPoint.setUP(topo.UP);
+                measPoint.calcEastNorthUpData();
             }
         }
     }

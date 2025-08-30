@@ -1,0 +1,54 @@
+package com.david.giczi.gpsurvey.utils;
+
+import android.content.Context;
+import android.os.Environment;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.david.giczi.gpsurvey.MainActivity;
+import com.david.giczi.gpsurvey.domain.MeasPoint;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class AppExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+    private final Context context;
+
+    public AppExceptionHandler(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
+        handleCrash();
+        System.exit(1);
+    }
+
+    private void handleCrash(){
+        File projectFile =
+                new File(Environment.getExternalStorageDirectory(),
+                        "/Documents/" + "SavedPoints_" + MainActivity.MEAS_POINT_LIST.size() + "_pcs.txt");
+        try {
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(projectFile));
+            for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+                bw.write((measPoint.getPointID().endsWith("_kit") ?
+                        measPoint.getPointID().substring(0, measPoint.getPointID().indexOf("_")) : measPoint.getPointID())
+                        + ";" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedBySemiColon());
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            Toast.makeText(context, projectFile.getName() +
+                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Toast.makeText(context,
+                "Projekt fájl mentve:\n"
+                        + projectFile.getName() , Toast.LENGTH_LONG).show();
+    }
+}

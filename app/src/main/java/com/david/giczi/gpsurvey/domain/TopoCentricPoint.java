@@ -33,6 +33,20 @@ public class TopoCentricPoint {
         UP = getUP();
     }
 
+    public static void initTopoCenter(double fi, double lambda, double h, boolean isSettingValue){
+
+        if( isSettingValue ){
+            setCentricFi(fi);
+            setCentricLambda(lambda);
+            setCentricH(h);
+        }
+       else if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d && TopoCentricPoint.H_0 == 0d ) {
+            setCentricFi(fi);
+            setCentricLambda(lambda);
+            setCentricH(h);
+        }
+    }
+
     public static void setCentricFi(double fi_centric) {
         TopoCentricPoint.FI_0 = Math.toRadians(fi_centric);
     }

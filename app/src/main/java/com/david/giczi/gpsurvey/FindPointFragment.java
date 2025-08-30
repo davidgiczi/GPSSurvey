@@ -146,10 +146,13 @@ public class FindPointFragment extends Fragment {
 
                 if( !parent.getItemAtPosition(position).equals(CHOOSE_POINT) ){
                     String chosenPointId = (String) parent.getItemAtPosition(position);
-                    String Y = String.valueOf(getChosenPoint(chosenPointId).getY_EOV());
-                    String X = String.valueOf(getChosenPoint(chosenPointId).getX_EOV());
-                    binding.findPoint1stCoordinate.setText(Y);
-                    binding.findPoint2ndCoordinate.setText(X);
+                    MeasPoint chosenPoint = getChosenPoint(chosenPointId);
+                    String firstData = String.valueOf((chosenPoint.getY_EOV() == 0 ?
+                            chosenPoint.getEAST() : chosenPoint.getY_EOV()));
+                    String secondData = String.valueOf((chosenPoint.getX_EOV() == 0 ?
+                            chosenPoint.getNORTH() : chosenPoint.getX_EOV()));
+                    binding.findPoint1stCoordinate.setText(firstData);
+                    binding.findPoint2ndCoordinate.setText(secondData);
                 }
                 else{
                     binding.findPoint1stCoordinate.setText("");
@@ -174,7 +177,6 @@ public class FindPointFragment extends Fragment {
                     .replace(",", ".").split("\\.");
             MainActivity.NEXT_POINT_NUMBER++;
             findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER + "_kit");
-            TopoCentricPoint topo = null;
             if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
                 double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
                         .replace(",", "."));
@@ -182,7 +184,6 @@ public class FindPointFragment extends Fragment {
                         .replace(",", "."));
                 findPoint.setFi_WGS(fi_WGS);
                 findPoint.setLambda_WGS(lambda_WGS);
-                topo = new TopoCentricPoint(fi_WGS, lambda_WGS, 0);
             }
             else if(input1stData[0].length() > 2 && input2ndData[0].length() > 2){
                 double y_eov = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
@@ -196,18 +197,8 @@ public class FindPointFragment extends Fragment {
                 findPoint.setH_WGS(wgs.getH_WGS());
                 findPoint.setY_EOV(y_eov);
                 findPoint.setX_EOV(x_eov);
-                topo = new TopoCentricPoint(wgs.getFi_WGS(), wgs.getLambda_WGS(), wgs.getH_WGS());
             }
-            if( topo != null ){
-                findPoint.setEAST(topo.EAST);
-                findPoint.setNORTH(topo.NORTH);
-                findPoint.setUP(topo.UP);
-            }
-            if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d && TopoCentricPoint.H_0 == 0d ){
-                TopoCentricPoint.setCentricFi(findPoint.getFi_WGS());
-                TopoCentricPoint.setCentricLambda(findPoint.getLambda_WGS());
-                TopoCentricPoint.setCentricH(findPoint.getH_WGS());
-            }
+            findPoint.calcEastNorthUpData();
             MainActivity.MEAS_POINT_LIST.add(findPoint);
         }
         else {
@@ -229,15 +220,17 @@ public class FindPointFragment extends Fragment {
         handler = new Handler();
         findPointProcess = () -> {
             handler.postDelayed(findPointProcess, 1000);
-            if( MainActivity.ACTUAL_POSITION == null ){
+            if( MainActivity.STANDING_POINT == null ){
                 return;
             }
-            MeasPoint actualPosition = new MeasPoint();
-            actualPosition.setEAST(MainActivity.ACTUAL_POSITION.EAST);
-            actualPosition.setNORTH(MainActivity.ACTUAL_POSITION.NORTH);
-            AzimuthAndDistance findPointData = new AzimuthAndDistance(actualPosition, findPoint);
-            double direction = 0 > Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH ?
-                    Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH + 360 :
+            TopoCentricPoint.initTopoCenter(MainActivity.STANDING_POINT.getFi_WGS(), MainActivity.STANDING_POINT.getLambda_WGS(),
+                    MainActivity.STANDING_POINT.getH_WGS(), false);
+            MainActivity.STANDING_POINT.calcEastNorthUpData();
+            AzimuthAndDistance findPointData = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);
+            double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointData.calcAzimuth()) >= 360  ?
+                    Math.toDegrees(findPointData.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
+                    0 > MainActivity.AZIMUTH + Math.toDegrees(findPointData.calcAzimuth())  ?
+                         Math.toDegrees(findPointData.calcAzimuth()) + MainActivity.AZIMUTH + 360 :
                     Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH;
             addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointData.calcDistance()));
             String findPointDirection = getString(R.string.find_point_direction) + " "

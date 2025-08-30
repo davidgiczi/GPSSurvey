@@ -39,6 +39,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.david.giczi.gpsurvey.databinding.ActivityMainBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
+import com.david.giczi.gpsurvey.utils.AppExceptionHandler;
 import com.david.giczi.gpsurvey.utils.EOV;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
-    public static TopoCentricPoint ACTUAL_POSITION;
+    public static MeasPoint STANDING_POINT;
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new AppExceptionHandler(this));
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
@@ -292,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 eovPosition.toEOV(location.getLatitude(), location.getLongitude(), location.getAltitude());
                 binding.eovText.setText(R.string.eov);
                 binding.eovData.setText(eovPosition.toString());
-                ACTUAL_POSITION = new TopoCentricPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
+                STANDING_POINT = new MeasPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
                 measurePoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
             }
 
@@ -318,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void measurePoint(double fi, double lambda, double h) {
-        if (!MeasFragment.IS_RUN_MEAS_PROCESS) {
+        if ( !MeasFragment.IS_RUN_MEAS_PROCESS ) {
             return;
         }
         MEAS_POINT.addMeasData(fi, lambda, h);
@@ -343,9 +345,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         builder.setPositiveButton("Igen", (dialog, which) -> {
            MEAS_POINT_LIST.clear();
-           TopoCentricPoint.setCentricFi(0d);
-           TopoCentricPoint.setCentricLambda(0d);
-           TopoCentricPoint.setCentricH(0d);
+           TopoCentricPoint.initTopoCenter(0d, 0d, 0d, true);
            openInputPointDataFile();
            navigateToStartFragment();
         });
@@ -481,19 +481,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     inputPoint.setY_EOV(eov.getY_EOV());
                     inputPoint.setX_EOV(eov.getX_EOV());
                     inputPoint.setZ_EOV(eov.getZ_EOV());
-                    TopoCentricPoint topo;
                     if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d &&
                         TopoCentricPoint.H_0 == 0d ){
-                        TopoCentricPoint.setCentricFi(inputPoint.getFi_WGS());
-                        TopoCentricPoint.setCentricLambda(inputPoint.getLambda_WGS());
-                        TopoCentricPoint.setCentricH(inputPoint.getH_WGS());
                         inputPoint.setTopoCenter(true);
                     }
-                    topo = new TopoCentricPoint(inputPoint.getFi_WGS(), inputPoint.getLambda_WGS(),
-                            inputPoint.getH_WGS());
-                    inputPoint.setEAST(topo.EAST);
-                    inputPoint.setNORTH(topo.NORTH);
-                    inputPoint.setUP(topo.UP);
+                    inputPoint.calcEastNorthUpData();
                     MEAS_POINT_LIST.add(inputPoint);
                     validInputPoints++;
                 }
@@ -517,7 +509,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     inputPoint.setY_EOV(input2ndData);
                     inputPoint.setX_EOV(input1stData);
                 }
-
                 double elevation;
                 try {
                     if( h != null ) {
@@ -534,19 +525,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                   inputPoint.setFi_WGS(wgs.getFi_WGS());
                   inputPoint.setLambda_WGS(wgs.getLambda_WGS());
                   inputPoint.setH_WGS(wgs.getH_WGS());
-                  TopoCentricPoint topo;
                     if( TopoCentricPoint.FI_0 == 0d && TopoCentricPoint.LAMBDA_0 == 0d &&
                             TopoCentricPoint.H_0 == 0d ){
-                        TopoCentricPoint.setCentricFi(wgs.getFi_WGS());
-                        TopoCentricPoint.setCentricLambda(wgs.getLambda_WGS());
-                        TopoCentricPoint.setCentricH(wgs.getH_WGS());
                         inputPoint.setTopoCenter(true);
                     }
-                    topo = new TopoCentricPoint(wgs.getFi_WGS(), wgs.getLambda_WGS(),
-                            wgs.getH_WGS());
-                    inputPoint.setEAST(topo.EAST);
-                    inputPoint.setNORTH(topo.NORTH);
-                    inputPoint.setUP(topo.UP);
+                  inputPoint.calcEastNorthUpData();
                   MEAS_POINT_LIST.add(inputPoint);
                   validInputPoints++;
                 }
