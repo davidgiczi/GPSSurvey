@@ -239,7 +239,7 @@ public class MeasPoint {
     }
     public String getWGSMeasPointDataInAngelMinSecFormat(){
         return (pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID)
-                + "," + MainActivity.convertAngleMinSecFormat(lambda_WGS) + ";" +
+                + ";" + MainActivity.convertAngleMinSecFormat(lambda_WGS) + ";" +
                 MainActivity.convertAngleMinSecFormat(fi_WGS) + ";" + ((int) (100 * h_WGS) / 100.0);
     }
 

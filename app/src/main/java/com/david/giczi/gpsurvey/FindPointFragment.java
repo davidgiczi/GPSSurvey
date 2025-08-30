@@ -229,12 +229,10 @@ public class FindPointFragment extends Fragment {
             AzimuthAndDistance findPointData = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);
             double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointData.calcAzimuth()) >= 360  ?
                     Math.toDegrees(findPointData.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
-                    0 > MainActivity.AZIMUTH + Math.toDegrees(findPointData.calcAzimuth())  ?
-                         Math.toDegrees(findPointData.calcAzimuth()) + MainActivity.AZIMUTH + 360 :
                     Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH;
             addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointData.calcDistance()));
             String findPointDirection = getString(R.string.find_point_direction) + " "
-                    + String.format(Locale.getDefault(),"%.1f°", direction);
+                    + String.format(Locale.getDefault(),"%.1f°", 0 > direction ? direction + 360 : direction);
             String findPointDistance = getString(R.string.distance) + " " +
                     String.format(Locale.getDefault(),"%.0fm", findPointData.calcDistance());
             binding.directionText.setText(findPointDirection);
