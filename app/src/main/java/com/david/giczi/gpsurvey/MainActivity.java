@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (locationListener == null) {
             startMeasureDialog();
         } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null) {
-            Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "GPS elindítva..", Toast.LENGTH_SHORT).show();
         }
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } else if (id == R.id.point_measure_option) {
 
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && locationListener != null) {
-                Toast.makeText(this, "GPS elindítva", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "GPS elindítva..", Toast.LENGTH_SHORT).show();
             } else {
                 startMeasure();
             }

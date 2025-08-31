@@ -218,6 +218,19 @@ public class FindPointFragment extends Fragment {
         return chosenPoint;
     }
 
+    private MeasPoint getTopoCentricPoint(){
+
+        MeasPoint topoCentric = null;
+
+        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
+            if( measPoint.isTopoCenter() ){
+                topoCentric = measPoint;
+            }
+        }
+
+        return topoCentric;
+    }
+
     private void calcFindPointDirectionAndDistance() {
         handler = new Handler();
         findPointProcess = () -> {
@@ -228,7 +241,23 @@ public class FindPointFragment extends Fragment {
             TopoCentricPoint.initTopoCenter(MainActivity.STANDING_POINT.getFi_WGS(), MainActivity.STANDING_POINT.getLambda_WGS(),
                     MainActivity.STANDING_POINT.getH_WGS(), false);
             MainActivity.STANDING_POINT.calcEastNorthUpData();
-            AzimuthAndDistance findPointData = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);
+            MeasPoint topoCentric = null;
+            if( binding.fromCentricPointCheckbox.isChecked() ){
+                topoCentric = getTopoCentricPoint();
+                if( topoCentric == null ){
+                    binding.fromCentricPointCheckbox.setChecked(false);
+                    Toast.makeText(requireContext(), "Topocentrum pont választása szükséges.",
+                            Toast.LENGTH_LONG).show();
+                }
+                else if( topoCentric.getPointID().equals(findPoint.getPointID()) ){
+                    topoCentric = null;
+                    binding.fromCentricPointCheckbox.setChecked(false);
+                    Toast.makeText(requireContext(), "Topocentrum pont nem lehet a felkeresendő pont.",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+            AzimuthAndDistance findPointData = new AzimuthAndDistance(topoCentric == null ?
+                    MainActivity.STANDING_POINT : topoCentric, findPoint);
             double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointData.calcAzimuth()) >= 360  ?
                     Math.toDegrees(findPointData.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
                     Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH;
