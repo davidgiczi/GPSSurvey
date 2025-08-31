@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
     public static MeasPoint STANDING_POINT;
+    public static float GPS_ACCURACY;
     public static int NEXT_POINT_NUMBER;
     public static int PAGE_NUMBER_VALUE;
     public static double AZIMUTH;
@@ -406,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        GPS_ACCURACY = accuracy;
     }
 
     private void openInputPointDataFile() {

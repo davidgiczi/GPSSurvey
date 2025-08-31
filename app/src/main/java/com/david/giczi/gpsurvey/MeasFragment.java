@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +51,7 @@ public class MeasFragment extends Fragment {
         MeasFragment.X_CENTER = getResources().getDisplayMetrics().widthPixels / 2F;
         MeasFragment.Y_CENTER = 89 * MM / 2F;
         displayMeasuredPoint();
+        displayAccuracy();
         if( IS_RUN_MEAS_PROCESS && MainActivity.measuredDataWindow != null ){
             MainActivity.measuredDataWindow
                     .showAtLocation( binding.getRoot(), Gravity.CENTER, 0, 700);
@@ -100,11 +102,48 @@ public class MeasFragment extends Fragment {
        });
     }
 
+    private void displayAccuracy(){
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            private String range = "NINCS";
+            @Override
+            public void run() {
+
+                paint.setColor(Color.WHITE);
+                canvas.drawText(range, 40 * MM, 87 * MM, paint);
+
+                if( MainActivity.GPS_ACCURACY > 0 && MainActivity.GPS_ACCURACY < 2 ){
+                    paint.setColor(Color.rgb(0, 132, 80));
+                    canvas.drawText("KIVÁLÓ", 40 * MM, 87 * MM, paint);
+                    range ="KIVÁLÓ";
+                }
+                else if( MainActivity.GPS_ACCURACY >= 2 && MainActivity.GPS_ACCURACY < 10 ){
+                    paint.setColor(Color.rgb(239, 183, 0));
+                    canvas.drawText("KÖZEPES", 40 * MM, 87 * MM, paint);
+                    range = "KÖZEPES";
+                }
+                else if( MainActivity.GPS_ACCURACY >= 10 ){
+                    paint.setColor(Color.rgb(184, 29, 19));
+                    canvas.drawText("GYENGE", 40 * MM, 87 * MM, paint);
+                    range = "GYENGE";
+                }
+                else {
+                    paint.setColor(Color.BLACK);
+                    canvas.drawText("NINCS", 40 * MM, 87 * MM, paint);
+                    range = "NINCS";
+                }
+                handler.postDelayed(this, 1000);
+            }
+        };
+        handler.postDelayed(runnable, 1000);
+    }
+
     private void displayMeasuredPoint(){
         init();
         setScaleValue();
         transformMeasPoints();
         canvas.drawText("M = 1:" + (int) SCALE, 3 * MM, 87 * MM, paint);
+        canvas.drawText("GPS pozíció:", 20 * MM, 87 * MM, paint);
         paint.setTypeface(Typeface.DEFAULT);
         for (MeasPoint measPoint : transformedMeasPointStore) {
             canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getEAST(), (float) measPoint.getNORTH(), paint);

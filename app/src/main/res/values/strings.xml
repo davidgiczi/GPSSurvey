@@ -30,7 +30,7 @@
     <string name="area">Terület:</string>
     <string name="elevation">Δm:</string>
     <string name="use_all_measured_points">Az összes mért pont használata, a mérés sorrendjében</string>
-    <string name="from_centric_point">A pont iránya, távolsága a topocentrumhoz képest</string>
+    <string name="from_centric_point">A pont iránya a topocentrumhoz képest</string>
     <string name="set_file_name">Fájlnév megadása</string>
     <string name="file_name">fájlnév</string>
     <string name="set_file_type">Fájltípus megadása</string>

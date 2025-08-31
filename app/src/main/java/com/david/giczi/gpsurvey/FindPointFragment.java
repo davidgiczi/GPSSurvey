@@ -256,16 +256,17 @@ public class FindPointFragment extends Fragment {
                             Toast.LENGTH_LONG).show();
                 }
             }
-            AzimuthAndDistance findPointData = new AzimuthAndDistance(topoCentric == null ?
+            AzimuthAndDistance findPointAzimuth = new AzimuthAndDistance(topoCentric == null ?
                     MainActivity.STANDING_POINT : topoCentric, findPoint);
-            double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointData.calcAzimuth()) >= 360  ?
-                    Math.toDegrees(findPointData.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
-                    Math.toDegrees(findPointData.calcAzimuth()) - MainActivity.AZIMUTH;
-            addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointData.calcDistance()));
+            double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointAzimuth.calcAzimuth()) >= 360  ?
+                    Math.toDegrees(findPointAzimuth.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
+                    Math.toDegrees(findPointAzimuth.calcAzimuth()) - MainActivity.AZIMUTH;
+            addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointAzimuth.calcDistance()));
             String findPointDirection = getString(R.string.find_point_direction) + " "
                     + String.format(Locale.getDefault(),"%.1f°", 0 > direction ? direction + 360 : direction);
             String findPointDistance = getString(R.string.distance) + " " +
-                    String.format(Locale.getDefault(),"%.0fm", findPointData.calcDistance());
+                    String.format(Locale.getDefault(),"%.0fm",
+                            new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint).calcDistance());
             binding.directionText.setText(findPointDirection);
             binding.distanceText.setText(findPointDistance);
         };
