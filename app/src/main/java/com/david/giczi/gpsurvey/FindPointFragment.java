@@ -100,33 +100,35 @@ public class FindPointFragment extends Fragment {
             Toast.makeText(requireContext(), "Nincs megadva a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        String[] input1stData = binding.findPoint1stCoordinate.getText().toString().split("\\.");
-        String[] input2ndData = binding.findPoint2ndCoordinate.getText().toString().split("\\.");
-        if( 2 > input1stData[0].length() || (2 < input1stData[0].length() && input1stData[0].length() < 6) ){
+        String[] input1stData = binding.findPoint1stCoordinate.getText()
+                .toString().replace(",", ".").split("\\.");
+        String[] input2ndData = binding.findPoint2ndCoordinate.getText()
+                .toString().replace(",", ".").split("\\.");
+        if( 1 > input1stData[0].length() || 4 == input1stData[0].length() || input1stData[0].length() > 6 ){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( 2 > input2ndData[0].length() || (2 < input2ndData[0].length() && input2ndData[0].length() < 6) ){
+        else if( 1 > input2ndData[0].length() || 4 == input2ndData[0].length() || input2ndData[0].length() > 6 ){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input1stData[0].length() >= 6 &&  (Double.parseDouble(input1stData[0]) < 400000 ||
+        else if( input1stData[0].length() == 6 && (Double.parseDouble(input1stData[0]) < 400000 ||
                 Double.parseDouble(input1stData[0]) > 960000 )){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input2ndData[0].length() >= 6 &&  (Double.parseDouble(input2ndData[0]) > 384000 ||
+        else if( (input2ndData[0].length() == 5 || input2ndData[0].length() == 6) &&  (Double.parseDouble(input2ndData[0]) > 384000 ||
                 Double.parseDouble(input2ndData[0]) < 32000) ){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input1stData[0].length() == 2 &&  (Double.parseDouble(input1stData[0]) < 45.74 ||
-                Double.parseDouble(input1stData[0]) > 48.58) ){
+        else if( input1stData[0].length() > 0  &&  input1stData[0].length() < 3 &&  (Double.parseDouble(input1stData[0]) < -90 ||
+                Double.parseDouble(input1stData[0]) > 90) ){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input2ndData[0].length() == 2 &&  (Double.parseDouble(input2ndData[0]) < 16.11  ||
-                Double.parseDouble(input2ndData[0]) > 22.9)){
+        else if( input2ndData[0].length() > 0 && input2ndData[0].length() < 4 && (Double.parseDouble(input2ndData[0]) < -180  ||
+                Double.parseDouble(input2ndData[0]) > 180)){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }

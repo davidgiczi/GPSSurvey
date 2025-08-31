@@ -452,16 +452,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         String[] data1Value = data1.replace(",", ".").split("\\.");
         String[] data2Value = data2.replace(",", ".").split("\\.");
 
-        if( data1Value[0].length() == 2 && data2Value[0].length() == 2 ){
+        if( (data1Value[0].length() > 0 && data1Value[0].length() < 4) &&
+                (data2Value[0].length() > 0 && data2Value[0].length() < 4) ){
             try {
                     double input1stData = Double.parseDouble(data1.replace(",", "."));
                     double input2ndData = Double.parseDouble(data2.replace(",", "."));
         MeasPoint inputPoint = new MeasPoint(id == null ? (NEXT_POINT_NUMBER++) + "_kit" : id + "_kit");
-              if( input1stData > 45.74 && input1stData < 48.58 && input2ndData > 16.11 && input2ndData < 22.9 ){
+              if( input1stData >= -90 && input1stData <= 90 && input2ndData >= -180 && input2ndData <= 180 ){
                   inputPoint.setFi_WGS(input1stData);
                   inputPoint.setLambda_WGS(input2ndData);
               }
-               else if( input2ndData > 45.74 && input2ndData < 48.58 && input1stData > 16.11 && input1stData < 22.9 ){
+               else if( input2ndData >= -90 && input2ndData <= 90 && input1stData >= -180 && input1stData <= 180 ){
                   inputPoint.setFi_WGS(input2ndData);
                   inputPoint.setLambda_WGS(input1stData);
               }
