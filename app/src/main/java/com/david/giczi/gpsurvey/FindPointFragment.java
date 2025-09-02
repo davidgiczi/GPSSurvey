@@ -181,7 +181,8 @@ public class FindPointFragment extends Fragment {
                     .replace(",", ".").split("\\.");
             MainActivity.NEXT_POINT_NUMBER++;
             findPoint = new MeasPoint(MainActivity.NEXT_POINT_NUMBER + "_kit");
-            if( input1stData[0].length() == 2 && input2ndData[0].length() == 2  ){
+            if( input1stData[0].length() > 0 && input1stData[0].length() < 4 &&
+                    input2ndData[0].length() > 0 && input2ndData[0].length() < 4){
                 double fi_WGS = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
                         .replace(",", "."));
                 double lambda_WGS = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()
@@ -189,7 +190,7 @@ public class FindPointFragment extends Fragment {
                 findPoint.setFi_WGS(fi_WGS);
                 findPoint.setLambda_WGS(lambda_WGS);
             }
-            else if(input1stData[0].length() > 2 && input2ndData[0].length() > 2){
+            else if(input1stData[0].length() == 6 && input2ndData[0].length() > 4 && input2ndData[0].length() < 7){
                 double y_eov = Double.parseDouble(binding.findPoint1stCoordinate.getText().toString()
                         .replace(",", "."));
                 double x_eov = Double.parseDouble(binding.findPoint2ndCoordinate.getText().toString()
@@ -201,6 +202,11 @@ public class FindPointFragment extends Fragment {
                 findPoint.setH_WGS(wgs.getH_WGS());
                 findPoint.setY_EOV(y_eov);
                 findPoint.setX_EOV(x_eov);
+            }
+            if( MainActivity.MEAS_POINT_LIST.isEmpty() && MainActivity.STANDING_POINT != null ) {
+                TopoCentricPoint.initTopoCenter(MainActivity.STANDING_POINT.getFi_WGS(), MainActivity.STANDING_POINT.getLambda_WGS(),
+                        MainActivity.STANDING_POINT.getH_WGS(), false);
+               findPoint.setTopoCenterForFindPoint(true);
             }
             findPoint.calcEastNorthUpData();
             MainActivity.MEAS_POINT_LIST.add(findPoint);

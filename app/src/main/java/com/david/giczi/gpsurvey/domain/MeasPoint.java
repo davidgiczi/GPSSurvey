@@ -45,11 +45,15 @@ public class MeasPoint {
         this.pointID = pointID;
     }
 
-    public void setTopoCenter(boolean topoCenter) {
+    public void setTopoCenterForFindPoint(boolean isTopoCenter){
+        this.isTopoCenter = isTopoCenter;
+    }
 
-        this.isTopoCenter = topoCenter;
+    public void setTopoCenter(boolean istopoCenter) {
 
-        if( topoCenter ){
+        this.isTopoCenter = istopoCenter;
+
+        if( istopoCenter ){
             this.EAST = 0d;
             this.NORTH = 0d;
             this.UP = 0d;
