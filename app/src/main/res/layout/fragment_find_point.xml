@@ -117,12 +117,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/point_catching_option"
-        app:layout_constraintBottom_toTopOf="@+id/from_centric_point_checkbox"
+        app:layout_constraintBottom_toTopOf="@+id/between_find_and_topo_point_line_checkbox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <CheckBox
-        android:id="@+id/from_centric_point_checkbox"
+        android:id="@+id/between_find_and_topo_point_line_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:button="@null"

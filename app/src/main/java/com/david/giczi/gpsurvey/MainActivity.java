@@ -296,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 binding.eovText.setText(R.string.eov);
                 binding.eovData.setText(eovPosition.toString());
                 STANDING_POINT = new MeasPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
+                GPS_ACCURACY = location.getAccuracy();
                 measurePoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
             }
 
@@ -407,7 +408,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        GPS_ACCURACY = accuracy;
     }
 
     private void openInputPointDataFile() {

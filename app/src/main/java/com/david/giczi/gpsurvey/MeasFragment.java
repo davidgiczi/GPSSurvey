@@ -106,32 +106,38 @@ public class MeasFragment extends Fragment {
         Handler handler = new Handler();
         Runnable runnable = new Runnable() {
             private String range = "NINCS";
+            private float accuracy = 0f;
             @Override
             public void run() {
 
                 paint.setColor(Color.WHITE);
-                canvas.drawText(range, 40 * MM, 87 * MM, paint);
+                canvas.drawText(range, 50 * MM, 87 * MM, paint);
 
-                if( MainActivity.GPS_ACCURACY > 0 && MainActivity.GPS_ACCURACY < 2 ){
-                    paint.setColor(Color.rgb(0, 132, 80));
-                    canvas.drawText("KIVÁLÓ", 40 * MM, 87 * MM, paint);
-                    range ="KIVÁLÓ";
-                }
-                else if( MainActivity.GPS_ACCURACY >= 2 && MainActivity.GPS_ACCURACY < 10 ){
-                    paint.setColor(Color.rgb(239, 183, 0));
-                    canvas.drawText("KÖZEPES", 40 * MM, 87 * MM, paint);
-                    range = "KÖZEPES";
+                if( MainActivity.GPS_ACCURACY == 0 || MainActivity.GPS_ACCURACY == accuracy ){
+                    paint.setColor(Color.BLACK);
+                    canvas.drawText("NINCS", 50 * MM, 87 * MM, paint);
+                    range ="NINCS";
                 }
                 else if( MainActivity.GPS_ACCURACY >= 10 ){
-                    paint.setColor(Color.rgb(184, 29, 19));
-                    canvas.drawText("GYENGE", 40 * MM, 87 * MM, paint);
+                    paint.setColor(Color.rgb(250, 186, 1));
+                    canvas.drawText("GYENGE", 50 * MM, 87 * MM, paint);
                     range = "GYENGE";
                 }
-                else {
-                    paint.setColor(Color.BLACK);
-                    canvas.drawText("NINCS", 40 * MM, 87 * MM, paint);
-                    range = "NINCS";
+                else if( MainActivity.GPS_ACCURACY >= 5 ){
+                    paint.setColor(Color.rgb(246, 96, 2));
+                    canvas.drawText("KÖZEPES", 50 * MM, 87 * MM, paint);
+                    range = "KÖZEPES";
                 }
+                else if ( MainActivity.GPS_ACCURACY >= 2) {
+                    paint.setColor(Color.rgb(127, 205, 86));
+                    canvas.drawText("JÓ", 50 * MM, 87 * MM, paint);
+                    range = "JÓ";
+                } else {
+                    paint.setColor(Color.rgb(74, 159, 4));
+                    canvas.drawText("KIVÁLÓ", 50 * MM, 87 * MM, paint);
+                    range = "KIVÁLÓ";
+                }
+                accuracy = MainActivity.GPS_ACCURACY;
                 handler.postDelayed(this, 1000);
             }
         };
@@ -143,7 +149,7 @@ public class MeasFragment extends Fragment {
         setScaleValue();
         transformMeasPoints();
         canvas.drawText("M = 1:" + (int) SCALE, 3 * MM, 87 * MM, paint);
-        canvas.drawText("GPS pozíció:", 20 * MM, 87 * MM, paint);
+        canvas.drawText("GPS pozíció:", 30 * MM, 87 * MM, paint);
         paint.setTypeface(Typeface.DEFAULT);
         for (MeasPoint measPoint : transformedMeasPointStore) {
             canvas.drawText(getString(R.string.dot_symbol), (float) measPoint.getEAST(), (float) measPoint.getNORTH(), paint);

@@ -19,6 +19,7 @@ import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +36,7 @@ public class FindPointFragment extends Fragment {
     private Runnable findPointProcess;
     private boolean isRunningFindPointProcess;
     private static final String CHOOSE_POINT = "Válassz pontot";
+    private boolean isShowingData = true;
 
     @Nullable
     @Override
@@ -150,9 +152,9 @@ public class FindPointFragment extends Fragment {
                     String chosenPointId = (String) parent.getItemAtPosition(position);
                     MeasPoint chosenPoint = getChosenPoint(chosenPointId);
                     String firstData = String.valueOf((chosenPoint.getY_EOV() == 0 ?
-                            chosenPoint.getEAST() : chosenPoint.getY_EOV()));
+                            chosenPoint.getFi_WGS() : chosenPoint.getY_EOV()));
                     String secondData = String.valueOf((chosenPoint.getX_EOV() == 0 ?
-                            chosenPoint.getNORTH() : chosenPoint.getX_EOV()));
+                            chosenPoint.getLambda_WGS() : chosenPoint.getX_EOV()));
                     binding.findPoint1stCoordinate.setText(firstData);
                     binding.findPoint2ndCoordinate.setText(secondData);
                 }
@@ -218,6 +220,36 @@ public class FindPointFragment extends Fragment {
         return chosenPoint;
     }
 
+    private void getFindPointDistancesBetweenTopoCenterAndFindPoints(){
+
+        if( binding.betweenFindAndTopoPointLineCheckbox.isChecked() && isShowingData ){
+
+            MeasPoint topoCenter = getTopoCentricPoint();
+
+            if( topoCenter == null ){
+                binding.betweenFindAndTopoPointLineCheckbox.setChecked(false);
+                Toast.makeText(requireContext(), "Topocentrum pont választása szükséges.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            else if( topoCenter.getPointID().equals(findPoint.getPointID()) ){
+                binding.betweenFindAndTopoPointLineCheckbox.setChecked(false);
+                Toast.makeText(requireContext(), "A felkeresendő és a topocentrum pont nem lehet megegyező.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            AzimuthAndDistance lineData = new AzimuthAndDistance(findPoint, topoCenter);
+            AzimuthAndDistance actualPosition = new AzimuthAndDistance(findPoint, MainActivity.STANDING_POINT);
+            double alfa = lineData.calcAzimuth() - actualPosition.calcAzimuth();
+            DecimalFormat format = new DecimalFormat("0.00");
+            String abscissa = format.format(Math.cos(alfa) * actualPosition.calcDistance()).replace(",", ".");
+            String ordinate = format.format(  Math.sin(alfa) * actualPosition.calcDistance() ).replace(",", ".");
+            Toast.makeText(getContext(), "Vonalig: " + ordinate + "m Vonalban: " + abscissa + "m", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     private MeasPoint getTopoCentricPoint(){
 
         MeasPoint topoCentric = null;
@@ -235,29 +267,15 @@ public class FindPointFragment extends Fragment {
         handler = new Handler();
         findPointProcess = () -> {
             handler.postDelayed(findPointProcess, 1000);
-            if( MainActivity.STANDING_POINT == null ){
+            if( MainActivity.STANDING_POINT == null || findPoint == null){
                 return;
             }
             TopoCentricPoint.initTopoCenter(MainActivity.STANDING_POINT.getFi_WGS(), MainActivity.STANDING_POINT.getLambda_WGS(),
                     MainActivity.STANDING_POINT.getH_WGS(), false);
             MainActivity.STANDING_POINT.calcEastNorthUpData();
-            MeasPoint topoCentric = null;
-            if( binding.fromCentricPointCheckbox.isChecked() ){
-                topoCentric = getTopoCentricPoint();
-                if( topoCentric == null ){
-                    binding.fromCentricPointCheckbox.setChecked(false);
-                    Toast.makeText(requireContext(), "Topocentrum pont választása szükséges.",
-                            Toast.LENGTH_LONG).show();
-                }
-                else if( topoCentric.getPointID().equals(findPoint.getPointID()) ){
-                    topoCentric = null;
-                    binding.fromCentricPointCheckbox.setChecked(false);
-                    Toast.makeText(requireContext(), "Topocentrum pont nem lehet a felkeresendő pont.",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-            AzimuthAndDistance findPointAzimuth = new AzimuthAndDistance(topoCentric == null ?
-                    MainActivity.STANDING_POINT : topoCentric, findPoint);
+            getFindPointDistancesBetweenTopoCenterAndFindPoints();
+            isShowingData = !isShowingData;
+            AzimuthAndDistance findPointAzimuth = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);
             double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointAzimuth.calcAzimuth()) >= 360  ?
                     Math.toDegrees(findPointAzimuth.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
                     Math.toDegrees(findPointAzimuth.calcAzimuth()) - MainActivity.AZIMUTH;
