@@ -106,14 +106,14 @@ public class MeasFragment extends Fragment {
         Handler handler = new Handler();
         Runnable runnable = new Runnable() {
             private String range = "NINCS";
-            private float accuracy = 0f;
+
             @Override
             public void run() {
 
                 paint.setColor(Color.WHITE);
                 canvas.drawText(range, 50 * MM, 87 * MM, paint);
 
-                if( MainActivity.GPS_ACCURACY == 0 || MainActivity.GPS_ACCURACY == accuracy ){
+                if( MainActivity.GPS_ACCURACY == 0 ){
                     paint.setColor(Color.BLACK);
                     canvas.drawText("NINCS", 50 * MM, 87 * MM, paint);
                     range ="NINCS";
@@ -137,7 +137,7 @@ public class MeasFragment extends Fragment {
                     canvas.drawText("KIVÁLÓ", 50 * MM, 87 * MM, paint);
                     range = "KIVÁLÓ";
                 }
-                accuracy = MainActivity.GPS_ACCURACY;
+
                 handler.postDelayed(this, 1000);
             }
         };

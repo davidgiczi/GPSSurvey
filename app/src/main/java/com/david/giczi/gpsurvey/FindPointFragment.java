@@ -10,12 +10,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.david.giczi.gpsurvey.databinding.FragmentFindPointBinding;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
-import com.david.giczi.gpsurvey.domain.TopoCentricPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
@@ -203,12 +204,12 @@ public class FindPointFragment extends Fragment {
                 findPoint.setY_EOV(y_eov);
                 findPoint.setX_EOV(x_eov);
             }
-            if( MainActivity.MEAS_POINT_LIST.isEmpty() && MainActivity.STANDING_POINT != null ) {
-                TopoCentricPoint.initTopoCenter(MainActivity.STANDING_POINT.getFi_WGS(), MainActivity.STANDING_POINT.getLambda_WGS(),
-                        MainActivity.STANDING_POINT.getH_WGS(), false);
-               findPoint.setTopoCenterForFindPoint(true);
+            if( MainActivity.MEAS_POINT_LIST.isEmpty() ) {
+               findPoint.setTopoCenter(true);
             }
-            findPoint.calcEastNorthUpData();
+            else{
+               findPoint.calcEastNorthUpData();
+            }
             MainActivity.MEAS_POINT_LIST.add(findPoint);
         }
         else {
@@ -276,8 +277,6 @@ public class FindPointFragment extends Fragment {
             if( MainActivity.STANDING_POINT == null || findPoint == null){
                 return;
             }
-            TopoCentricPoint.initTopoCenter(MainActivity.STANDING_POINT.getFi_WGS(), MainActivity.STANDING_POINT.getLambda_WGS(),
-                    MainActivity.STANDING_POINT.getH_WGS(), false);
             MainActivity.STANDING_POINT.calcEastNorthUpData();
             getFindPointDistancesBetweenTopoCenterAndFindPoints();
             isShowingData = !isShowingData;
