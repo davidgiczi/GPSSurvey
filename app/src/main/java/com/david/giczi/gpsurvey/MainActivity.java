@@ -59,7 +59,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public LocationManager locationManager;
     public LocationListener locationListener;
     private SensorManager sensorManager;
-    private Sensor sensor;
+    private Sensor accelerometerSensor;
+    private Sensor magnetometerSensor;
+    private float[] gravityValues = new float[3];
+    private float[] geomagneticValues = new float[3];
     private ViewGroup compassContainer;
     public ViewGroup measuredDataContainer;
     public static PopupWindow measuredDataWindow;
@@ -95,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Toast.makeText(this, "GPS elindítva..", Toast.LENGTH_SHORT).show();
         }
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         MEAS_POINT_LIST = new ArrayList<>();
         activityResultLauncher =  registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -296,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 binding.eovText.setText(R.string.eov);
                 binding.eovData.setText(eovPosition.toString());
                 STANDING_POINT = new MeasPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
+                STANDING_POINT.calcEastNorthUpData();
                 GPS_ACCURACY = location.getAccuracy();
                 measurePoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
             }
@@ -315,7 +320,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             requestPermissions();
             return;
         }
-        sensorManager.registerListener(this, sensor,
+        sensorManager.registerListener(this, accelerometerSensor,
+                SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(this, magnetometerSensor,
                 SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 500, 0, locationListener);
@@ -402,10 +409,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        rotateCompass(-event.values[0]);
-        AZIMUTH = event.values[0];
-    }
 
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            gravityValues = event.values.clone();
+        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            geomagneticValues = event.values.clone();
+        }
+            float[] R = new float[9];
+            float[] I = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, gravityValues, geomagneticValues);
+
+            if (success) {
+                float[] orientation = new float[3];
+                SensorManager.getOrientation(R, orientation);
+
+                float azimuth = (float) Math.toDegrees(orientation[0]);
+                rotateCompass(-azimuth);
+                AZIMUTH = azimuth;
+            }
+    }
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }

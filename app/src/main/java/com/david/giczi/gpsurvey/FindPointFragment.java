@@ -277,7 +277,6 @@ public class FindPointFragment extends Fragment {
             if( MainActivity.STANDING_POINT == null || findPoint == null){
                 return;
             }
-            MainActivity.STANDING_POINT.calcEastNorthUpData();
             getFindPointDistancesBetweenTopoCenterAndFindPoints();
             isShowingData = !isShowingData;
             AzimuthAndDistance findPointAzimuth = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);

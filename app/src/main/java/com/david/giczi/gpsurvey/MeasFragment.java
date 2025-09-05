@@ -105,43 +105,67 @@ public class MeasFragment extends Fragment {
     private void displayAccuracy(){
         Handler handler = new Handler();
         Runnable runnable = new Runnable() {
-            private String range = "NINCS";
+
+            private double screenEAST = 0d;
+            private double screenNORTH = 0d;
 
             @Override
             public void run() {
 
+                String mask = "████████";
+                String position = "●";
+
                 paint.setColor(Color.WHITE);
-                canvas.drawText(range, 50 * MM, 87 * MM, paint);
+                canvas.drawText(mask, 50 * MM, 87 * MM, paint);
+                canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
+                        (float) getStandingPointScreenY(screenNORTH), paint);
+
+                if( MainActivity.STANDING_POINT != null ){
+                    screenEAST = MainActivity.STANDING_POINT.getEAST();
+                    screenNORTH = MainActivity.STANDING_POINT.getNORTH();
+                }
 
                 if( MainActivity.GPS_ACCURACY == 0 ){
                     paint.setColor(Color.BLACK);
                     canvas.drawText("NINCS", 50 * MM, 87 * MM, paint);
-                    range ="NINCS";
                 }
                 else if( MainActivity.GPS_ACCURACY >= 10 ){
                     paint.setColor(Color.rgb(250, 186, 1));
                     canvas.drawText("GYENGE", 50 * MM, 87 * MM, paint);
-                    range = "GYENGE";
+                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
+                            (float) getStandingPointScreenY(screenNORTH), paint);
                 }
                 else if( MainActivity.GPS_ACCURACY >= 5 ){
                     paint.setColor(Color.rgb(246, 96, 2));
                     canvas.drawText("KÖZEPES", 50 * MM, 87 * MM, paint);
-                    range = "KÖZEPES";
+                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
+                            (float) getStandingPointScreenY(screenNORTH), paint);
                 }
                 else if ( MainActivity.GPS_ACCURACY >= 2) {
                     paint.setColor(Color.rgb(127, 205, 86));
                     canvas.drawText("JÓ", 50 * MM, 87 * MM, paint);
-                    range = "JÓ";
+                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
+                            (float) getStandingPointScreenY(screenNORTH), paint);
                 } else {
                     paint.setColor(Color.rgb(74, 159, 4));
                     canvas.drawText("KIVÁLÓ", 50 * MM, 87 * MM, paint);
-                    range = "KIVÁLÓ";
+                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
+                            (float) getStandingPointScreenY(screenNORTH), paint);
                 }
 
                 handler.postDelayed(this, 1000);
             }
         };
         handler.postDelayed(runnable, 1000);
+    }
+
+
+    private double getStandingPointScreenX(double standingEAST){
+        return X_CENTER + ((standingEAST - getMediumEAST()) * 1000 * MM) / SCALE;
+    }
+
+    private double getStandingPointScreenY(double standingNORTH){
+        return Y_CENTER + ((standingNORTH - getMediumNORTH()) * 1000 * MM) / SCALE;
     }
 
     private void displayMeasuredPoint(){
@@ -189,11 +213,16 @@ public class MeasFragment extends Fragment {
             transformedMeasPointStore.add(transformedPoint);
         }
     }
-
     private double getMediumEAST(){
+        if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
+            return 0d;
+        }
         return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getEAST).summaryStatistics().getAverage();
     }
     private double getMediumNORTH(){
+        if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
+            return 0d;
+        }
         return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getNORTH).summaryStatistics().getAverage();
     }
 
