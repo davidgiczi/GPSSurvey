@@ -381,6 +381,7 @@ public class CalcFragment extends Fragment {
         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
             ITEMS.add(measPoint.getPointID());
         }
+
         binding.pointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

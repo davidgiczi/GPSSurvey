@@ -245,7 +245,12 @@ public class FindPointFragment extends Fragment {
                         Toast.LENGTH_LONG).show();
                 return;
             }
-
+            else if( topoCenter.getEAST() == findPoint.getEAST() && topoCenter.getNORTH() == findPoint.getNORTH() ){
+                binding.betweenFindAndTopoPointLineCheckbox.setChecked(false);
+                Toast.makeText(requireContext(), "A felkeresendő és a topocentrum pont koordinátái egyenlőek.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
             AzimuthAndDistance lineData = new AzimuthAndDistance(findPoint, topoCenter);
             AzimuthAndDistance actualPosition = new AzimuthAndDistance(findPoint, MainActivity.STANDING_POINT);
             double alfa = lineData.calcAzimuth() - actualPosition.calcAzimuth();
