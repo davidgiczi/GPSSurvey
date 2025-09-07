@@ -1,5 +1,6 @@
 package com.david.giczi.gpsurvey;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -108,23 +109,14 @@ public class CalcFragment extends Fragment {
             measPointEastNorthUpDataLayout.addView(measPointEastNorthUpData);
             measPointEastNorthUpData.setOnClickListener(enu -> {
 
-                for (int i = 0; i < binding.calcLinearlayout.getChildCount(); i++) {
-                    if( binding.calcLinearlayout.getChildAt(i).getId() == 0 ){
-                        ((TextView) ((LinearLayout) binding.calcLinearlayout.getChildAt(i))
-                                .getChildAt(0)).setTextColor(Color.BLACK);
-                    }
+               refreshEastNorthUpDataOnScreen(enu);
+
+                if( binding.allPointsCheckbox.isChecked() ){
+                    displayCalculatedData(MainActivity.MEAS_POINT_LIST);
                 }
-                ((TextView) enu).setTextColor(Color.RED);
-                recalculateTopoPoints((TextView) enu);
-                int pointIndex = 0;
-                for (int i = 0; i < binding.calcLinearlayout.getChildCount(); i++) {
-                    if( binding.calcLinearlayout.getChildAt(i).getId() == 0 ) {
-                        ((TextView) ((LinearLayout) binding.calcLinearlayout.getChildAt(i))
-                                .getChildAt(0)).setText(MainActivity.MEAS_POINT_LIST.get(pointIndex).getEastNorthUpPointData());
-                        pointIndex++;
-                    }
+                else if( !chosenMeasPointList.isEmpty()) {
+                    displayCalculatedData(chosenMeasPointList);
                 }
-                displayCalculatedData(MainActivity.MEAS_POINT_LIST);
             });
             if( measPoint.isTopoCenter() ){
                 measPointEastNorthUpData.setTextColor(Color.RED);
@@ -134,6 +126,24 @@ public class CalcFragment extends Fragment {
         }
     }
 
+    private void refreshEastNorthUpDataOnScreen(View enu){
+        for (int i = 0; i < binding.calcLinearlayout.getChildCount(); i++) {
+            if( binding.calcLinearlayout.getChildAt(i).getId() == 0 ){
+                ((TextView) ((LinearLayout) binding.calcLinearlayout.getChildAt(i))
+                        .getChildAt(0)).setTextColor(Color.BLACK);
+            }
+        }
+        ((TextView) enu).setTextColor(Color.RED);
+        recalculateTopoPoints((TextView) enu);
+        int pointIndex = 0;
+        for (int i = 0; i < binding.calcLinearlayout.getChildCount(); i++) {
+            if( binding.calcLinearlayout.getChildAt(i).getId() == 0 ) {
+                ((TextView) ((LinearLayout) binding.calcLinearlayout.getChildAt(i))
+                        .getChildAt(0)).setText(MainActivity.MEAS_POINT_LIST.get(pointIndex).getEastNorthUpPointData());
+                pointIndex++;
+            }
+        }
+    }
 
     private void deletePointDialog(String pointText) {
         String pointNumber = pointText.split("\\.")[0];
@@ -288,6 +298,7 @@ public class CalcFragment extends Fragment {
         return fileName;
     }
 
+    @SuppressLint("InflateParams")
     private void popupSaveWindow(boolean saveAllPoints){
         saveDataContainer =  (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_save, null);
         PopupWindow saveDataWindow = new PopupWindow(saveDataContainer, 900,1600, true);

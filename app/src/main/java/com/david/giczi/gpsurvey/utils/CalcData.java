@@ -1,6 +1,7 @@
 package com.david.giczi.gpsurvey.utils;
 
 import com.david.giczi.gpsurvey.domain.MeasPoint;
+
 import java.util.List;
 
 public class CalcData {
@@ -112,9 +113,8 @@ public class CalcData {
             return 0.0;
         }
         double elevation = 0.0;
-
         for (int i = 0; i < pointStore.size() - 1; i++) {
-            elevation += (pointStore.get(i + 1).getUP() - pointStore.get(i).getUP());
+            elevation += ( pointStore.get(i + 1).getUP() - pointStore.get(i).getUP() );
         }
         return (int) (100 * elevation) / 100.0;
     }

@@ -1,6 +1,7 @@
 package com.david.giczi.gpsurvey;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 });
     }
 
+    @SuppressLint("InflateParams")
     private void popupCompassWindow() {
         compassContainer = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_compass, null);
         PopupWindow compassWindow = new PopupWindow(compassContainer, 600, 600, true);

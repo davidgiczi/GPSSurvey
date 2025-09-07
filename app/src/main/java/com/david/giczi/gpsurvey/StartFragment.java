@@ -20,7 +20,7 @@ public class StartFragment extends Fragment {
             Bundle savedInstanceState
     ) {
       binding = FragmentStartBinding.inflate(inflater, container, false);
-      binding.startPage.setBackground(((MainActivity) requireActivity()).getDrawable(R.drawable.background_satellite));
+      binding.startPage.setBackground(requireActivity().getDrawable(R.drawable.background_satellite));
       MainActivity.PAGE_NUMBER_VALUE = 0;
         return binding.getRoot();
     }

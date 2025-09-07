@@ -1,5 +1,6 @@
 package com.david.giczi.gpsurvey;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -77,7 +78,7 @@ public class MeasFragment extends Fragment {
     }
 
     private void popupMeasPointData() {
-       ViewGroup measuredDataContainer = ((MainActivity) requireActivity()).measuredDataContainer =
+       @SuppressLint("InflateParams") ViewGroup measuredDataContainer = ((MainActivity) requireActivity()).measuredDataContainer =
                (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_meas_point, null);
        MainActivity.measuredDataWindow =
                new PopupWindow(measuredDataContainer, 1000, 670, false);
@@ -165,7 +166,7 @@ public class MeasFragment extends Fragment {
     }
 
     private double getStandingPointScreenY(double standingNORTH){
-        return Y_CENTER + ((standingNORTH - getMediumNORTH()) * 1000 * MM) / SCALE;
+        return Y_CENTER - ((standingNORTH - getMediumNORTH()) * 1000 * MM) / SCALE;
     }
 
     private void displayMeasuredPoint(){
