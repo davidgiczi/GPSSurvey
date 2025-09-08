@@ -285,12 +285,13 @@ public class FindPointFragment extends Fragment {
             getFindPointDistancesBetweenTopoCenterAndFindPoints();
             isShowingData = !isShowingData;
             AzimuthAndDistance findPointAzimuth = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);
-            double direction = MainActivity.AZIMUTH + Math.toDegrees(findPointAzimuth.calcAzimuth()) >= 360  ?
-                    Math.toDegrees(findPointAzimuth.calcAzimuth()) + MainActivity.AZIMUTH - 360 :
+            double direction = 0 > MainActivity.AZIMUTH   ?
+                    Math.toDegrees(findPointAzimuth.calcAzimuth()) + Math.abs(MainActivity.AZIMUTH)  :
                     Math.toDegrees(findPointAzimuth.calcAzimuth()) - MainActivity.AZIMUTH;
+            direction = direction >= 360 ? direction - 360 : 0 > direction ? direction + 360 : direction;
             addFindPointDirectionArrowImage((float) direction, (int) Math.round(findPointAzimuth.calcDistance()));
             String findPointDirection = getString(R.string.find_point_direction) + " "
-                    + String.format(Locale.getDefault(),"%.1f°", 0 > direction ? direction + 360 : direction);
+                    + String.format(Locale.getDefault(),"%.1f°", direction);
             String findPointDistance = getString(R.string.distance) + " " +
                     String.format(Locale.getDefault(),"%.0fm",
                             new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint).calcDistance());
