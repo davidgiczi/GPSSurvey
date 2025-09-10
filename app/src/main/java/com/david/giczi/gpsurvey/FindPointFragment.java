@@ -107,11 +107,12 @@ public class FindPointFragment extends Fragment {
                 .toString().replace(",", ".").split("\\.");
         String[] input2ndData = binding.findPoint2ndCoordinate.getText()
                 .toString().replace(",", ".").split("\\.");
-        if( 1 > input1stData[0].length() || 4 == input1stData[0].length() || input1stData[0].length() > 6 ){
+        if( 1 > input1stData[0].length() || 4 == input1stData[0].length() ||
+                5 == input1stData[0].length() || input1stData[0].length() > 6 ){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( 1 > input2ndData[0].length() || 4 == input2ndData[0].length() || input2ndData[0].length() > 6 ){
+        else if( 1 > input2ndData[0].length() || input2ndData[0].length() > 6 ){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -125,12 +126,12 @@ public class FindPointFragment extends Fragment {
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input1stData[0].length() > 0  &&  input1stData[0].length() < 3 &&  (Double.parseDouble(input1stData[0]) < -90 ||
+        else if( input1stData[0].length() > 0  &&  input1stData[0].length() < 4 &&  (Double.parseDouble(input1stData[0]) < -90 ||
                 Double.parseDouble(input1stData[0]) > 90) ){
             Toast.makeText(requireContext(), "Nem megfelelő az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( input2ndData[0].length() > 0 && input2ndData[0].length() < 4 && (Double.parseDouble(input2ndData[0]) < -180  ||
+        else if( input2ndData[0].length() > 0 && input2ndData[0].length() < 5 && (Double.parseDouble(input2ndData[0]) < -180  ||
                 Double.parseDouble(input2ndData[0]) > 180)){
             Toast.makeText(requireContext(), "Nem megfelelő a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;

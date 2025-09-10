@@ -109,15 +109,15 @@ public class MeasFragment extends Fragment {
 
             private double screenEAST = 0d;
             private double screenNORTH = 0d;
+            private static final String mask = "████████";
+            private static final String position = "●";
 
             @Override
             public void run() {
 
-                String mask = "████████";
-                String position = "●";
-
                 paint.setColor(Color.WHITE);
                 canvas.drawText(mask, 50 * MM, 87 * MM, paint);
+                paint.setColor(Color.TRANSPARENT);
                 canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
                         (float) getStandingPointScreenY(screenNORTH), paint);
 
@@ -153,7 +153,6 @@ public class MeasFragment extends Fragment {
                     canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
                             (float) getStandingPointScreenY(screenNORTH), paint);
                 }
-
                 handler.postDelayed(this, 1000);
             }
         };
