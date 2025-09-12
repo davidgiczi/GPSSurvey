@@ -110,14 +110,14 @@ public class MeasFragment extends Fragment {
             private double screenEAST = 0d;
             private double screenNORTH = 0d;
             private static final String mask = "████████";
-            private static final String position = "●";
+            private static final String position = "¤";
 
             @Override
             public void run() {
 
                 paint.setColor(Color.WHITE);
                 canvas.drawText(mask, 50 * MM, 87 * MM, paint);
-                paint.setColor(Color.TRANSPARENT);
+                paint.setColor(Color.GRAY);
                 canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
                         (float) getStandingPointScreenY(screenNORTH), paint);
 
@@ -133,25 +133,17 @@ public class MeasFragment extends Fragment {
                 else if( MainActivity.GPS_ACCURACY >= 10 ){
                     paint.setColor(Color.rgb(250, 186, 1));
                     canvas.drawText("GYENGE", 50 * MM, 87 * MM, paint);
-                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
-                            (float) getStandingPointScreenY(screenNORTH), paint);
                 }
                 else if( MainActivity.GPS_ACCURACY >= 5 ){
                     paint.setColor(Color.rgb(246, 96, 2));
                     canvas.drawText("KÖZEPES", 50 * MM, 87 * MM, paint);
-                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
-                            (float) getStandingPointScreenY(screenNORTH), paint);
                 }
                 else if ( MainActivity.GPS_ACCURACY >= 2) {
                     paint.setColor(Color.rgb(127, 205, 86));
                     canvas.drawText("JÓ", 50 * MM, 87 * MM, paint);
-                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
-                            (float) getStandingPointScreenY(screenNORTH), paint);
                 } else {
                     paint.setColor(Color.rgb(74, 159, 4));
                     canvas.drawText("KIVÁLÓ", 50 * MM, 87 * MM, paint);
-                    canvas.drawText(position, (float) getStandingPointScreenX(screenEAST),
-                            (float) getStandingPointScreenY(screenNORTH), paint);
                 }
                 handler.postDelayed(this, 1000);
             }

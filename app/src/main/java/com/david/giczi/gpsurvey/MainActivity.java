@@ -426,7 +426,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 SensorManager.getOrientation(R, orientation);
 
                 float azimuth = (float) Math.toDegrees(orientation[0]);
-                rotateCompass(-azimuth);
+                azimuth = 0 > azimuth ? azimuth + 360 : azimuth;
+                rotateCompass(azimuth);
                 AZIMUTH = azimuth;
             }
     }
