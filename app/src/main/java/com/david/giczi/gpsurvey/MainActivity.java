@@ -460,13 +460,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             while ((line = br.readLine()) != null) {
                 row++;
             if( !parseInputData(line) ){
-                Toast.makeText(this, "Nem beolvasható adat a fájl " + row + ". sorában.", Toast.LENGTH_SHORT).show();
                 continue;
             }
             pcs++;
             }
             br.close();
-            Toast.makeText(this, pcs +  "db / " + row + " db pont beolvasva.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, pcs +  "db / " + row + "db pont beolvasva.", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(this, "A fájl nem olvasható.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
