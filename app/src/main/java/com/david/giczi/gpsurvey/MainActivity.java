@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private Sensor magnetometerSensor;
+    private float declination;
     private float[] gravityValues = new float[3];
     private float[] geomagneticValues = new float[3];
     private ViewGroup compassContainer;
@@ -78,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private boolean decimalFormat = true;
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
-    private int validInputPoints;
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
@@ -266,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
+                declination = getDeclination(location.getLatitude(), location.getLongitude(), location.getAltitude());
                 if (angleMinSecFormat) {
                     binding.latitudeText.setText(R.string.latitude);
                     binding.longitudeText.setText(R.string.longitude);
@@ -328,6 +330,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 500, 0, locationListener);
+    }
+
+    private float getDeclination(double latitude, double longitude, double altitude){
+        long time = System.currentTimeMillis();
+        GeomagneticField geomagneticField =
+                new GeomagneticField((float) latitude, (float) longitude, (float) altitude, time);
+        return geomagneticField.getDeclination();
     }
 
     private void measurePoint(double fi, double lambda, double h) {
@@ -425,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 float[] orientation = new float[3];
                 SensorManager.getOrientation(R, orientation);
 
-                float azimuth = (float) Math.toDegrees(orientation[0]);
+                float azimuth = (float) Math.toDegrees(orientation[0]) + declination;
                 rotateCompass( - azimuth );
                 AZIMUTH = azimuth;
             }
@@ -442,39 +451,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void readInputPointData(Uri uri) {
-        validInputPoints = 0;
+        int pcs = 0;
+        int row = 0;
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             String line;
-            int row = 1;
             while ((line = br.readLine()) != null) {
-              parseInputData(line, row);
-              row++;
+                row++;
+            if( !parseInputData(line) ){
+                Toast.makeText(this, "Nem beolvasható adat a fájl " + row + ". sorában.", Toast.LENGTH_SHORT).show();
+                continue;
+            }
+            pcs++;
             }
             br.close();
-            Toast.makeText(this, validInputPoints + " db pont beolvasva", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, pcs +  "db / " + row + " db pont beolvasva.", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
+            Toast.makeText(this, "A fájl nem olvasható.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
-        private void parseInputData(String dataLine, int row){
+        private boolean parseInputData(String dataLine){
         String[] inputData = dataLine.split(";");
         switch ( inputData.length ){
             case 2:
-                validateInputData(null, inputData[0], inputData[1], null);
-                break;
+               return setInputData(null, inputData[0], inputData[1], null);
             case 3:
-                validateInputData(inputData[0], inputData[1], inputData[2], null);
-                break;
+               return setInputData(inputData[0], inputData[1], inputData[2], null);
             case 4:
-                validateInputData(inputData[0], inputData[1], inputData[2], inputData[3]);
-                break;
-            default:
-                Toast.makeText(this, row + ". sor beolvasása sikertelen", Toast.LENGTH_SHORT).show();
+               return  setInputData(inputData[0], inputData[1], inputData[2], inputData[3]);
+
         }
+        return false;
    }
-        private void validateInputData(String id, String data1, String data2, String h){
+        private boolean setInputData(String id, String data1, String data2, String h){
         String[] data1Value = data1.replace(",", ".").split("\\.");
         String[] data2Value = data2.replace(",", ".").split("\\.");
 
@@ -502,7 +513,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 catch (NumberFormatException e){
                     e.printStackTrace();
                 }
-                finally {
                     EOV eov = new EOV();
                     eov.toEOV(inputPoint.getFi_WGS(), inputPoint.getLambda_WGS(), inputPoint.getH_WGS());
                     inputPoint.setY_EOV(eov.getY_EOV());
@@ -514,8 +524,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     }
                     inputPoint.calcEastNorthUpData();
                     MEAS_POINT_LIST.add(inputPoint);
-                    validInputPoints++;
-                }
+                    return true;
             }
             catch (NumberFormatException e){
                 e.printStackTrace();
@@ -546,7 +555,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 catch (NumberFormatException e){
                     e.printStackTrace();
                 }
-                finally {
                   WGS84 wgs = new WGS84();
                   wgs.toWGS84(inputPoint.getY_EOV(), inputPoint.getX_EOV(), inputPoint.getZ_EOV());
                   inputPoint.setFi_WGS(wgs.getFi_WGS());
@@ -558,14 +566,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     }
                   inputPoint.calcEastNorthUpData();
                   MEAS_POINT_LIST.add(inputPoint);
-                  validInputPoints++;
-                }
-
+                  return true;
             }
             catch (NumberFormatException e){
                 e.printStackTrace();
             }
         }
+        return false;
 }
 
     }
