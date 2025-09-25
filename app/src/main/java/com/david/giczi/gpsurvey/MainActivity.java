@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static PopupWindow measuredDataWindow;
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
+    public static List<MeasPoint> CHOSEN_MEAS_POINT_LIST;
     public static MeasPoint MEAS_POINT;
     public static MeasPoint STANDING_POINT;
     public static float GPS_ACCURACY;
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         MEAS_POINT_LIST = new ArrayList<>();
+        CHOSEN_MEAS_POINT_LIST = new ArrayList<>();
         activityResultLauncher =  registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -169,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             popupCompassWindow();
         }
         else if( id == R.id.input_points_option ){
+            navigateToStartFragment();
             inputPointDataDialog();
         } else if (id == R.id.calc_option) {
             navigateToCalcFragment();
@@ -367,11 +370,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
            MEAS_POINT_LIST.clear();
            TopoCentricPoint.initTopoCenter(0d, 0d, 0d, true);
            openInputPointDataFile();
-           navigateToStartFragment();
         });
         builder.setNegativeButton("Nem", (dialog, which) -> {
             openInputPointDataFile();
-            navigateToStartFragment();
             dialog.dismiss();
         });
         AlertDialog alert = builder.create();

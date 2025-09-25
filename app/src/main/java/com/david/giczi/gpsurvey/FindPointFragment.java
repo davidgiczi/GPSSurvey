@@ -172,6 +172,7 @@ public class FindPointFragment extends Fragment {
         });
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(),
                 R.layout.point_spinner, ITEMS);
+        arrayAdapter.setDropDownViewResource(R.layout.point_spinner);
         binding.pointSpinner.setAdapter(arrayAdapter);
     }
 

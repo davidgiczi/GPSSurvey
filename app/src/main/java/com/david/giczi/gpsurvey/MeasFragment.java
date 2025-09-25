@@ -194,7 +194,8 @@ public class MeasFragment extends Fragment {
         transformedMeasPointStore = new ArrayList<>();
         double east = getMediumEAST();
         double north = getMediumNORTH();
-        for (MeasPoint measuredPoint : MainActivity.MEAS_POINT_LIST) {
+        for (MeasPoint measuredPoint : MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ?
+                MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST) {
             MeasPoint transformedPoint = new MeasPoint();
             transformedPoint.setPointID(measuredPoint.getPointID());
             if( measuredPoint.isTopoCenter() ){
@@ -209,17 +210,27 @@ public class MeasFragment extends Fragment {
         if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
             return 0d;
         }
+        else if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
+            return MainActivity.CHOSEN_MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getEAST).summaryStatistics().getAverage();
+        }
         return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getEAST).summaryStatistics().getAverage();
     }
     private double getMediumNORTH(){
         if( MainActivity.MEAS_POINT_LIST.isEmpty() ){
             return 0d;
         }
+        else if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
+            return MainActivity.CHOSEN_MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getNORTH).summaryStatistics().getAverage();
+        }
         return MainActivity.MEAS_POINT_LIST.stream().mapToDouble(MeasPoint::getNORTH).summaryStatistics().getAverage();
     }
 
     private void setScaleValue(){
-        if( 2 > MainActivity.MEAS_POINT_LIST.size() ){
+
+        if( MainActivity.CHOSEN_MEAS_POINT_LIST.size() == 1 ){
+            SCALE = 100.0;
+        }
+        else if( MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() && 2 > MainActivity.MEAS_POINT_LIST.size() ){
             SCALE = 100.0;
         }
         else {
@@ -229,8 +240,10 @@ public class MeasFragment extends Fragment {
 
     private double getTheLongestDistance(){
         double theLongestDistance = 0.0;
-        for (MeasPoint measPoint1 : MainActivity.MEAS_POINT_LIST) {
-            for (MeasPoint measPoint2 : MainActivity.MEAS_POINT_LIST) {
+        for (MeasPoint measPoint1 : MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ?
+                MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST) {
+            for (MeasPoint measPoint2 : MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ?
+                    MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST) {
                 double distance = new AzimuthAndDistance(measPoint1, measPoint2).calcDistance();
                 if(  distance > theLongestDistance ){
                     theLongestDistance = distance;

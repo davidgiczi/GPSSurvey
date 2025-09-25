@@ -46,7 +46,6 @@ public class CalcFragment extends Fragment {
 
     private FragmentCalcBinding binding;
     private List<LinearLayout> displayedMeasuredPointLinearLayoutStore;
-    private List<MeasPoint> chosenMeasPointList;
     private  ViewGroup saveDataContainer;
     private static final List<String> ITEMS_FOR_KML = Arrays.asList("Pontok", "Vonal", "Kerület");
     private static final List<String> ITEMS_FOR_TXT =
@@ -60,12 +59,13 @@ public class CalcFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentCalcBinding.inflate(inflater, container, false);
-        this.chosenMeasPointList = new ArrayList<>();
         MainActivity.PAGE_NUMBER_VALUE = 2;
         addOnClickListenerForCheckBox();
         initPointSpinner();
-        displayCalculatedData(MainActivity.MEAS_POINT_LIST);
-        displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
+        if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
+            displayMeasuredPoint(MainActivity.CHOSEN_MEAS_POINT_LIST);
+            displayCalculatedData(MainActivity.CHOSEN_MEAS_POINT_LIST);
+        }
         return binding.getRoot();
     }
 
@@ -114,8 +114,8 @@ public class CalcFragment extends Fragment {
                 if( binding.allPointsCheckbox.isChecked() ){
                     displayCalculatedData(MainActivity.MEAS_POINT_LIST);
                 }
-                else if( !chosenMeasPointList.isEmpty()) {
-                    displayCalculatedData(chosenMeasPointList);
+                else if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty()) {
+                    displayCalculatedData(MainActivity.CHOSEN_MEAS_POINT_LIST);
                 }
             });
             if( measPoint.isTopoCenter() ){
@@ -154,7 +154,7 @@ public class CalcFragment extends Fragment {
             for (int i = MainActivity.MEAS_POINT_LIST.size() - 1; i >= 0; i--) {
                 if ( pointNumber.equals(MainActivity.MEAS_POINT_LIST.get(i).getPointID()) ) {
                   MeasPoint deletedPoint = MainActivity.MEAS_POINT_LIST.remove(i);
-                  chosenMeasPointList.remove(deletedPoint);
+                  MainActivity.CHOSEN_MEAS_POINT_LIST.remove(deletedPoint);
                 }
             }
             clearCalculatedData();
@@ -164,9 +164,9 @@ public class CalcFragment extends Fragment {
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
             }
-            else if( !chosenMeasPointList.isEmpty() ){
-                displayCalculatedData(chosenMeasPointList);
-                displayMeasuredPoint(chosenMeasPointList);
+            else if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
+                displayCalculatedData(MainActivity.CHOSEN_MEAS_POINT_LIST);
+                displayMeasuredPoint(MainActivity.CHOSEN_MEAS_POINT_LIST);
             }
         });
 
@@ -223,11 +223,11 @@ public class CalcFragment extends Fragment {
             Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if( !saveAllPoints && chosenMeasPointList.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(1))){
+        else if( !saveAllPoints && MainActivity.CHOSEN_MEAS_POINT_LIST.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(1))){
             Toast.makeText(getContext(), "Vonal mentéséhez legalább 2 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if( !saveAllPoints && chosenMeasPointList.size()  < 3 && dataType.equals(ITEMS_FOR_KML.get(2))){
+        else if( !saveAllPoints && MainActivity.CHOSEN_MEAS_POINT_LIST.size()  < 3 && dataType.equals(ITEMS_FOR_KML.get(2))){
             Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -245,7 +245,7 @@ public class CalcFragment extends Fragment {
         }
         else {
             ((EditText) saveDataContainer.findViewById(R.id.file_name_input_field))
-                    .setText(getSaveFileName(chosenMeasPointList));
+                    .setText(getSaveFileName(MainActivity.CHOSEN_MEAS_POINT_LIST));
         }
     }
 
@@ -396,8 +396,9 @@ public class CalcFragment extends Fragment {
         binding.pointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if( !parent.getItemAtPosition(position).equals("Válassz pontokat") ){
+                if( position == 0 ) {
+                    return;
+                }
                     String pointId = (String) parent.getItemAtPosition(position);
                     MeasPoint chosenPoint = null;
                     for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
@@ -405,29 +406,25 @@ public class CalcFragment extends Fragment {
                             chosenPoint = measPoint;
                         }
                     }
-                    if( chosenMeasPointList.contains(chosenPoint) ){
+                    if( MainActivity.CHOSEN_MEAS_POINT_LIST.contains(chosenPoint) ){
                         return;
                     }
-                    chosenMeasPointList.add(chosenPoint);
+                    MainActivity.CHOSEN_MEAS_POINT_LIST.add(chosenPoint);
                     clearDisplayedPointData();
-                    displayMeasuredPoint(chosenMeasPointList);
-                    displayCalculatedData(chosenMeasPointList);
+                    displayMeasuredPoint(MainActivity.CHOSEN_MEAS_POINT_LIST);
+                    displayCalculatedData(MainActivity.CHOSEN_MEAS_POINT_LIST);
                     savePointDialog(false);
-                }
-                else if( !binding.allPointsCheckbox.isChecked() ) {
-                    clearDisplayedPointData();
-                    clearCalculatedData();
-                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
+
         });
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(),
                 R.layout.point_spinner, ITEMS);
+        arrayAdapter.setDropDownViewResource(R.layout.point_spinner);
         binding.pointSpinner.setAdapter(arrayAdapter);
-        binding.pointSpinner.setEnabled(false);
     }
     private void clearCalculatedData(){
         String zeroValue = String.format(Locale.getDefault(), "%4.2fm", 0.0);
@@ -442,24 +439,23 @@ public class CalcFragment extends Fragment {
         zeroReliableValue = String.format(Locale.getDefault(), "±%4.1fm2", 0.0);
         binding.areaValue.setText(zeroValue);
         binding.areaReliable.setText(zeroReliableValue);
-        chosenMeasPointList.clear();
+        MainActivity.CHOSEN_MEAS_POINT_LIST.clear();
     }
 
     private void addOnClickListenerForCheckBox(){
-        binding.allPointsCheckbox.setChecked(true);
+        binding.allPointsCheckbox.setChecked(false);
         binding.allPointsCheckbox.setOnClickListener(c -> {
 
+            clearCalculatedData();
             clearDisplayedPointData();
 
             if( binding.allPointsCheckbox.isChecked() ){
-                binding.pointSpinner.setEnabled(false);
-                initPointSpinner();
+                MainActivity.CHOSEN_MEAS_POINT_LIST.clear();
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
             }
             else {
-                binding.pointSpinner.setEnabled(true);
-                clearCalculatedData();
+
                 if( !MainActivity.MEAS_POINT_LIST.isEmpty() ){
                     savePointDialog(true);
                 }
@@ -507,7 +503,7 @@ public class CalcFragment extends Fragment {
         }
         else{
             wrapDataInKML =
-                    new WrapDataInKML(chosenMeasPointList, dataType, fileName);
+                    new WrapDataInKML(MainActivity.CHOSEN_MEAS_POINT_LIST, dataType, fileName);
         }
         wrapDataInKML.createDataListForKML(getContext());
         File projectFile =
@@ -552,7 +548,7 @@ public class CalcFragment extends Fragment {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
 
-            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST)) {
                 bw.write(measPoint.getEOVPointSeparatedBySemicolon());
                 bw.newLine();
             }
@@ -581,7 +577,7 @@ public class CalcFragment extends Fragment {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
 
-            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST)) {
                 bw.write(measPoint.getEOVPointSeparatedBySemicolon());
                 bw.newLine();
             }
@@ -611,7 +607,7 @@ public class CalcFragment extends Fragment {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
-            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST)) {
                 bw.write((measPoint.getPointID().endsWith("_kit") ?
                         measPoint.getPointID().substring(0, measPoint.getPointID().indexOf("_")) : measPoint.getPointID())
                         + ";" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedBySemiColon());
@@ -641,7 +637,7 @@ public class CalcFragment extends Fragment {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
-            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST)) {
                 bw.write(measPoint.getWGSMeasPointDataInAngelMinSecFormat());
                 bw.newLine();
             }
@@ -669,7 +665,7 @@ public class CalcFragment extends Fragment {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
-            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : chosenMeasPointList)) {
+            for (MeasPoint measPoint : (saveAllPoints ? MainActivity.MEAS_POINT_LIST : MainActivity.CHOSEN_MEAS_POINT_LIST)) {
                 bw.write(measPoint.getWGSMeasPointDataInXYZFormat());
                 bw.newLine();
             }
