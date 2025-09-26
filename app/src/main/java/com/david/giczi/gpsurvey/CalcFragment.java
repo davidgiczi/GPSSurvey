@@ -160,11 +160,11 @@ public class CalcFragment extends Fragment {
             clearCalculatedData();
             clearDisplayedPointData();
             initPointSpinner();
-            if( binding.allPointsCheckbox.isChecked() ){
+            if( MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() && binding.allPointsCheckbox.isChecked() ){
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
             }
-            else if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
+            else {
                 displayCalculatedData(MainActivity.CHOSEN_MEAS_POINT_LIST);
                 displayMeasuredPoint(MainActivity.CHOSEN_MEAS_POINT_LIST);
             }
@@ -439,7 +439,6 @@ public class CalcFragment extends Fragment {
         zeroReliableValue = String.format(Locale.getDefault(), "±%4.1fm2", 0.0);
         binding.areaValue.setText(zeroValue);
         binding.areaReliable.setText(zeroReliableValue);
-        MainActivity.CHOSEN_MEAS_POINT_LIST.clear();
     }
 
     private void addOnClickListenerForCheckBox(){
@@ -453,9 +452,6 @@ public class CalcFragment extends Fragment {
                 MainActivity.CHOSEN_MEAS_POINT_LIST.clear();
                 displayMeasuredPoint(MainActivity.MEAS_POINT_LIST);
                 displayCalculatedData(MainActivity.MEAS_POINT_LIST);
-            }
-            else {
-
                 if( !MainActivity.MEAS_POINT_LIST.isEmpty() ){
                     savePointDialog(true);
                 }
