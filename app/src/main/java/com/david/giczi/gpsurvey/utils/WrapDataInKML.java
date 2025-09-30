@@ -19,13 +19,11 @@ public class WrapDataInKML extends Fragment {
     private final String fileName;
     private List<String> kmlDataList;
 
-
     public WrapDataInKML(List<MeasPoint> measPointList, String dataType, String fileName) {
         this.measPointList = measPointList;
         this.dataType = dataType;
         this.fileName = fileName;
     }
-
     public List<String> getKmlDataList() {
         return kmlDataList;
     }
@@ -38,9 +36,14 @@ public class WrapDataInKML extends Fragment {
             case "Vonal":
                 wrapPointsForLineInKML();
                 break;
+            case "Pontok+Vonal":
+                wrapPointsAndLinesInKML();
+                break;
             case "Kerület":
                 wrapPointsForPerimeterInKML();
                 break;
+            case "Pontok+Kerület":
+                wrapPointsAndPerimeterInKML();
         }
     }
 
@@ -61,6 +64,26 @@ public class WrapDataInKML extends Fragment {
         }
     }
 
+    private void wrapPointsAndLinesInKML(){
+        kmlDataList.add("<Folder>");
+        kmlDataList.add("<name>Points</name>");
+        for (MeasPoint measPoint : measPointList) {
+            wrapPoint(measPoint);
+        }
+        kmlDataList.add("</Folder>");
+        wrapPointsForLineInKML();
+    }
+
+    private void wrapPointsAndPerimeterInKML(){
+        kmlDataList.add("<Folder>");
+        kmlDataList.add("<name>Points</name>");
+        for (MeasPoint measPoint : measPointList) {
+            wrapPoint(measPoint);
+        }
+        kmlDataList.add("</Folder>");
+        wrapPointsForPerimeterInKML();
+    }
+
     private void wrapPointsInKML(){
         kmlDataList.add("<Folder>");
         kmlDataList.add("<name>Points</name>");
@@ -74,8 +97,8 @@ public class WrapDataInKML extends Fragment {
 
     private void wrapPoint(MeasPoint measPoint){
        kmlDataList.add("<Placemark>");
-              kmlDataList.add( "<name>" + measPoint.getPointID() + "</name>");
-              kmlDataList.add("<description><![CDATA[Name=" + measPoint.getPointID() + "]]></description>");
+              kmlDataList.add( "<name>" + measPoint.getPointIDForKML() + "</name>");
+              kmlDataList.add("<description><![CDATA[Name=" + measPoint.getPointIDForKML() + "]]></description>");
               kmlDataList.add("<styleUrl>#placemark</styleUrl>");
               kmlDataList.add("<Point>");
               kmlDataList.add("<coordinates>" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedByComma() + "</coordinates>");
@@ -88,8 +111,8 @@ public class WrapDataInKML extends Fragment {
         kmlDataList.add("<name>Line</name>");
         kmlDataList.add("<Placemark>");
         kmlDataList.add( "<name>" +
-                measPointList.get(0).getPointID() + "-" +
-                measPointList.get(measPointList.size() - 1).getPointID() +  "_track</name>");
+                measPointList.get(0).getPointIDForKML() + "-" +
+                measPointList.get(measPointList.size() - 1).getPointIDForKML() +  "_track</name>");
         kmlDataList.add("<styleUrl>#linestyle</styleUrl>");
         kmlDataList.add("<LineString>");
         kmlDataList.add("<tessellate>1</tessellate>");
@@ -110,8 +133,8 @@ public class WrapDataInKML extends Fragment {
         kmlDataList.add("<name>Perimeter</name>");
         kmlDataList.add("<Placemark>");
         kmlDataList.add( "<name>" +
-                measPointList.get(0).getPointID() + "-" +
-                measPointList.get(measPointList.size() - 1).getPointID() +  "_perimeter</name>");
+                measPointList.get(0).getPointIDForKML() + "-" +
+                measPointList.get(measPointList.size() - 1).getPointIDForKML() +  "_perimeter</name>");
         kmlDataList.add("<styleUrl>#linestyle</styleUrl>");
         kmlDataList.add("<LineString>");
         kmlDataList.add("<tessellate>1</tessellate>");

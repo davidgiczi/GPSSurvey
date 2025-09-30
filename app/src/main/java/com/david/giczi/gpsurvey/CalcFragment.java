@@ -47,7 +47,8 @@ public class CalcFragment extends Fragment {
     private FragmentCalcBinding binding;
     private List<LinearLayout> displayedMeasuredPointLinearLayoutStore;
     private  ViewGroup saveDataContainer;
-    private static final List<String> ITEMS_FOR_KML = Arrays.asList("Pontok", "Vonal", "Kerület");
+    private static final List<String> ITEMS_FOR_KML = Arrays.asList("Pontok", "Vonal", "Pontok+Vonal",
+            "Kerület", "Pontok+Kerület");
     private static final List<String> ITEMS_FOR_TXT =
             Arrays.asList("EOV koordináták","EOV koordináták és számítások", "WGS - decimális",
                     "WGS - fok-perc-mperc", "WGS - XYZ");
@@ -215,19 +216,23 @@ public class CalcFragment extends Fragment {
 
     private boolean isNotCorrectDataForSaving(boolean saveAllPoints){
         String dataType = (String) ((Spinner) saveDataContainer.findViewById(R.id.data_type_spinner)).getSelectedItem();
-        if( saveAllPoints && MainActivity.MEAS_POINT_LIST.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(1))){
+        if( saveAllPoints && MainActivity.MEAS_POINT_LIST.size() < 2 &&
+                (dataType.equals(ITEMS_FOR_KML.get(1)) || dataType.equals(ITEMS_FOR_KML.get(2))) ){
             Toast.makeText(getContext(), "Vonal mentéséhez legalább 2 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if( saveAllPoints && MainActivity.MEAS_POINT_LIST.size()  < 3 && dataType.equals(ITEMS_FOR_KML.get(2))){
+        else if( saveAllPoints && MainActivity.MEAS_POINT_LIST.size()  < 3 &&
+                (dataType.equals(ITEMS_FOR_KML.get(3)) || dataType.equals(ITEMS_FOR_KML.get(4))) ){
             Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if( !saveAllPoints && MainActivity.CHOSEN_MEAS_POINT_LIST.size()  < 2 && dataType.equals(ITEMS_FOR_KML.get(1))){
+        else if( !saveAllPoints && MainActivity.CHOSEN_MEAS_POINT_LIST.size()  < 2 &&
+                (dataType.equals(ITEMS_FOR_KML.get(1)) || dataType.equals(ITEMS_FOR_KML.get(2))) ){
             Toast.makeText(getContext(), "Vonal mentéséhez legalább 2 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
-        else if( !saveAllPoints && MainActivity.CHOSEN_MEAS_POINT_LIST.size()  < 3 && dataType.equals(ITEMS_FOR_KML.get(2))){
+        else if( !saveAllPoints && MainActivity.CHOSEN_MEAS_POINT_LIST.size()  < 3 &&
+                (dataType.equals(ITEMS_FOR_KML.get(3)) || dataType.equals(ITEMS_FOR_KML.get(4))) ){
             Toast.makeText(getContext(), "Kerület mentéséhez legalább 3 pont szükséges.", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -265,7 +270,15 @@ public class CalcFragment extends Fragment {
         }
         else if( points.size() > 1 && dataType.equals(ITEMS_FOR_KML.get(2))){
             fileName = "_" + points.get(0).getPointID() + "-"
+                    + points.get(points.size() - 1).getPointID() + "_pontok+vonal.kml";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_KML.get(3))){
+            fileName = "_" + points.get(0).getPointID() + "-"
                             + points.get(points.size() - 1).getPointID() + "_kerulet.kml";
+        }
+        else if( points.size() > 1 && dataType.equals(ITEMS_FOR_KML.get(4))){
+            fileName = "_" + points.get(0).getPointID() + "-"
+                    + points.get(points.size() - 1).getPointID() + "_pontok+kerulet.kml";
         }
         else if( points.size() == 1 && (dataType.equals(ITEMS_FOR_TXT.get(0)) || dataType.equals(ITEMS_FOR_TXT.get(1))) ){
             fileName = "_" + points.get(0).getPointID() + "_pont_EOV.txt";
@@ -310,7 +323,6 @@ public class CalcFragment extends Fragment {
                return;
             }
             saveDataProcess(saveAllPoints);
-            saveDataWindow.dismiss();
         });
         RadioButton radioButtonForKML = saveDataContainer.findViewById(R.id.kml_format);
         radioButtonForKML.setChecked(true);

@@ -126,6 +126,10 @@ public class MeasPoint {
     public String getPointID() {
         return pointID;
     }
+
+    public String getPointIDForKML() {
+        return pointID.endsWith("_kit") ? pointID.substring(0, pointID.indexOf("_")) : pointID;
+    }
     public double getY_EOV() {return (int) (100 * Y_EOV) / 100.0;}
 
     public double getX_EOV() {return (int) (100 * X_EOV) / 100.0;}
