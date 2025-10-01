@@ -14,9 +14,9 @@ import java.util.List;
 
 public class WrapDataInKML extends Fragment {
 
-    private final List<MeasPoint> measPointList;
-    private final String dataType;
-    private final String fileName;
+    private List<MeasPoint> measPointList;
+    private String dataType;
+    private String fileName;
     private List<String> kmlDataList;
 
     public WrapDataInKML(List<MeasPoint> measPointList, String dataType, String fileName) {
@@ -27,8 +27,14 @@ public class WrapDataInKML extends Fragment {
     public List<String> getKmlDataList() {
         return kmlDataList;
     }
-    public void createDataListForKML(Context context){
-        getTemplateDataForKML(context);
+    public void createDataListForKML(Context context, boolean isAppendData){
+        if( isAppendData ){
+            kmlDataList.remove(kmlDataList.size() - 1);
+            kmlDataList.remove( kmlDataList.size() - 1);
+        }
+        else {
+            getTemplateDataForKML(context);
+        }
         switch (dataType) {
             case "Pontok":
                 wrapPointsInKML();
@@ -36,15 +42,26 @@ public class WrapDataInKML extends Fragment {
             case "Vonal":
                 wrapPointsForLineInKML();
                 break;
-            case "Pontok+Vonal":
-                wrapPointsAndLinesInKML();
-                break;
             case "Kerület":
                 wrapPointsForPerimeterInKML();
-                break;
-            case "Pontok+Kerület":
-                wrapPointsAndPerimeterInKML();
         }
+        closeKMLDataFile();
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setMeasPointList(List<MeasPoint> measPointList) {
+        this.measPointList = measPointList;
     }
 
     private void getTemplateDataForKML(Context context)  {
@@ -64,26 +81,6 @@ public class WrapDataInKML extends Fragment {
         }
     }
 
-    private void wrapPointsAndLinesInKML(){
-        kmlDataList.add("<Folder>");
-        kmlDataList.add("<name>Points</name>");
-        for (MeasPoint measPoint : measPointList) {
-            wrapPoint(measPoint);
-        }
-        kmlDataList.add("</Folder>");
-        wrapPointsForLineInKML();
-    }
-
-    private void wrapPointsAndPerimeterInKML(){
-        kmlDataList.add("<Folder>");
-        kmlDataList.add("<name>Points</name>");
-        for (MeasPoint measPoint : measPointList) {
-            wrapPoint(measPoint);
-        }
-        kmlDataList.add("</Folder>");
-        wrapPointsForPerimeterInKML();
-    }
-
     private void wrapPointsInKML(){
         kmlDataList.add("<Folder>");
         kmlDataList.add("<name>Points</name>");
@@ -91,8 +88,6 @@ public class WrapDataInKML extends Fragment {
            wrapPoint(measPoint);
         }
         kmlDataList.add("</Folder>");
-        kmlDataList.add("</Document>");
-        kmlDataList.add("</kml>");
     }
 
     private void wrapPoint(MeasPoint measPoint){
@@ -124,8 +119,6 @@ public class WrapDataInKML extends Fragment {
         kmlDataList.add("</LineString>");
         kmlDataList.add("</Placemark>");
         kmlDataList.add("</Folder>");
-        kmlDataList.add("</Document>");
-        kmlDataList.add("</kml>");
     }
 
     private void wrapPointsForPerimeterInKML(){
@@ -147,6 +140,8 @@ public class WrapDataInKML extends Fragment {
         kmlDataList.add("</LineString>");
         kmlDataList.add("</Placemark>");
         kmlDataList.add("</Folder>");
+    }
+    private void closeKMLDataFile(){
         kmlDataList.add("</Document>");
         kmlDataList.add("</kml>");
     }
