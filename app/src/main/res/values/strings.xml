@@ -44,4 +44,5 @@
     <string name="find_point_arrow">find_point_arrow</string>
     <string name="stop">Stop</string>
     <string name="elevation_diagram">Magassági profil</string>
+    <string name="ok">OK</string>
 </resources>

@@ -57,7 +57,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private AppBarConfiguration appBarConfiguration;
-    private ActivityMainBinding binding;
+    public ActivityMainBinding binding;
     public LocationManager locationManager;
     public LocationListener locationListener;
     private SensorManager sensorManager;
@@ -177,6 +177,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             navigateToCalcFragment();
         } else if (id == R.id.finding_point_option) {
             navigateToFindPointFragment();
+        }
+        else if( id == R.id.elevation_diagram){
+            new ElevationDiagram(this).popupElevationDiagram();
         }
         return super.onOptionsItemSelected(item);
     }
