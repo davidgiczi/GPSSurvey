@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             navigateToFindPointFragment();
         }
         else if( id == R.id.elevation_diagram){
-            new ElevationDiagram(this).popupElevationDiagram();
+            new ElevationDiagram(this);
         }
         return super.onOptionsItemSelected(item);
     }

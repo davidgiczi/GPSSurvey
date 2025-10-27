@@ -406,6 +406,7 @@ public class CalcFragment extends Fragment {
                             chosenPoint = measPoint;
                         }
                     }
+                    savePointDialog(false);
                     if( MainActivity.CHOSEN_MEAS_POINT_LIST.contains(chosenPoint) ){
                         return;
                     }
@@ -413,7 +414,7 @@ public class CalcFragment extends Fragment {
                     clearDisplayedPointData();
                     displayMeasuredPoint(MainActivity.CHOSEN_MEAS_POINT_LIST);
                     displayCalculatedData(MainActivity.CHOSEN_MEAS_POINT_LIST);
-                    savePointDialog(false);
+                    parent.setSelection(0);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
