@@ -5,12 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import com.david.giczi.gpsurvey.domain.ElevPoint;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
@@ -52,8 +53,8 @@ public class ElevationDiagram {
 
     private boolean setElevationPointList() {
     MeasPoint topoCenter = getTopoCenterPoint();
-     if( MainActivity.MEAS_POINT_LIST.isEmpty() && MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
-         Toast.makeText(mainActivity, "Nincs megjeleníthető pont.", Toast.LENGTH_SHORT).show();
+     if( 2 > MainActivity.CHOSEN_MEAS_POINT_LIST.size() && 2 > MainActivity.MEAS_POINT_LIST.size() ){
+         Toast.makeText(mainActivity, "A megjelenítéshez legalább 2 db pont szükséges.", Toast.LENGTH_SHORT).show();
          return false;
      }
      else if( topoCenter == null ){
@@ -108,26 +109,18 @@ public class ElevationDiagram {
     }
 
     private void drawElevationDiagram(){
-        paint.setColor(Color.GRAY);
+        paint.setColor(ContextCompat.getColor(mainActivity, R.color.steel_gray));
         paint.setStrokeWidth(7);
-        canvas.drawLine(X_CENTER - 20 * MM, Y_CENTER - 50 * MM, X_CENTER - 20 * MM, Y_CENTER + 50 * MM , paint);
-        canvas.drawLine(X_CENTER - 21 * MM, Y_CENTER - 50 * MM, X_CENTER + 19 * MM, Y_CENTER - 50 * MM , paint);
-        displayPoint();
+        canvas.drawLine(X_CENTER - 20 * MM, Y_CENTER - 45 * MM, X_CENTER - 20 * MM, Y_CENTER + 55 * MM , paint);
+
+        canvas.drawLine(X_CENTER - 15 * MM, Y_CENTER - 50 * MM, X_CENTER + 25 * MM, Y_CENTER - 50 * MM , paint);
+        canvas.drawLine(X_CENTER - 15 * MM, Y_CENTER - 50 * MM, X_CENTER - 15 * MM, Y_CENTER - 51 * MM , paint);
+        canvas.drawLine(X_CENTER + 25 * MM, Y_CENTER - 50 * MM, X_CENTER + 25 * MM, Y_CENTER - 51 * MM , paint);
+        canvas.drawLine(X_CENTER + 5 * MM, Y_CENTER - 50 * MM, X_CENTER + 5 * MM, Y_CENTER - 51 * MM , paint);
+
     }
 
-    private void displayPoint(){
-    paint.setColor(Color.LTGRAY);
-    paint.setTextSize(60);
-    paint.setTypeface(Typeface.DEFAULT_BOLD);
-    paint.setStrokeWidth(5);
-    canvas.drawLine( X_CENTER + MM, Y_CENTER - 50 * MM , X_CENTER + MM,  Y_CENTER + 50 * MM , paint);
-    canvas.save();
-    canvas.rotate(90, X_CENTER, Y_CENTER);
-    canvas.drawText(mainActivity.getString(R.string.dot_symbol), X_CENTER, Y_CENTER, paint);
-    paint.setColor(Color.BLACK);
-    canvas.drawText(elevationPointList.get(0).getPointID(), X_CENTER - MM, Y_CENTER - 3 * MM, paint);
-    canvas.restore();
-    }
+
 
 
 }
