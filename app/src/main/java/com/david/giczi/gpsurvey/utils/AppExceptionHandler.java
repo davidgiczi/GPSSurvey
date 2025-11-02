@@ -24,14 +24,14 @@ public class AppExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
-        handleCrash();
+        saveAllMeasPoints();
         System.exit(1);
     }
 
-    private void handleCrash(){
+    public void saveAllMeasPoints(){
         File projectFile =
                 new File(Environment.getExternalStorageDirectory(),
-                        "/Documents/" + "SavedPoints_" + MainActivity.MEAS_POINT_LIST.size() + "_pcs.txt");
+                        "/Documents/" + "SavedPoints.txt");
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
@@ -44,11 +44,11 @@ public class AppExceptionHandler implements Thread.UncaughtExceptionHandler {
             bw.close();
         } catch (IOException e) {
             Toast.makeText(context, projectFile.getName() +
-                    "\nprojekt fájl mentése sikertelen.", Toast.LENGTH_LONG).show();
+                    "\nfájl mentése sikertelen.", Toast.LENGTH_LONG).show();
             return;
         }
         Toast.makeText(context,
-                "Projekt fájl mentve:\n"
+                "Pont adatok fájl mentve:\n"
                         + projectFile.getName() , Toast.LENGTH_LONG).show();
     }
 }

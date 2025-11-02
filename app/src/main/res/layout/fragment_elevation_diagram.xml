@@ -10,8 +10,8 @@
             android:id="@+id/elevation_diagram"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:layout_editor_absoluteX="-28dp"
-            tools:layout_editor_absoluteY="0dp" />
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="-46dp" />
 
         <Button
             android:id="@+id/button_ok"
@@ -24,6 +24,6 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/elevation_diagram"
             app:layout_constraintTop_toTopOf="@+id/elevation_diagram"
-            app:layout_constraintVertical_bias="0.519" />
+            app:layout_constraintVertical_bias="0.535" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

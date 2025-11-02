@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public ActivityMainBinding binding;
     public LocationManager locationManager;
     public LocationListener locationListener;
+    public AppExceptionHandler exceptionHandler;
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private Sensor magnetometerSensor;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private ViewGroup compassContainer;
     public ViewGroup measuredDataContainer;
     public static PopupWindow measuredDataWindow;
+    public static boolean IS_SAVED_POINTS_INTO_FILE = true;
     private static final int REQUEST_LOCATION = 1;
     public static List<MeasPoint> MEAS_POINT_LIST;
     public static List<MeasPoint> CHOSEN_MEAS_POINT_LIST;
@@ -86,7 +88,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new AppExceptionHandler(this));
+        this.exceptionHandler = new AppExceptionHandler(this);
+        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
@@ -167,7 +170,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             angleMinSecFormat = true;
             decimalFormat = false;
             xyzFormat = false;
-        } else if (id == R.id.compass_option) {
+        }else if( id == R.id.save_points ){
+            IS_SAVED_POINTS_INTO_FILE = !IS_SAVED_POINTS_INTO_FILE;
+            if( IS_SAVED_POINTS_INTO_FILE ){
+                item.setTitle(R.string.save_points_with_pipe);
+            } else{
+                item.setTitle(R.string.save_points_without_pipe);
+            }
+        }
+        else if (id == R.id.compass_option) {
             popupCompassWindow();
         }
         else if( id == R.id.input_points_option ){
@@ -403,14 +414,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("Alkalmazás bezárása");
-        builder.setMessage("Biztos, hogy ki akar lépni az alkalmazásból?\n\nA nem mentett adatok elvesznek.");
+        builder.setMessage(MEAS_POINT_LIST.isEmpty() ?
+              "Biztos, hogy kilép az alkalmazásból?"
+            : "Menti a mért pontok adatait?\n\n" +
+              "A nem mentett adatok elvesznek.");
 
         builder.setPositiveButton("Igen", (dialog, which) -> {
+            if( !MEAS_POINT_LIST.isEmpty() ){
+                exceptionHandler.saveAllMeasPoints();
+            }
             dialog.dismiss();
             System.exit(0);
         });
 
-        builder.setNegativeButton("Nem", (dialog, which) -> dialog.dismiss());
+        builder.setNegativeButton("Nem", (dialog, which) -> {
+            dialog.dismiss();
+            if( !MEAS_POINT_LIST.isEmpty() ){
+                System.exit(0);
+            }
+        });
 
         AlertDialog alert = builder.create();
         alert.show();

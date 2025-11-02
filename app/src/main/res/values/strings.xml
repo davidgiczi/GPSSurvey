@@ -11,6 +11,8 @@
     <string name="input_points_option">Pontok beolvasása</string>
     <string name="save_data_option">Adatok fájlba mentése</string>
     <string name="point_catching_option">Pont felkeresése</string>
+    <string name="save_points_with_pipe">Pontok fájlba mentése ✔️</string>
+    <string name="save_points_without_pipe">Pontok fájlba mentése</string>
     <string name="exit_option">Kilépés</string>
     <!-- Strings used for fragments for navigation -->
     <string name="latitude">Φ:</string>

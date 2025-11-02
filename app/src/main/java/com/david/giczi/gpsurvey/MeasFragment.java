@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class MeasFragment extends Fragment {
 
     private FragmentMeasBinding binding;
@@ -99,7 +98,13 @@ public class MeasFragment extends Fragment {
            }
            MainActivity.MEAS_POINT.calculateEOVData();
            MainActivity.MEAS_POINT_LIST.add(MainActivity.MEAS_POINT);
+           if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
+               MainActivity.CHOSEN_MEAS_POINT_LIST.add(MainActivity.MEAS_POINT);
+           }
            displayMeasuredPoint();
+           if( MainActivity.IS_SAVED_POINTS_INTO_FILE ){
+               ((MainActivity) requireActivity()).exceptionHandler.saveAllMeasPoints();
+           }
        });
     }
 
@@ -234,7 +239,7 @@ public class MeasFragment extends Fragment {
             SCALE = 100.0;
         }
         else {
-            SCALE = getTheLongestDistance() / 0.05;
+            SCALE = Math.ceil(getTheLongestDistance() / 0.05);
         }
     }
 
