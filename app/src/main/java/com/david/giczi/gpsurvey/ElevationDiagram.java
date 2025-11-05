@@ -44,8 +44,8 @@ public class ElevationDiagram {
         ElevationDiagram.MM = (float) (mainActivity.getResources().getDisplayMetrics().xdpi / 25.4);
         ElevationDiagram.X_CENTER = mainActivity.getResources().getDisplayMetrics().widthPixels / 2f;
         ElevationDiagram.Y_CENTER = mainActivity.getResources().getDisplayMetrics().heightPixels / 2f;
-        ElevationDiagram.X_ORIGIN = Y_CENTER - 45 * MM;
-        ElevationDiagram.Y_ORIGIN = X_CENTER - 15 * MM;
+        ElevationDiagram.X_ORIGIN = X_CENTER - 15 * MM;
+        ElevationDiagram.Y_ORIGIN = Y_CENTER - 45 * MM;
         this.bitmap = Bitmap.createBitmap(mainActivity.getResources().getDisplayMetrics().widthPixels,
                 mainActivity.getResources().getDisplayMetrics().heightPixels, Bitmap.Config.ARGB_8888);
         this.canvas = new Canvas(bitmap);
@@ -56,44 +56,53 @@ public class ElevationDiagram {
     }
 
     private boolean setElevationPointList() {
-    MeasPoint topoCenter = getTopoCenterPoint();
+
      if( 2 > MainActivity.CHOSEN_MEAS_POINT_LIST.size() && 2 > MainActivity.MEAS_POINT_LIST.size() ){
          Toast.makeText(mainActivity, "A megjelenítéshez legalább 2 db pont szükséges.", Toast.LENGTH_SHORT).show();
          return false;
      }
-     else if( topoCenter == null ){
-         Toast.makeText(mainActivity, "Topocentrum pont megadása szükséges.", Toast.LENGTH_SHORT).show();
-         return false;
-     }
      this.elevationPointList = new ArrayList<>();
+     double distance = 0d;
      if( !MainActivity.CHOSEN_MEAS_POINT_LIST.isEmpty() ){
-         for (MeasPoint chosenMeasPoint : MainActivity.CHOSEN_MEAS_POINT_LIST) {
-             elevationPointList.add( new ElevPoint(chosenMeasPoint.getPointID(),
-                     calcDistance(topoCenter, chosenMeasPoint),
-                     topoCenter.getZ_EOV() > 0 ? topoCenter.getZ_EOV() : 0) );
+         elevationPointList.add(new ElevPoint(MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getPointID(),
+                 distance,
+                 MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getZ_EOV() > 0 ?
+                 MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getZ_EOV() : 0));
+         for (int i = 0; i < MainActivity.CHOSEN_MEAS_POINT_LIST.size() - 1; i++) {
+             distance = MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getEAST() -
+                        MainActivity.CHOSEN_MEAS_POINT_LIST.get(i).getEAST() >= 0 ?
+                        distance + calcDistance(MainActivity.CHOSEN_MEAS_POINT_LIST.get(i),
+                                    MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1)) :
+                        distance - calcDistance(MainActivity.CHOSEN_MEAS_POINT_LIST.get(i),
+                             MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1));
+             elevationPointList.add(
+                     new ElevPoint(MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getPointID(),
+                             distance,
+                        MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getZ_EOV() > 0 ?
+                        MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getZ_EOV() : 0));
          }
      }
      else {
-         for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-             elevationPointList.add( new ElevPoint(measPoint.getPointID(),
-                     calcDistance(topoCenter, measPoint),
-                     topoCenter.getZ_EOV() > 0 ? topoCenter.getZ_EOV() : 0) );
+         elevationPointList.add(new ElevPoint(MainActivity.MEAS_POINT_LIST.get(0).getPointID(),
+                 distance,
+                 MainActivity.MEAS_POINT_LIST.get(0).getZ_EOV() > 0 ?
+                         MainActivity.MEAS_POINT_LIST.get(0).getZ_EOV() : 0));
+         for (int i = 0; i < MainActivity.MEAS_POINT_LIST.size() - 1; i++) {
+             distance = MainActivity.MEAS_POINT_LIST.get(i + 1).getEAST() -
+                     MainActivity.MEAS_POINT_LIST.get(i).getEAST() >= 0 ?
+                     distance + calcDistance(MainActivity.MEAS_POINT_LIST.get(i),
+                             MainActivity.MEAS_POINT_LIST.get(i + 1)) :
+                     distance - calcDistance(MainActivity.MEAS_POINT_LIST.get(i),
+                             MainActivity.MEAS_POINT_LIST.get(i + 1));
+             elevationPointList.add(
+                     new ElevPoint(MainActivity.MEAS_POINT_LIST.get(i + 1).getPointID(),
+                             distance,
+                             MainActivity.MEAS_POINT_LIST.get(i + 1).getZ_EOV() > 0 ?
+                                     MainActivity.MEAS_POINT_LIST.get(i + 1).getZ_EOV() : 0));
+         }
      }
-        }
-
         Collections.sort(elevationPointList);
-
      return true;
-    }
-
-    private MeasPoint getTopoCenterPoint(){
-        MeasPoint topoCenter = null;
-        for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-            if( measPoint.isTopoCenter() ){
-                topoCenter = measPoint;
-            }
-        }
-        return  topoCenter;
     }
 
     private double calcDistance(MeasPoint startPoint, MeasPoint endPoint){
@@ -115,19 +124,14 @@ public class ElevationDiagram {
     private void drawElevationDiagramSystem(){
         paint.setColor(ContextCompat.getColor(mainActivity, R.color.steel_gray));
         paint.setStrokeWidth(5);
-        canvas.drawLine(X_CENTER - 20 * MM, Y_CENTER - 45 * MM, X_CENTER - 20 * MM, Y_CENTER + 55 * MM , paint);
-        canvas.drawLine(X_CENTER - 20 * MM, Y_CENTER - 45 * MM, X_CENTER - 19 * MM, Y_CENTER - 45 * MM , paint);
-        canvas.drawLine(X_CENTER - 20 * MM, Y_CENTER  + 5 * MM, X_CENTER - 19 * MM, Y_CENTER + 5 * MM , paint);
-        canvas.drawLine(X_CENTER - 20 * MM, Y_CENTER + 55 * MM, X_CENTER - 19 * MM, Y_CENTER + 55 * MM , paint);
-
-        canvas.drawLine(X_CENTER - 15 * MM, Y_CENTER - 50 * MM, X_CENTER + 25 * MM, Y_CENTER - 50 * MM , paint);
-        canvas.drawLine(X_CENTER - 15 * MM, Y_CENTER - 50 * MM, X_CENTER - 15 * MM, Y_CENTER - 51 * MM , paint);
-        canvas.drawLine(X_CENTER + 25 * MM, Y_CENTER - 50 * MM, X_CENTER + 25 * MM, Y_CENTER - 51 * MM , paint);
-        canvas.drawLine(X_CENTER + 5 * MM, Y_CENTER - 50 * MM, X_CENTER + 5 * MM, Y_CENTER - 51 * MM , paint);
-
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN, X_ORIGIN - 5 * MM, Y_ORIGIN + 100 * MM , paint);
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN + 0.1f * MM, X_ORIGIN - 4 * MM, Y_ORIGIN + 0.1f * MM , paint);
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN  + 50 * MM, X_ORIGIN - 4.5f * MM, Y_ORIGIN + 50 * MM , paint);
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN + 99.9f * MM, X_ORIGIN - 4 * MM, Y_ORIGIN + 99.9f * MM , paint);
+        canvas.drawLine(X_ORIGIN, Y_ORIGIN - 5 * MM, X_ORIGIN + 40 * MM, Y_ORIGIN - 5 * MM , paint);
+        canvas.drawLine(X_ORIGIN + 0.1f * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 0.1f * MM, Y_ORIGIN - 6 * MM , paint);
+        canvas.drawLine(X_ORIGIN + 20 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 20 * MM, Y_ORIGIN - 5.5f * MM , paint);
+        canvas.drawLine(X_ORIGIN + 39.9f * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 39.9f * MM, Y_ORIGIN - 6 * MM , paint);
     }
-
-
-
 
 }

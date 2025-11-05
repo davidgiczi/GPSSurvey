@@ -239,7 +239,7 @@ public class MeasFragment extends Fragment {
             SCALE = 100.0;
         }
         else {
-            SCALE = Math.ceil(getTheLongestDistance() / 0.05);
+            SCALE =  10 * Math.ceil(10 * getTheLongestDistance() / 5);
         }
     }
 
