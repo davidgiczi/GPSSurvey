@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -118,20 +119,80 @@ public class ElevationDiagram {
         elevationDiagramWindow.showAtLocation(mainActivity.binding.getRoot(), Gravity.CENTER, 0, 0);
         ((ImageView)  container.findViewById(R.id.elevation_diagram)).setImageBitmap(bitmap);
         drawElevationDiagramSystem();
+        displayPoints();
         container.findViewById(R.id.button_ok).setOnClickListener(b -> elevationDiagramWindow.dismiss());
     }
 
     private void drawElevationDiagramSystem(){
         paint.setColor(ContextCompat.getColor(mainActivity, R.color.steel_gray));
         paint.setStrokeWidth(5);
+        paint.setAntiAlias(true);
         canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN, X_ORIGIN - 5 * MM, Y_ORIGIN + 100 * MM , paint);
         canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN + 0.1f * MM, X_ORIGIN - 4 * MM, Y_ORIGIN + 0.1f * MM , paint);
-        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN  + 50 * MM, X_ORIGIN - 4.5f * MM, Y_ORIGIN + 50 * MM , paint);
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN  + 25 * MM, X_ORIGIN - 4.5f * MM, Y_ORIGIN + 25 * MM , paint);
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN  + 50 * MM, X_ORIGIN - 4 * MM, Y_ORIGIN + 50 * MM , paint);
+        canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN  + 75 * MM, X_ORIGIN - 4.5f * MM, Y_ORIGIN + 75 * MM , paint);
         canvas.drawLine(X_ORIGIN - 5 * MM, Y_ORIGIN + 99.9f * MM, X_ORIGIN - 4 * MM, Y_ORIGIN + 99.9f * MM , paint);
         canvas.drawLine(X_ORIGIN, Y_ORIGIN - 5 * MM, X_ORIGIN + 40 * MM, Y_ORIGIN - 5 * MM , paint);
         canvas.drawLine(X_ORIGIN + 0.1f * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 0.1f * MM, Y_ORIGIN - 6 * MM , paint);
-        canvas.drawLine(X_ORIGIN + 20 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 20 * MM, Y_ORIGIN - 5.5f * MM , paint);
+        canvas.drawLine(X_ORIGIN + 10 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 10 * MM, Y_ORIGIN - 5.5f * MM , paint);
+        canvas.drawLine(X_ORIGIN + 20 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 20 * MM, Y_ORIGIN - 6 * MM , paint);
+        canvas.drawLine(X_ORIGIN + 30 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 30 * MM, Y_ORIGIN - 5.5f * MM , paint);
         canvas.drawLine(X_ORIGIN + 39.9f * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 39.9f * MM, Y_ORIGIN - 6 * MM , paint);
+    }
+
+    private void displayPoints(){
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(50f);
+        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        transformationPointDataForScreen();
+        for (ElevPoint elevPoint : elevationPointList) {
+            canvas.save();
+            canvas.rotate(90, elevPoint.getX_onScreen(), elevPoint.getY_onScreen());
+            if( elevationPointList.indexOf(elevPoint) == 0 ) {
+                canvas.drawText(mainActivity.getString(R.string.dot_symbol), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
+                canvas.drawText(elevPoint.getPointID(), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
+            }
+            canvas.restore();
+
+        }
+    }
+
+    private void transformationPointDataForScreen(){
+        setHorizontalScaleValue();
+        setVerticalScaleValue();
+        for (ElevPoint elevPoint : elevationPointList) {
+            if( elevationPointList.indexOf(elevPoint) == 0 ){
+                elevPoint.setY_onScreen(Y_ORIGIN);
+            }
+            else{
+            //elevPoint.setX_onScreen((float) (X_ORIGIN + ((elevPoint.getDistance() - elevationPointList.get(0).getDistance()) / HR_SCALE) * 1000 * MM));
+            }
+
+            elevPoint.setX_onScreen(X_ORIGIN);
+        }
+    }
+
+
+    private void setHorizontalScaleValue(){
+        this.HR_SCALE = 10 * (int)  Math.ceil( getHorizontalAxisDistance() );
+    }
+
+    private double getHorizontalAxisDistance(){
+        return Math.abs(elevationPointList.get(0).getDistance()) +
+                Math.abs(elevationPointList.get(elevationPointList.size() - 1).getDistance());
+    }
+
+    private void setVerticalScaleValue(){
+    this.VR_SCALE = (int) Math.ceil((getTheTopElevationValue() - getTheStartElevationValue()) / 0.04);
+    }
+
+    private int getTheStartElevationValue() {
+        return (int) Math.floor(elevationPointList.stream().mapToDouble(ElevPoint::getElevation).min().orElse(0.0));
+    }
+
+    private int getTheTopElevationValue(){
+            return (int) Math.ceil(elevationPointList.stream().mapToDouble(ElevPoint::getElevation).max().orElse(0.0));
     }
 
 }
