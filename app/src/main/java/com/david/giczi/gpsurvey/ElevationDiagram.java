@@ -149,12 +149,9 @@ public class ElevationDiagram {
         for (ElevPoint elevPoint : elevationPointList) {
             canvas.save();
             canvas.rotate(90, elevPoint.getX_onScreen(), elevPoint.getY_onScreen());
-            if( elevationPointList.indexOf(elevPoint) == 0 ) {
-                canvas.drawText(mainActivity.getString(R.string.dot_symbol), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
-                canvas.drawText(elevPoint.getPointID(), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
-            }
+            canvas.drawText(mainActivity.getString(R.string.dot_symbol), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
+            canvas.drawText(elevPoint.getPointID(), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
             canvas.restore();
-
         }
     }
 
@@ -162,17 +159,12 @@ public class ElevationDiagram {
         setHorizontalScaleValue();
         setVerticalScaleValue();
         for (ElevPoint elevPoint : elevationPointList) {
-            if( elevationPointList.indexOf(elevPoint) == 0 ){
-                elevPoint.setY_onScreen(Y_ORIGIN);
-            }
-            else{
-            //elevPoint.setX_onScreen((float) (X_ORIGIN + ((elevPoint.getDistance() - elevationPointList.get(0).getDistance()) / HR_SCALE) * 1000 * MM));
-            }
-
-            elevPoint.setX_onScreen(X_ORIGIN);
+            elevPoint.setX_onScreen((float) (X_ORIGIN +
+                    ((elevPoint.getElevation() - getTheStartElevationValue()) / VR_SCALE) * 1000 * MM));
+          elevPoint.setY_onScreen((float) (Y_ORIGIN +
+                  ((elevPoint.getDistance() - elevationPointList.get(0).getDistance()) / HR_SCALE) * 1000 * MM));
         }
     }
-
 
     private void setHorizontalScaleValue(){
         this.HR_SCALE = 10 * (int)  Math.ceil( getHorizontalAxisDistance() );

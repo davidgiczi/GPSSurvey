@@ -47,4 +47,5 @@
     <string name="stop">Stop</string>
     <string name="elevation_diagram">Magassági profil</string>
     <string name="ok">OK</string>
+    <string name="todo">TODO</string>
 </resources>

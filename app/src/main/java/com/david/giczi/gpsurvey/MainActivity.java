@@ -382,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         builder.setPositiveButton("Igen", (dialog, which) -> {
            MEAS_POINT_LIST.clear();
+           CHOSEN_MEAS_POINT_LIST.clear();
            TopoCentricPoint.initTopoCenter(0d, 0d, 0d, true);
            openInputPointDataFile();
         });
