@@ -58,7 +58,7 @@ public class ElevationDiagram {
 
     private boolean setElevationPointList() {
 
-     if( 2 > MainActivity.CHOSEN_MEAS_POINT_LIST.size() && 2 > MainActivity.MEAS_POINT_LIST.size() ){
+     if(2 > MainActivity.MEAS_POINT_LIST.size() || MainActivity.CHOSEN_MEAS_POINT_LIST.size() == 1){
          Toast.makeText(mainActivity, "A megjelenítéshez legalább 2 db pont szükséges.", Toast.LENGTH_SHORT).show();
          return false;
      }
@@ -119,6 +119,8 @@ public class ElevationDiagram {
         elevationDiagramWindow.showAtLocation(mainActivity.binding.getRoot(), Gravity.CENTER, 0, 0);
         ((ImageView)  container.findViewById(R.id.elevation_diagram)).setImageBitmap(bitmap);
         drawElevationDiagramSystem();
+        transformationPointDataForScreen();
+        drawSlopeDistance();
         displayPoints();
         container.findViewById(R.id.button_ok).setOnClickListener(b -> elevationDiagramWindow.dismiss());
     }
@@ -145,13 +147,22 @@ public class ElevationDiagram {
         paint.setColor(Color.BLACK);
         paint.setTextSize(50f);
         paint.setTypeface(Typeface.DEFAULT_BOLD);
-        transformationPointDataForScreen();
         for (ElevPoint elevPoint : elevationPointList) {
             canvas.save();
             canvas.rotate(90, elevPoint.getX_onScreen(), elevPoint.getY_onScreen());
             canvas.drawText(mainActivity.getString(R.string.dot_symbol), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
-            canvas.drawText(elevPoint.getPointID(), elevPoint.getX_onScreen(), elevPoint.getY_onScreen(), paint);
+            canvas.drawText(elevPoint.getPointID(), elevPoint.getX_onScreen() -  MM, elevPoint.getY_onScreen() - 2 * MM, paint);
             canvas.restore();
+        }
+    }
+
+    private void drawSlopeDistance(){
+        paint.setColor(ContextCompat.getColor(mainActivity, R.color.blue));
+        paint.setStrokeWidth(8);
+        paint.setAntiAlias(true);
+        for (int i = 0; i < elevationPointList.size() - 1; i++) {
+            canvas.drawLine(elevationPointList.get(i).getX_onScreen(), elevationPointList.get(i).getY_onScreen(),
+                    elevationPointList.get(i + 1).getX_onScreen(), elevationPointList.get(i + 1).getY_onScreen(), paint);
         }
     }
 
