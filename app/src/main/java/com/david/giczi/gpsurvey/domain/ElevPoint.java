@@ -2,9 +2,7 @@ package com.david.giczi.gpsurvey.domain;
 
 import androidx.annotation.NonNull;
 
-import java.util.Locale;
-
-public class ElevPoint implements Comparable<ElevPoint> {
+public class ElevPoint {
 
     private final String pointID;
     private final double distance;
@@ -26,10 +24,6 @@ public class ElevPoint implements Comparable<ElevPoint> {
         return distance;
     }
 
-    public String getElevationAsString() {
-        return String.format(Locale.getDefault(),"%.2fm", elevation).replace(",", ".");
-    }
-
     public double getElevation() {
         return elevation;
     }
@@ -48,11 +42,6 @@ public class ElevPoint implements Comparable<ElevPoint> {
 
     public void setY_onScreen(float y_onScreen) {
         Y_onScreen = y_onScreen;
-    }
-
-    @Override
-    public int compareTo(ElevPoint o) {
-        return Double.compare(this.distance, o.distance);
     }
 
     @NonNull
