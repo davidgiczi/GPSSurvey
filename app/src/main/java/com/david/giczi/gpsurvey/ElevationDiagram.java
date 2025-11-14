@@ -16,7 +16,9 @@ import com.david.giczi.gpsurvey.domain.ElevPoint;
 import com.david.giczi.gpsurvey.domain.MeasPoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class ElevationDiagram {
 
@@ -103,6 +105,7 @@ public class ElevationDiagram {
         elevationDiagramWindow.showAtLocation(mainActivity.binding.getRoot(), Gravity.CENTER, 0, 0);
         ((ImageView)  container.findViewById(R.id.elevation_diagram)).setImageBitmap(bitmap);
         drawElevationDiagramSystem();
+        drawElevationDiagramMetaData();
         transformationPointDataForScreen();
         drawSlopeDistance();
         displayPoints();
@@ -126,6 +129,35 @@ public class ElevationDiagram {
         canvas.drawLine(X_ORIGIN + 20 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 20 * MM, Y_ORIGIN - 6 * MM , paint);
         canvas.drawLine(X_ORIGIN + 30 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 30 * MM, Y_ORIGIN - 5.5f * MM , paint);
         canvas.drawLine(X_ORIGIN + 40 * MM, Y_ORIGIN - 5 * MM, X_ORIGIN + 40 * MM, Y_ORIGIN - 6 * MM , paint);
+    }
+
+    private void drawElevationDiagramMetaData(){
+        List<String> elevationData = getElevationData();
+        paint.setColor(Color.DKGRAY);
+        paint.setTextSize(40f);
+        int SHIFT = 0;
+        for (String elevation : elevationData) {
+            canvas.save();
+            canvas.rotate(90, X_ORIGIN + SHIFT * MM, Y_ORIGIN - 13 * MM);
+            canvas.drawText(elevation, X_ORIGIN + SHIFT * MM, Y_ORIGIN - 13 * MM, paint);
+            canvas.restore();
+            SHIFT += 10;
+        }
+        List<String> distanceData = getDistanceData();
+        SHIFT = 0;
+        for (String distance : distanceData) {
+            canvas.save();
+            canvas.rotate(90, X_ORIGIN - 3 * MM, Y_ORIGIN + SHIFT * MM);
+            canvas.drawText(distance, X_ORIGIN - 3 * MM, Y_ORIGIN + SHIFT * MM, paint);
+            canvas.restore();
+            SHIFT += 25;
+        }
+        paint.setTextSize(50f);
+        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        canvas.save();
+        canvas.rotate(90, X_ORIGIN - 12 * MM, Y_ORIGIN + 80 * MM);
+        canvas.drawText(getHorizontalScaleValue(), X_ORIGIN - 12 * MM, Y_ORIGIN + 80 * MM, paint);
+        canvas.restore();
     }
 
     private void displayPoints(){
@@ -177,6 +209,34 @@ public class ElevationDiagram {
 
     private int getTheTopElevationValue(){
             return (int) Math.ceil(elevationPointList.stream().mapToDouble(ElevPoint::getElevation).max().orElse(0.0));
+    }
+
+    private List<String> getElevationData(){
+        int elevationRange = getTheTopElevationValue() - getTheStartElevationValue();
+        return Arrays.asList(String.format(Locale.getDefault(),"%dm", getTheStartElevationValue()),
+                            String.format(Locale.getDefault(), "%dm",
+                                    getTheStartElevationValue() + elevationRange / 4),
+                            String.format(Locale.getDefault(), "%dm",
+                                    getTheStartElevationValue() + elevationRange / 2),
+                            String.format(Locale.getDefault(), "%dm",
+                                    getTheStartElevationValue() + 3 * elevationRange / 4),
+                            String.format(Locale.getDefault(),"%dm", getTheTopElevationValue()));
+    }
+
+    private List<String> getDistanceData(){
+        boolean isKm = elevationPointList.get(elevationPointList.size() - 1).getDistance() >= 1000;
+        double distance = isKm ?
+                elevationPointList.get(elevationPointList.size() - 1).getDistance() / 1000.0 :
+                elevationPointList.get(elevationPointList.size() - 1).getDistance();
+        return Arrays.asList("0", String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance / 4),
+                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance / 2),
+                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 3 * distance / 4),
+                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance));
+    }
+
+    private String getHorizontalScaleValue(){
+        return  "1cm = " +  String.format(Locale.getDefault(),
+                "%.0fm", elevationPointList.get(elevationPointList.size() - 1).getDistance() / 10.0);
     }
 
 }
