@@ -215,7 +215,7 @@ public class ElevationDiagram {
     }
 
     private List<String> getElevationData(){
-        int elevationRange = (int) Math.ceil((getTheTopElevationValue() - getTheStartElevationValue()) / 4d);
+        int elevationRange = (int) Math.ceil((getTheTopElevationValue() - getTheStartElevationValue()) / 4.0);
         return Arrays.asList(String.format(Locale.getDefault(),"%dm", getTheStartElevationValue()),
                             String.format(Locale.getDefault(), "%dm",
                                     getTheStartElevationValue() + elevationRange),
@@ -228,14 +228,11 @@ public class ElevationDiagram {
     }
 
     private List<String> getDistanceData(){
-        boolean isKm = elevationPointList.get(elevationPointList.size() - 1).getDistance() >= 1000;
-        double distance = isKm ?
-                 Math.ceil(10 * (elevationPointList.get(elevationPointList.size() - 1).getDistance() / 4000.0)) / 10.0  :
-                 Math.ceil(10 * (elevationPointList.get(elevationPointList.size() - 1).getDistance() / 4.0)) / 10.0;
-        return Arrays.asList("0", String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance),
-                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 2 * distance),
-                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 3 * distance),
-                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 4 * distance));
+        int distance = (int)  Math.ceil(elevationPointList.get(elevationPointList.size() - 1).getDistance() / 4.0);
+        return Arrays.asList("0", String.format(Locale.getDefault(),"%dm", distance),
+                                  String.format(Locale.getDefault(),"%dm",2 * distance),
+                                  String.format(Locale.getDefault(),"%dm",3 * distance),
+                                  String.format(Locale.getDefault(),"%dm",4 * distance));
     }
 
     private String getHorizontalScaleValue(){
