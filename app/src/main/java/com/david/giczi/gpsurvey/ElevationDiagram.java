@@ -67,26 +67,29 @@ public class ElevationDiagram {
          elevationPointList.add(new ElevPoint(MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getPointID(),
                  distance,
                  MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getZ_EOV() > 0 ?
-                 MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getZ_EOV() : 0));
+                 MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getZ_EOV() :
+                 MainActivity.CHOSEN_MEAS_POINT_LIST.get(0).getUP()));
          for (int i = 0; i < MainActivity.CHOSEN_MEAS_POINT_LIST.size() - 1; i++) {
              distance += calcDistance(MainActivity.CHOSEN_MEAS_POINT_LIST.get(i), MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1));
              elevationPointList.add(
                      new ElevPoint(MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getPointID(), distance,
                         MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getZ_EOV() > 0 ?
-                        MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getZ_EOV() : 0));
+                        MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getZ_EOV() :
+                        MainActivity.CHOSEN_MEAS_POINT_LIST.get(i + 1).getUP()));
          }
      }
      else {
          elevationPointList.add(new ElevPoint(MainActivity.MEAS_POINT_LIST.get(0).getPointID(),
                  distance,
                  MainActivity.MEAS_POINT_LIST.get(0).getZ_EOV() > 0 ?
-                         MainActivity.MEAS_POINT_LIST.get(0).getZ_EOV() : 0));
+                         MainActivity.MEAS_POINT_LIST.get(0).getZ_EOV() : MainActivity.MEAS_POINT_LIST.get(0).getUP()));
          for (int i = 0; i < MainActivity.MEAS_POINT_LIST.size() - 1; i++) {
              distance += calcDistance(MainActivity.MEAS_POINT_LIST.get(i), MainActivity.MEAS_POINT_LIST.get(i + 1));
              elevationPointList.add(
                      new ElevPoint(MainActivity.MEAS_POINT_LIST.get(i + 1).getPointID(), distance,
                              MainActivity.MEAS_POINT_LIST.get(i + 1).getZ_EOV() > 0 ?
-                                     MainActivity.MEAS_POINT_LIST.get(i + 1).getZ_EOV() : 0));
+                                     MainActivity.MEAS_POINT_LIST.get(i + 1).getZ_EOV() :
+                                     MainActivity.MEAS_POINT_LIST.get(i + 1).getUP()));
          }
      }
      return true;
@@ -212,26 +215,27 @@ public class ElevationDiagram {
     }
 
     private List<String> getElevationData(){
-        int elevationRange = getTheTopElevationValue() - getTheStartElevationValue();
+        int elevationRange = (int) Math.ceil((getTheTopElevationValue() - getTheStartElevationValue()) / 4d);
         return Arrays.asList(String.format(Locale.getDefault(),"%dm", getTheStartElevationValue()),
                             String.format(Locale.getDefault(), "%dm",
-                                    getTheStartElevationValue() + elevationRange / 4),
+                                    getTheStartElevationValue() + elevationRange),
                             String.format(Locale.getDefault(), "%dm",
-                                    getTheStartElevationValue() + elevationRange / 2),
+                                    getTheStartElevationValue() + 2 * elevationRange),
                             String.format(Locale.getDefault(), "%dm",
-                                    getTheStartElevationValue() + 3 * elevationRange / 4),
-                            String.format(Locale.getDefault(),"%dm", getTheTopElevationValue()));
+                                    getTheStartElevationValue() + 3 * elevationRange),
+                            String.format(Locale.getDefault(),"%dm",
+                                    getTheStartElevationValue() + 4 * elevationRange));
     }
 
     private List<String> getDistanceData(){
         boolean isKm = elevationPointList.get(elevationPointList.size() - 1).getDistance() >= 1000;
         double distance = isKm ?
-                elevationPointList.get(elevationPointList.size() - 1).getDistance() / 1000.0 :
-                elevationPointList.get(elevationPointList.size() - 1).getDistance();
-        return Arrays.asList("0", String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance / 4),
-                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance / 2),
-                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 3 * distance / 4),
-                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance));
+                 Math.ceil(10 * (elevationPointList.get(elevationPointList.size() - 1).getDistance() / 4000.0)) / 10.0  :
+                 Math.ceil(10 * (elevationPointList.get(elevationPointList.size() - 1).getDistance() / 4.0)) / 10.0;
+        return Arrays.asList("0", String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), distance),
+                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 2 * distance),
+                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 3 * distance),
+                                  String.format(Locale.getDefault(),"%.1f" + (isKm ? "km" : "m"), 4 * distance));
     }
 
     private String getHorizontalScaleValue(){
