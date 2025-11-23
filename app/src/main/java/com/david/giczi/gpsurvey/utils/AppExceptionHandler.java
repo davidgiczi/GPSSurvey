@@ -2,6 +2,7 @@ package com.david.giczi.gpsurvey.utils;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,8 +25,22 @@ public class AppExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
-        saveAllMeasPoints();
+        saveCrashReport(e);
         System.exit(1);
+    }
+
+
+    private void saveCrashReport(Throwable e) {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory(),
+                    "/Documents/" + "GPSurvey_crash_log.txt");
+            FileWriter writer = new FileWriter(file, true);
+            writer.write("\n\n=== Crash ===\n");
+            writer.write(Log.getStackTraceString(e));
+            writer.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void saveAllMeasPoints(){
