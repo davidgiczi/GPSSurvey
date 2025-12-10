@@ -95,12 +95,14 @@ public class FindPointFragment extends Fragment {
     }
 
     private boolean validateInputPointData(){
-        if( binding.findPoint1stCoordinate.getText().toString().isEmpty() ){
-            Toast.makeText(requireContext(), "Nincs megadva az első koordináta érték.", Toast.LENGTH_SHORT).show();
+        String findPoint1stCoordinate = binding.findPoint1stCoordinate.getText().toString();
+        String findPoint2ndCoordinate = binding.findPoint2ndCoordinate.getText().toString();
+        if( findPoint1stCoordinate.isEmpty() || MainActivity.isInvalidInputChars(findPoint1stCoordinate) ){
+            Toast.makeText(requireContext(), "Hibás az első koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        else if( binding.findPoint2ndCoordinate.getText().toString().isEmpty() ){
-            Toast.makeText(requireContext(), "Nincs megadva a második koordináta érték.", Toast.LENGTH_SHORT).show();
+        else if( findPoint2ndCoordinate.isEmpty() || MainActivity.isInvalidInputChars(findPoint2ndCoordinate) ){
+            Toast.makeText(requireContext(), "Hibás a második koordináta érték.", Toast.LENGTH_SHORT).show();
             return false;
         }
         String[] input1stData = binding.findPoint1stCoordinate.getText()

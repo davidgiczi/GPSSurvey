@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private boolean angleMinSecFormat;
     private boolean xyzFormat;
     private ActivityResultLauncher<Intent> activityResultLauncher;
+    private static final List<String> INVALID_INPUT_CHARS = Arrays.asList(" ", ".", ",", "-", ".-", "-.", ",-", "-," );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         }
                     }
                 });
+    }
+    public static boolean isInvalidInputChars(String inputData){
+        if( inputData.length() == 1 && INVALID_INPUT_CHARS.contains(inputData) ){
+            return true;
+        }
+        else return inputData.length() == 2 && INVALID_INPUT_CHARS.contains(inputData);
     }
 
     @SuppressLint("InflateParams")
