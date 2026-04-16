@@ -20,7 +20,6 @@ import com.david.giczi.gpsurvey.domain.MeasPoint;
 import com.david.giczi.gpsurvey.utils.AzimuthAndDistance;
 import com.david.giczi.gpsurvey.utils.WGS84;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -231,7 +230,7 @@ public class FindPointFragment extends Fragment {
         return chosenPoint;
     }
 
-    private void getFindPointDistancesBetweenTopoCenterAndFindPoints(){
+    /*private void getFindPointDistancesBetweenTopoCenterAndFindPoints(){
 
         if( binding.betweenFindAndTopoPointLineCheckbox.isChecked() && isShowingData ){
 
@@ -264,7 +263,7 @@ public class FindPointFragment extends Fragment {
             Toast.makeText(getContext(), "Vonalig: " + ordinate + "m Vonalban: " + abscissa + "m", Toast.LENGTH_SHORT).show();
         }
 
-    }
+    }*/
 
     private MeasPoint getTopoCentricPoint(){
 
@@ -286,7 +285,7 @@ public class FindPointFragment extends Fragment {
             if( MainActivity.STANDING_POINT == null || findPoint == null){
                 return;
             }
-            getFindPointDistancesBetweenTopoCenterAndFindPoints();
+            //getFindPointDistancesBetweenTopoCenterAndFindPoints();
             isShowingData = !isShowingData;
             AzimuthAndDistance findPointAzimuth = new AzimuthAndDistance(MainActivity.STANDING_POINT, findPoint);
             double direction = Math.toDegrees(findPointAzimuth.calcAzimuth()) - MainActivity.AZIMUTH;

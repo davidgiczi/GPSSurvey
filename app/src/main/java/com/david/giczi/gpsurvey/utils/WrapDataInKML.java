@@ -20,6 +20,11 @@ public class WrapDataInKML extends Fragment {
     private List<String> kmlDataList;
 
     public WrapDataInKML(List<MeasPoint> measPointList, String dataType, String fileName) {
+        int pointId = 1;
+        for (MeasPoint measPoint : measPointList) {
+            measPoint.setPointID(String.valueOf(pointId));
+            pointId++;
+        }
         this.measPointList = measPointList;
         this.dataType = dataType;
         this.fileName = fileName;

@@ -50,11 +50,11 @@ public class AppExceptionHandler implements Thread.UncaughtExceptionHandler {
         try {
             BufferedWriter bw = new BufferedWriter(
                     new FileWriter(projectFile));
+            int pointId = 1;
             for (MeasPoint measPoint : MainActivity.MEAS_POINT_LIST) {
-                bw.write((measPoint.getPointID().endsWith("_kit") ?
-                        measPoint.getPointID().substring(0, measPoint.getPointID().indexOf("_")) : measPoint.getPointID())
-                        + ";" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedBySemiColon());
+                bw.write(pointId + ";" + measPoint.getWGSMeasPointDataInDecimalFormatSeparatedBySemiColon());
                 bw.newLine();
+                pointId++;
             }
             bw.close();
         } catch (IOException e) {
